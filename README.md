@@ -38,6 +38,10 @@ Only common readings are asked for. A reading counts as common when it appears i
 
 **Unlocking.** An item unlocks the kanji and words built on it once every one of its cards has reached 3 days of FSRS stability. In practice that means after the lesson, the 4-hour review and the review two days later.
 
+**Already know it?** Any item can go straight into reviews at a level you choose (learning, fresh, settling, solid or mastered), skipping its lesson. Do it from the item's page, or press **Select…** in Browse to pick many tiles at once (e.g. "Select all shown" on a level). The radicals and kanji an item is built from can be included. Each card gets matching FSRS stability. Its first review is spread over that interval, so marking hundreds of items doesn't make them all due on one day, and marked items don't count toward the day's new items. "Not studied" sends items back to lessons.
+
+**Your own meanings.** Add extra accepted meanings on a lesson card, after answering in a quiz ("Add a meaning"), or on an item's page.
+
 **Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule.
 
 **Pace.** Lessons come in batches (5 by default) up to a daily maximum (15 by default). With adaptive pacing on, the daily number shrinks when your 7-day accuracy falls below 90% (to zero at 70%) or when more than 150 reviews are waiting. **Learn more anyway** on the Today page always allows another batch.

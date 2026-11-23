@@ -1,9 +1,10 @@
 // One item's page: its info card, your progress on each question, and your own meanings.
 
 import { item, cardTypes, TYPE_LABEL } from '../data.js';
-import { itemHistory, getSynonyms, addSynonym, removeSynonym, resetItem, isIntroduced, isUnlocked, isPassed, recall } from '../state.js';
+import { itemHistory, resetItem, isIntroduced, isUnlocked, isPassed, recall } from '../state.js';
 import { retrievability, formatInterval } from '../srs.js';
-import { infoCardHtml } from './info.js';
+import { infoCardHtml, synonymEditorHtml, wireSynonymEditors, levelPickerHtml, wireLevelPicker } from './info.js';
+import { LEVELS, unstudiedParts } from '../state.js';
 import { esc, confirmDialog, toast } from '../ui.js';
 import { wireSpeech } from '../speech.js';
 
@@ -29,22 +30,21 @@ export function renderItem(root, id, rerender) {
       <p class="hint">“Memory” is how long until recall would drop to 90% without review (FSRS stability). Overall recall right now: ${Math.round(recall(it) * 100)}%.</p>`
       : locked ? `<p>Locked. It unlocks once you know ${waiting.map((p) => `<a href="#item/${encodeURIComponent(p.id)}" lang="ja">${esc(p.ch || p.w)}</a>`).join(', ')} well enough.</p>`
         : '<p>Not studied yet. It’s in your lesson queue.</p>'}
+      <h3>Already know it?</h3>
+      <p class="hint">Put it straight into reviews at the level you think it’s at, skipping the lesson. Its parts can come along too.</p>
+      ${levelPickerHtml({ partsCount: unstudiedParts(it).length })}
       <h3>Your meanings</h3>
       <p class="hint">Extra English answers you want accepted for this ${it.kind === 'r' ? 'radical' : it.kind === 'k' ? 'kanji' : 'word'}.</p>
-      <ul class="syn-list">${getSynonyms(it.id).map((s) => `<li>${esc(s)} <button type="button" class="btn tiny quiet" data-rm="${esc(s)}" aria-label="Remove ${esc(s)}">✕</button></li>`).join('')}</ul>
-      <form class="syn-add"><input name="syn" placeholder="Add a meaning" aria-label="Add a meaning"> <button class="btn small">Add</button></form>
+      ${synonymEditorHtml(it)}
       ${hist.length ? `<p><button type="button" class="btn small danger" data-act="reset">Reset this item</button></p>` : ''}
     </section>
   </div>`;
   wireSpeech(root);
-  root.querySelector('.syn-add').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const v = e.target.syn.value.trim();
-    if (!v) return;
-    await addSynonym(it.id, v);
+  wireSynonymEditors(root, () => rerender());
+  wireLevelPicker(root, () => [it], (n, level) => {
+    toast(level === 'none' ? `Reset ${n} item${n === 1 ? '' : 's'}.` : `Set ${n} item${n === 1 ? '' : 's'} to ${LEVELS[level].label.split(' (')[0]}.`);
     rerender();
-  });
-  root.querySelectorAll('[data-rm]').forEach((b) => b.addEventListener('click', async () => { await removeSynonym(it.id, b.dataset.rm); rerender(); }));
+  }, (n) => confirmDialog({ title: 'Reset to not studied?', body: `Review history for ${n} item${n === 1 ? '' : 's'} will be cleared and ${n === 1 ? 'it goes' : 'they go'} back to lessons.`, confirm: 'Reset', danger: true }));
   root.querySelector('[data-act="reset"]')?.addEventListener('click', async () => {
     const ok = await confirmDialog({
       title: 'Reset this item?',

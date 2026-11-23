@@ -292,6 +292,74 @@ async def main():
         await pg.goto(BASE + '#settings')
         await pg.wait_for_selector('.settings-form')
 
+        # --- "Already know it": set a level from the item page, parts included ---
+        await pg.goto(BASE + '#item/k:%E5%83%8D')  # 働
+        await pg.wait_for_selector('.level-picker')
+        learned_before = await pg.evaluate("async () => (await import('./js/state.js')).learnedToday()")
+        await pg.select_option('.level-picker select', 'solid')
+        await pg.click('.level-picker button')
+        await pg.wait_for_selector('.info-stage.st-solid')
+        info = await pg.evaluate("""async () => {
+          const s = await import('./js/state.js'); const d = await import('./js/data.js');
+          const ids = ['k:働', 'r:亻', 'k:動', 'r:力'];
+          return { stages: ids.map((i) => s.stage(d.item(i))), passed: s.isPassed('k:働'),
+                   learned: s.learnedToday(), due: d.cardTypes(d.item('k:働')).map((t) => s.getCard('k:働/' + t).srs.due) };
+        }""")
+        check(all(st == 'solid' for st in info['stages']), f"働 and its parts set to solid: {info['stages']}")
+        check(info['passed'], '働 counts as passed, so what builds on it unlocks')
+        check(info['learned'] == learned_before, "marking items doesn't use up the day's new items")
+        days = [(dt.datetime.fromisoformat(d.replace('Z', '+00:00')).timestamp() * 1000 - await pg.evaluate('Date.now()')) / 86400000 for d in info['due']]
+        check(all(10 <= x <= 61 for x in days), f'solid items come due within their 60-day stability: {[round(x) for x in days]} days')
+
+        await pg.select_option('.level-picker select', 'none')
+        await pg.click('.level-picker button')
+        await pg.click('dialog .btn.danger')
+        await pg.wait_for_selector('text=Not studied yet')
+        check(True, 'setting "Not studied" sends it back to lessons')
+
+        # --- Bulk: select tiles in Browse and set them all ---
+        await pg.goto(BASE + '#browse/k/3/all')
+        await pg.wait_for_selector('.browse > .grid .tile')
+        await pg.click('[data-act="select"]')
+        tiles = await pg.query_selector_all('.browse > .grid .tile')
+        for t in tiles[:3]:
+            await t.click()
+        check((await pg.text_content('.sel-count')).strip() == '3 selected', 'tapping tiles selects them instead of opening them')
+        check('#browse' in pg.url, 'still on the browse page')
+        await pg.select_option('.select-bar .level-picker select', 'mastered')
+        await pg.click('.select-bar .level-picker button')
+        await pg.wait_for_selector('.browse > .grid .tile.st-mastered')
+        n = len(await pg.query_selector_all('.browse > .grid .tile.st-mastered'))
+        check(n == 3, f'{n} kanji set to mastered in one go')
+
+        # --- Add a meaning during a lesson and during a quiz ---
+        await pg.evaluate("async () => (await import('./js/state.js')).saveSettings({ dailyMax: 500 })")
+        await pg.goto(BASE + '#today')
+        await pg.reload()
+        await pg.wait_for_selector('.today')
+        await pg.click('[data-act="lessons"]')
+        await pg.wait_for_selector('.lesson .syn-add input')
+        item_id = await pg.get_attribute('.lesson .info', 'data-item')
+        await pg.fill('.lesson .syn-add input', 'my lesson meaning')
+        await pg.press('.lesson .syn-add input', 'Enter')
+        await pg.wait_for_selector('.lesson .syn-chip')
+        check(await pg.get_attribute('.lesson .info', 'data-item') == item_id, 'Enter in the meaning box adds it without leaving the card')
+        n = len(await pg.query_selector_all('.lesson-tabs button'))
+        for _ in range(n):
+            await pg.keyboard.press('ArrowRight')
+        await pg.wait_for_selector('.quiz')
+        info = await answer_current(pg)
+        await pg.wait_for_selector('.q-form.is-right')
+        await pg.click('.q-addsyn')
+        await pg.fill('.q-after .syn-add input', 'quiz meaning')
+        await pg.press('.q-after .syn-add input', 'Enter')
+        await pg.wait_for_selector('.q-after .syn-chip')
+        check(await pg.get_attribute('.q-card', 'data-card') == info['id'], 'Enter in the quiz meaning box stays on the card')
+        syn = await pg.evaluate(f"async () => (await import('./js/state.js')).getSynonyms('{info['id'].split('/')[0]}')")
+        check('quiz meaning' in syn, 'meaning added during the quiz is saved')
+        lesson_syn = await pg.evaluate(f"async () => (await import('./js/state.js')).getSynonyms('{item_id}')")
+        check('my lesson meaning' in lesson_syn, 'meaning added on the lesson card is saved')
+
         check(not errors, 'no console errors' + ('' if not errors else ': ' + '; '.join(errors)))
         await b.close()
 

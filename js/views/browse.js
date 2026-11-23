@@ -1,8 +1,9 @@
 // Browse every radical, kanji and word, coloured by how well you know it.
 
-import { curriculum, meanings, primaryMeaning } from '../data.js';
-import { stage, recall, STAGE_LABEL, STAGES, getSynonyms } from '../state.js';
-import { esc, tileHtml, recallBadge } from '../ui.js';
+import { curriculum, meanings, primaryMeaning, item } from '../data.js';
+import { stage, recall, STAGE_LABEL, STAGES, getSynonyms, LEVELS } from '../state.js';
+import { esc, tileHtml, recallBadge, toast, confirmDialog, plural } from '../ui.js';
+import { levelPickerHtml, wireLevelPicker } from './info.js';
 import { toHiragana } from '../../vendor/wanakana.js';
 
 const KINDS = { r: 'Radicals', k: 'Kanji', v: 'Vocabulary' };
@@ -37,12 +38,22 @@ export function renderBrowse(root, params, navigate) {
         <option value="new" ${status === 'new' ? 'selected' : ''}>Not studied</option>
       </select></label>
       <input type="search" class="browse-search" placeholder="Search meaning, reading or kanji" aria-label="Search">
+      <button type="button" class="btn small" data-act="select">Select…</button>
     </div>
     <ul class="stage-legend">${STAGES.map((s) => `<li><i class="st-${s}"></i>${esc(STAGE_LABEL[s])}</li>`).join('')}</ul>
     <div class="level-radicals"></div>
     <p class="browse-count muted"></p>
     <div class="tiles grid"></div>
     <p><button type="button" class="btn more" hidden>Show more</button></p>
+    <div class="select-bar" hidden>
+      <div class="select-row">
+        <b class="sel-count">0 selected</b>
+        <button type="button" class="btn small" data-act="all">Select all shown</button>
+        <button type="button" class="btn small" data-act="clear">Clear</button>
+        <button type="button" class="btn small quiet" data-act="done">Done</button>
+      </div>
+      ${levelPickerHtml({ compact: true })}
+    </div>
   </section>`;
 
   const grid = root.querySelector('.browse > .grid');
@@ -89,11 +100,51 @@ export function renderBrowse(root, params, navigate) {
     moreBtn.hidden = list.length <= limit;
   }
 
-  moreBtn.addEventListener('click', () => { limit += PAGE; draw(); });
+  // Select mode: tap tiles to pick them, then set their level in one go.
+  const selected = new Set();
+  let selecting = false;
+  const bar = root.querySelector('.select-bar');
+  const idOf = (tile) => decodeURIComponent(tile.getAttribute('href').replace('#item/', ''));
+  function refreshSelection() {
+    root.querySelectorAll('.browse .tile').forEach((t) => t.classList.toggle('is-selected', selected.has(idOf(t))));
+    root.querySelector('.sel-count').textContent = `${selected.size} selected`;
+    root.querySelector('.level-picker button').disabled = !selected.size;
+  }
+  function setSelecting(on) {
+    selecting = on;
+    bar.hidden = !on;
+    root.querySelector('.browse').classList.toggle('is-selecting', on);
+    root.querySelector('[data-act="select"]').textContent = on ? 'Stop selecting' : 'Select…';
+    if (!on) selected.clear();
+    refreshSelection();
+  }
+  root.querySelector('[data-act="select"]').addEventListener('click', () => setSelecting(!selecting));
+  root.querySelector('[data-act="done"]').addEventListener('click', () => setSelecting(false));
+  root.querySelector('[data-act="clear"]').addEventListener('click', () => { selected.clear(); refreshSelection(); });
+  root.querySelector('[data-act="all"]').addEventListener('click', () => {
+    root.querySelectorAll('.browse .tile').forEach((t) => selected.add(idOf(t)));
+    refreshSelection();
+  });
+  root.querySelector('.browse').addEventListener('click', (e) => {
+    const tile = e.target.closest('.tile');
+    if (!selecting || !tile) return;
+    e.preventDefault();
+    const id = idOf(tile);
+    if (selected.has(id)) selected.delete(id); else selected.add(id);
+    refreshSelection();
+  });
+  wireLevelPicker(bar, () => [...selected].map(item).filter(Boolean), (n, level) => {
+    toast(level === 'none' ? `Reset ${plural(n, 'item')}.` : `Set ${plural(n, 'item')} to ${LEVELS[level].label.split(' (')[0]}.`);
+    selected.clear();
+    draw();
+    refreshSelection();
+  }, (n) => confirmDialog({ title: 'Reset to not studied?', body: `Review history for ${plural(n, 'item')} will be cleared and they go back to lessons.`, confirm: 'Reset', danger: true }));
+
+  moreBtn.addEventListener('click', () => { limit += PAGE; draw(); refreshSelection(); });
   let t = null;
   root.querySelector('.browse-search').addEventListener('input', (e) => {
     clearTimeout(t);
-    t = setTimeout(() => { query = e.target.value.trim(); limit = PAGE; draw(); }, 150);
+    t = setTimeout(() => { query = e.target.value.trim(); limit = PAGE; draw(); refreshSelection(); }, 150);
   });
   draw();
 }

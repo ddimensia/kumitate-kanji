@@ -3,7 +3,7 @@
 
 import { cardTypes, cardId, glyph, KIND_LABEL } from '../data.js';
 import { introduceItems, allowance, lessonQueue, dueCardIds, getSettings } from '../state.js';
-import { infoCardHtml } from './info.js';
+import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './info.js';
 import { runQuiz } from '../quiz.js';
 import { esc, plural } from '../ui.js';
 import { wireSpeech, speak } from '../speech.js';
@@ -44,6 +44,7 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
     root.querySelector('[data-act="next"]').addEventListener('click', () => (index === batch.length - 1 ? startQuiz() : go(index + 1)));
     root.querySelectorAll('.lesson-tabs button').forEach((b) => b.addEventListener('click', () => go(+b.dataset.i)));
     setKeys((e) => {
+      if (e.target.closest?.('input, textarea, select')) return; // typing a meaning
       if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); index === batch.length - 1 ? startQuiz() : go(index + 1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
     });
@@ -53,11 +54,14 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
   function go(i) {
     index = Math.max(0, Math.min(batch.length - 1, i));
     const it = batch[index];
-    root.querySelector('.lesson-card').innerHTML = `<p class="lesson-step">${KIND_LABEL[it.kind]} ${index + 1} of ${batch.length}</p>${infoCardHtml(it, { compact: true })}`;
+    const card = root.querySelector('.lesson-card');
+    card.innerHTML = `<p class="lesson-step">${KIND_LABEL[it.kind]} ${index + 1} of ${batch.length}</p>${infoCardHtml(it, { compact: true })}${synonymEditorHtml(it)}`;
+    wireSynonymEditors(card, () => go(index));
     root.querySelectorAll('.lesson-tabs button').forEach((b, k) => b.classList.toggle('is-on', k === index));
     root.querySelector('[data-act="prev"]').disabled = index === 0;
     root.querySelector('[data-act="next"]').textContent = index === batch.length - 1 ? 'Start quiz →' : 'Next →';
-    if (it.kind === 'v' && getSettings().autoplay) speak(it.readings[0]);
+    if (it.kind === 'v' && getSettings().autoplay && !card.dataset.shown?.includes(it.id)) speak(it.readings[0]);
+    card.dataset.shown = (card.dataset.shown || '') + ' ' + it.id;
     window.scrollTo({ top: 0 });
   }
 

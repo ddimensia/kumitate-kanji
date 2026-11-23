@@ -11,7 +11,7 @@ import { checkMeaning, checkReading, kunDisplay } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc } from './ui.js';
 import { speak, speakerButton, wireSpeech } from './speech.js';
-import { infoCardHtml } from './views/info.js';
+import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './views/info.js';
 
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
@@ -161,7 +161,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     if (type === 'r' && getSettings().autoplay) speak(it.readings[0]);
   }
 
-  function renderAfter(showInfo = false) {
+  function renderAfter(showInfo = false, showSyn = false) {
     const { ok, it, type, given } = answered;
     const after = stageEl.querySelector('.q-after');
     const say = it.kind === 'v' ? speakerButton(it.readings[0]) : '';
@@ -173,13 +173,28 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       <div class="q-actions">
         ${ok ? '' : '<button type="button" class="btn small q-undo" title="Backspace">Undo <kbd>⌫</kbd></button>'}
         ${!ok && type === 'm' && given.trim() ? `<button type="button" class="btn small q-syn">Accept “${esc(given.trim())}” as mine</button>` : ''}
+        <button type="button" class="btn small q-addsyn">${showSyn ? 'Hide my meanings' : 'Add a meaning'}</button>
         <button type="button" class="btn small q-info" title="F">${showInfo ? 'Hide' : 'Show'} details <kbd>F</kbd></button>
         <button type="button" class="btn small primary q-next">Next <kbd>⏎</kbd></button>
       </div>
+      ${showSyn ? synonymEditorHtml(it) : ''}
       ${showInfo ? infoCardHtml(it, { compact: true }) : ''}`;
     after.querySelector('.q-undo')?.addEventListener('click', undo);
     after.querySelector('.q-syn')?.addEventListener('click', acceptAsSynonym);
-    after.querySelector('.q-info').addEventListener('click', () => renderAfter(!showInfo));
+    after.querySelector('.q-info').addEventListener('click', () => renderAfter(!showInfo, showSyn));
+    after.querySelector('.q-addsyn').addEventListener('click', () => {
+      renderAfter(showInfo, !showSyn);
+      after.querySelector('.syn-add input')?.focus();
+    });
+    wireSynonymEditors(after, (id, added) => {
+      renderAfter(showInfo, true);
+      if (added) {
+        const note = stageEl.querySelector('.q-note');
+        note.className = 'q-note is-right';
+        note.textContent = `Added “${added}” to your meanings.`;
+      }
+      after.querySelector('.syn-add input')?.focus();
+    });
     after.querySelector('.q-next').addEventListener('click', advance);
     after.dataset.info = showInfo ? '1' : '';
   }
@@ -235,10 +250,11 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
 
   setKeys((e) => {
     if (!answered) return;
+    if (e.target.closest?.('.syn-add')) return; // typing a new meaning: its own Enter adds it
     if (e.key === 'Backspace' && !answered.ok) { e.preventDefault(); undo(); }
     else if (e.key === 'f' || e.key === 'F') {
       e.preventDefault();
-      renderAfter(!stageEl.querySelector('.q-after').dataset.info);
+      renderAfter(!stageEl.querySelector('.q-after').dataset.info, !!stageEl.querySelector('.q-after .syn-editor'));
     } else if (e.key === 'Enter') {
       // Enter moves on from anywhere (a read-only answer box doesn't submit its form in
       // every browser), except on the Undo / Accept / Details buttons, which Enter presses.

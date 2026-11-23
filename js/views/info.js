@@ -2,7 +2,7 @@
 
 import { item, primaryMeaning, KIND_LABEL, glyph } from '../data.js';
 import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge } from '../ui.js';
-import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL } from '../state.js';
+import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL, addSynonym, removeSynonym, LEVELS, setLevel, unstudiedParts } from '../state.js';
 import { speakerButton } from '../speech.js';
 
 // In lessons and quizzes (compact), long lists start collapsed so the buttons stay in view.
@@ -139,3 +139,68 @@ export function infoCardHtml(it, { compact = false } = {}) {
 }
 
 export { glyph };
+
+/** Your own extra meanings for an item, with a box to add more. */
+export function synonymEditorHtml(it) {
+  const syn = getSynonyms(it.id);
+  return `<div class="syn-editor" data-item="${esc(it.id)}">
+    <span class="syn-label">Your meanings:</span>
+    ${syn.map((s) => `<span class="syn-chip">${esc(s)}<button type="button" class="syn-rm" data-rm="${esc(s)}" aria-label="Remove ${esc(s)}">✕</button></span>`).join('') || '<span class="muted">none yet</span>'}
+    <form class="syn-add"><input name="syn" placeholder="Add a meaning" aria-label="Add a meaning" autocomplete="off"><button class="btn small">Add</button></form>
+  </div>`;
+}
+
+/** Wire every synonym editor inside `root`; `onChange` re-renders whatever shows them. */
+export function wireSynonymEditors(root, onChange) {
+  root.querySelectorAll('.syn-editor').forEach((ed) => {
+    const id = ed.dataset.item;
+    ed.querySelector('.syn-add').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const v = e.target.syn.value.trim();
+      if (!v) return;
+      await addSynonym(id, v);
+      onChange(id, v);
+    });
+    ed.querySelectorAll('[data-rm]').forEach((b) => b.addEventListener('click', async () => {
+      await removeSynonym(id, b.dataset.rm);
+      onChange(id);
+    }));
+  });
+}
+
+
+/**
+ * Controls to put items straight at a level ("I already know these"). `getItems` returns
+ * the items to change when Apply is pressed; `onDone(count)` runs afterwards.
+ */
+export function levelPickerHtml({ partsCount = null, compact = false } = {}) {
+  return `<form class="level-picker${compact ? ' compact' : ''}">
+    <label>Set my level <select name="level">
+      ${Object.entries(LEVELS).map(([k, l]) => `<option value="${k}" ${k === 'solid' ? 'selected' : ''}>${esc(l.label)}</option>`).join('')}
+      <option value="none">Not studied (back to lessons)</option>
+    </select></label>
+    <label class="check"><input type="checkbox" name="parts" checked> Also mark the radicals and kanji they’re built from${partsCount !== null ? ` (${partsCount} not studied yet)` : ''}</label>
+    <button class="btn small primary">Apply</button>
+  </form>`;
+}
+
+export function wireLevelPicker(root, getItems, onDone, confirmFn) {
+  const form = root.querySelector('.level-picker');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const level = form.level.value;
+    let items = getItems();
+    if (!items.length) return;
+    if (form.parts.checked && level !== 'none') {
+      const seen = new Set(items.map((it) => it.id));
+      const extra = [];
+      for (const it of items) for (const p of unstudiedParts(it)) if (!seen.has(p.id)) { seen.add(p.id); extra.push(p); }
+      items = [...extra, ...items];
+    }
+    if (level === 'none' && confirmFn && !(await confirmFn(items.length))) return;
+    await setLevel(items, level);
+    onDone(items.length, level);
+  });
+}

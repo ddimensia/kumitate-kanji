@@ -297,6 +297,13 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 
 .mistakes-panel .hero-actions { margin-top: 0.75rem; }
 
+.syn-editor { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin: 0.5rem 0; font-size: 0.875rem; }
+.syn-label { color: var(--ink-soft); }
+.syn-chip { border: 1px dashed var(--accent); border-radius: 6px; padding: 0.05rem 0.2rem 0.05rem 0.5rem; display: inline-flex; align-items: center; gap: 0.2rem; }
+.syn-rm { border: 0; background: none; color: var(--ink-soft); cursor: pointer; font-size: 0.75rem; }
+.syn-add { display: inline-flex; gap: 0.35rem; }
+.syn-add input { font: inherit; color: var(--ink); background: var(--sheet); border: 1.5px solid var(--rule-soft); border-radius: 8px; padding: 0.2rem 0.5rem; width: 12rem; }
+
 /* Browse */
 .browse-controls { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-bottom: 0.5rem; }
 .browse-controls label { font-size: 0.875rem; color: var(--ink-soft); }
@@ -308,6 +315,19 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .seg a { text-decoration: none; padding: 0.3rem 0.9rem; color: var(--ink-soft); }
 .seg a.is-on { background: var(--accent); color: var(--accent-ink); }
 .grid .tile { min-width: 4.2rem; }
+.is-selecting .tile { cursor: pointer; }
+.item-page .syn-label { display: none; }
+.tile.is-selected { opacity: 1; outline: 3px solid var(--accent); outline-offset: 1px; background: color-mix(in srgb, var(--accent) 12%, var(--sheet)); }
+.select-bar {
+  position: sticky; bottom: 0.75rem; z-index: 4; margin-top: 1rem;
+  background: var(--sheet); border: 1.5px solid var(--accent); border-radius: var(--radius);
+  padding: 0.6rem 0.9rem; box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+}
+.select-bar[hidden] { display: none; }
+.select-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem; }
+.level-picker { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; font-size: 0.875rem; }
+.level-picker select { font: inherit; color: var(--ink); background: var(--sheet); border: 1.5px solid var(--rule-soft); border-radius: 8px; padding: 0.25rem 0.4rem; }
+.level-picker .check { display: inline-flex; gap: 0.35rem; align-items: center; color: var(--ink-soft); }
 
 /* Item page */
 .hist { border-collapse: collapse; width: 100%; font-size: 0.875rem; }

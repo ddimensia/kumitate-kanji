@@ -118,7 +118,7 @@ export function dayStart(now = new Date()) {
 export function learnedToday(now = new Date()) {
   const start = dayStart(now);
   let n = 0;
-  for (const c of cards.values()) if (c.type === 'm' && c.introducedAt >= start) n++;
+  for (const c of cards.values()) if (c.type === 'm' && !c.marked && c.introducedAt >= start) n++;
   return n;
 }
 
@@ -260,6 +260,79 @@ export function recentMistakes(now = new Date()) {
   return { since, until: last, items };
 }
 
+// ---- Setting your own level ------------------------------------------------------
+
+/** Levels you can put an item at directly, with the memory stability (days) each implies. */
+export const LEVELS = {
+  learning: { label: 'Learning (review soon)', stability: 0 },
+  fresh: { label: 'Fresh (under a week)', stability: 3 },
+  settling: { label: 'Settling (weeks)', stability: 14 },
+  solid: { label: 'Solid (months)', stability: 60 },
+  mastered: { label: 'Mastered (4+ months)', stability: 180 },
+};
+
+/** Not-yet-studied parts an item is built from, all the way down (radicals and kanji). */
+export function unstudiedParts(it, seen = new Set()) {
+  const out = [];
+  for (const p of it.prereq) {
+    if (seen.has(p)) continue;
+    seen.add(p);
+    const part = item(p);
+    if (!part) continue;
+    out.push(...unstudiedParts(part, seen));
+    if (!isIntroduced(part)) out.push(part);
+  }
+  return out;
+}
+
+/**
+ * Put items straight into reviews at a chosen level, skipping their lessons. For known
+ * levels, each card gets that much memory stability and a first review spread over the
+ * interval, so marking a hundred items doesn't make them all due on one day. Items marked
+ * this way don't count toward the day's new items. 'none' forgets the items instead.
+ */
+export async function setLevel(items, level, now = new Date()) {
+  if (level === 'none') {
+    for (const it of items) await resetItem(it, { quiet: true });
+    emit();
+    return;
+  }
+  const { stability } = LEVELS[level];
+  const out = [];
+  for (const it of items) {
+    for (const t of cardTypes(it)) {
+      const id = cardId(it.id, t);
+      const old = cards.get(id);
+      let srs;
+      if (!stability) {
+        srs = review(newSrsCard(now), Rating.Good, now); // as after a lesson
+      } else {
+        const wait = stability * (0.25 + Math.random() * 0.75) * DAY;
+        const due = new Date(now.getTime() + wait);
+        srs = {
+          ...newSrsCard(now),
+          state: State.Review, stability, difficulty: 5, reps: 1, lapses: 0,
+          scheduled_days: Math.round(stability), elapsed_days: 0, learning_steps: 0,
+          due: due.toISOString(),
+          // As if last reviewed one stability ago, so recall at the due date is about 90%.
+          last_review: new Date(due.getTime() - stability * DAY).toISOString(),
+        };
+      }
+      const c = {
+        id, item: it.id, type: t, introducedAt: old?.introducedAt ?? now.getTime(),
+        srs, right: old?.right || 0, wrong: old?.wrong || 0, marked: true,
+      };
+      cards.set(id, c);
+      out.push(c);
+    }
+    if (stability >= settings.unlockStability) passed[it.id] = passed[it.id] || now.getTime();
+    else delete passed[it.id];
+  }
+  await store.putMany('cards', out);
+  await store.kvSet('passed', passed);
+  emit();
+}
+
 export async function addSynonym(itemId, text) {
   const t = text.trim();
   if (!t) return;
@@ -277,13 +350,13 @@ export async function removeSynonym(itemId, text) {
 }
 
 /** Forget an item: its cards go away and it returns to the lesson queue. */
-export async function resetItem(it) {
+export async function resetItem(it, { quiet = false } = {}) {
   const ids = cardTypes(it).map((t) => cardId(it.id, t));
   for (const id of ids) cards.delete(id);
   await store.deleteMany('cards', ids);
   delete passed[it.id];
   await store.kvSet('passed', passed);
-  emit();
+  if (!quiet) emit();
 }
 
 // ---- Stats --------------------------------------------------------------------------
@@ -311,7 +384,7 @@ export function weakest(n = 8, kinds = 'rk', now = new Date()) {
 
 export function recentlyLearned(n = 8, kinds = 'rk', now = new Date()) {
   return introducedItems()
-    .filter((it) => kinds.includes(it.kind))
+    .filter((it) => kinds.includes(it.kind) && !cards.get(cardId(it.id, 'm'))?.marked)
     .map((it) => ({ it, r: recall(it, now), at: cards.get(cardId(it.id, 'm')).introducedAt }))
     .sort((a, b) => b.at - a.at)
     .slice(0, n);
