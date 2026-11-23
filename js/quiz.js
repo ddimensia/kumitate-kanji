@@ -7,10 +7,10 @@
 
 import { bind, unbind } from '../vendor/wanakana.js';
 import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings } from './data.js';
-import { checkMeaning, checkReading, kunDisplay } from './answer.js';
+import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc } from './ui.js';
-import { speak, speakerButton, wireSpeech } from './speech.js';
+import { speak, speakerButton, wireSpeech, readAloud } from './speech.js';
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './views/info.js';
 
 function shuffle(a) {
@@ -158,7 +158,13 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     note.className = `q-note ${ok ? 'is-right' : 'is-wrong'}`;
     note.textContent = ok ? (res.note || '') : '';
     renderAfter();
-    if (type === 'r' && getSettings().autoplay) speak(it.readings[0]);
+    // Read aloud (setting): a word's reading, or after a kanji reading question, the reading you
+    // typed if right, otherwise that kind's common readings.
+    if (type === 'r') readAloud(it);
+    else if (type === 'on' || type === 'kun') {
+      if (ok && getSettings().autoplay) speak(toKanaAnswer(given));
+      else readAloud(it, type);
+    }
   }
 
   function renderAfter(showInfo = false, showSyn = false) {

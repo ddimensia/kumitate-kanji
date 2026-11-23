@@ -54,6 +54,11 @@ async def main():
         chrome = shutil.which('google-chrome')
         b = await p.chromium.launch(executable_path=chrome) if chrome else await p.chromium.launch()
         ctx = await b.new_context(viewport={'width': 1000, 'height': 900})
+        # Record what would be spoken (the test browser has no Japanese voice).
+        await ctx.add_init_script("""
+          window.__said = [];
+          if (window.speechSynthesis) window.speechSynthesis.speak = (u) => window.__said.push(u.text);
+        """)
         pg = await ctx.new_page()
         errors = []
         pg.on('pageerror', lambda e: errors.append(str(e)))
@@ -247,11 +252,17 @@ async def main():
         await pg.wait_for_selector('.today')
         await pg.click('[data-act="lessons"]')
         await pg.wait_for_selector('.lesson')
+        first = await pg.get_attribute('.lesson .info', 'data-item')
+        said = await pg.evaluate('window.__said')
+        check(first.startswith('k:') and len(said) > 0, f'a kanji lesson card reads its readings aloud: {first} {said}')
         n = len(await pg.query_selector_all('.lesson-tabs button'))
         for _ in range(n):
             await pg.keyboard.press('ArrowRight')
         await pg.wait_for_selector('.quiz')
+        await pg.evaluate('window.__said = []')
         await run_checked_quiz()
+        said = await pg.evaluate('window.__said')
+        check(any(all('\u3040' <= ch <= '\u30ff' for ch in x) for x in said), f'kanji readings are said after reading answers: {said[:6]}')
         check(did_kata, "an on'yomi was answered in katakana")
         check(did_reading_btn, 'readings after an answer are clickable buttons')
         await pg.wait_for_selector('.summary')
@@ -291,6 +302,16 @@ async def main():
         check('Meaning' in await pg.text_content('.hist'), 'item page shows progress')
         await pg.goto(BASE + '#settings')
         await pg.wait_for_selector('.settings-form')
+
+        # --- Turning "Read kanji and words aloud" off silences lessons and answers ---
+        await pg.evaluate("async () => (await import('./js/state.js')).saveSettings({ autoplay: false })")
+        await pg.evaluate('window.__said = []')
+        await pg.evaluate("""async () => {
+          const sp = await import('./js/speech.js'); const d = await import('./js/data.js');
+          sp.readAloud(d.item('k:日')); sp.readAloud(d.item('k:日'), 'on');
+        }""")
+        check(await pg.evaluate('window.__said') == [], 'read-aloud setting off: nothing is said')
+        await pg.evaluate("async () => (await import('./js/state.js')).saveSettings({ autoplay: true })")
 
         # --- "Already know it": set a level from the item page, parts included ---
         await pg.goto(BASE + '#item/k:%E5%83%8D')  # 働

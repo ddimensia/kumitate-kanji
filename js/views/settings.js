@@ -37,7 +37,7 @@ export function renderSettings(root, reload) {
       <h2>Audio</h2>
       ${speechAvailable() ? '' : '<p class="warn">This browser has no Japanese voice. On most systems you can add one in the OS language or speech settings.</p>'}
       <label class="row check"><input type="checkbox" name="autoplay" ${s.autoplay ? 'checked' : ''}>
-        <span>Say words aloud after I answer their reading</span></label>
+        <span>Read kanji and words aloud<small>Says a kanji’s common on’yomi and kun’yomi, or a word’s reading, when its lesson card opens and after you answer a reading question. Tapping a reading always plays it.</small></span></label>
       <label class="row"><span>Voice</span>
         <select name="voice"><option value="">Best available</option>${voices.map((v) => `<option ${v === s.voice ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></label>
       <label class="row"><span>Speed</span>

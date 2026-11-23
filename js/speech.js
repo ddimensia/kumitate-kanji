@@ -34,17 +34,40 @@ function pickVoice() {
   return voices[0] || null;
 }
 
-export function speak(kana) {
-  if (!synth || !kana) return false;
-  if (!voices.length) loadVoices();
-  synth.cancel();
+function utterance(kana) {
   const u = new SpeechSynthesisUtterance(kana);
   u.lang = 'ja-JP';
   const v = pickVoice();
   if (v) u.voice = v;
   u.rate = getSettings().rate || 0.9;
-  synth.speak(u);
+  return u;
+}
+
+/** Say one or more readings in turn (replacing anything still being said). */
+export function speak(...kana) {
+  const list = kana.flat().filter(Boolean);
+  if (!synth || !list.length) return false;
+  if (!voices.length) loadVoices();
+  synth.cancel();
+  for (const k of list) synth.speak(utterance(k));
   return true;
+}
+
+/** What to say for a kanji's readings of one kind: its common ones, as kana (あげる for あ.げる). */
+export function kanjiReadingsToSay(it, kind) {
+  return it[kind]
+    .filter((r) => r.common)
+    .map((r) => r.forms.find((f) => !f.startsWith('-') && !f.endsWith('-'))) // skip affix-only forms (〜か)
+    .filter(Boolean)
+    .map((f) => f.replace(/[.-]/g, ''));
+}
+
+/** Read an item aloud if the "read aloud" setting is on: a word's reading, a kanji's common readings. */
+export function readAloud(it, kind = null) {
+  if (!getSettings().autoplay) return false;
+  if (it.kind === 'v') return speak(it.readings[0]);
+  if (it.kind === 'k') return speak(kind ? kanjiReadingsToSay(it, kind) : [...kanjiReadingsToSay(it, 'on'), ...kanjiReadingsToSay(it, 'kun')]);
+  return false;
 }
 
 /** Make any [data-say] element inside `root` speak its text when clicked. */

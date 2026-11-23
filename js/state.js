@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS = {
   adaptive: true,       // scale new items by recent accuracy and backlog
   retention: 0.9,       // FSRS target recall
   unlockStability: 3,   // days of memory stability before an item unlocks what builds on it
-  autoplay: true,       // speak vocab after answering its reading
+  autoplay: true,       // read kanji readings and words aloud (lesson cards, after reading answers)
   voice: '',            // speechSynthesis voice name ('' = best Japanese voice found)
   rate: 0.9,
   dayStartHour: 4,      // a study day starts at 4am

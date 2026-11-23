@@ -56,7 +56,7 @@ Only common readings are asked for. A reading counts as common when it appears i
 
 **Recall.** Today shows your weakest and most recently learned items, each with the current chance you'd recall it. Browse colours every radical, kanji and word by stage, from learning to mastered.
 
-**Audio.** Words and readings are spoken with the browser's Japanese voice (Web Speech API). The voice is always given kana, so it can't misread a kanji. Voice quality depends on the OS: macOS, iOS, Android and Windows have good Japanese voices. Google Translate's speech endpoint isn't usable from a web page (unofficial, against its terms, and blocked by CORS).
+**Audio.** Words and readings are spoken with the browser's Japanese voice (Web Speech API). With **Read kanji and words aloud** on (Settings), a kanji's common on'yomi and kun'yomi, or a word's reading, are said when its lesson card opens and after you answer a reading question. Tapping any reading always plays it. The voice is always given kana, so it can't misread a kanji. Voice quality depends on the OS: macOS, iOS, Android and Windows have good Japanese voices. Google Translate's speech endpoint isn't usable from a web page (unofficial, against its terms, and blocked by CORS).
 
 ## Running it
 

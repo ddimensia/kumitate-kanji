@@ -6,7 +6,7 @@ import { introduceItems, allowance, lessonQueue, dueCardIds, getSettings } from 
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './info.js';
 import { runQuiz } from '../quiz.js';
 import { esc, plural } from '../ui.js';
-import { wireSpeech, speak } from '../speech.js';
+import { wireSpeech, readAloud } from '../speech.js';
 
 const UNIT = { m: 'minute', h: 'hour', d: 'day' };
 /** '4h' -> '4 hours' */
@@ -60,7 +60,7 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
     root.querySelectorAll('.lesson-tabs button').forEach((b, k) => b.classList.toggle('is-on', k === index));
     root.querySelector('[data-act="prev"]').disabled = index === 0;
     root.querySelector('[data-act="next"]').textContent = index === batch.length - 1 ? 'Start quiz →' : 'Next →';
-    if (it.kind === 'v' && getSettings().autoplay && !card.dataset.shown?.includes(it.id)) speak(it.readings[0]);
+    if (!card.dataset.shown?.includes(it.id)) readAloud(it); // first time each card is shown
     card.dataset.shown = (card.dataset.shown || '') + ' ' + it.id;
     window.scrollTo({ top: 0 });
   }
