@@ -275,15 +275,25 @@ async def main():
         check(did_kata, "an on'yomi was answered in katakana")
         check(did_reading_btn, 'readings after an answer are clickable buttons')
         await pg.wait_for_selector('.summary')
-        for hours in (64.2, 125):
-            await pg.clock.set_system_time(start + dt.timedelta(hours=hours))
+        # Review whenever the next cards come due (intervals depend on FSRS, so don't
+        # hard-code hours), until the kanji pass and their words unlock.
+        for _ in range(4):
+            next_due = await pg.evaluate("""async () => {
+              const s = await import('./js/state.js');
+              return Math.min(...s.introducedItems().flatMap((it) => s.itemCards(it)).map((c) => Date.parse(c.srs.due)));
+            }""")
+            await pg.clock.set_system_time(dt.datetime.fromtimestamp(next_due / 1000 + 60))
+            await pg.goto(BASE + '#browse')
             await pg.goto(BASE + '#today')
             await pg.reload()
-            await pg.wait_for_selector('.today')
+            await pg.wait_for_selector('.hero.reviews [data-act="reviews"]:not([disabled])')
             await pg.click('[data-act="reviews"]')
             await pg.wait_for_selector('.quiz')
             await finish_quiz(pg)
             await pg.wait_for_selector('.summary')
+            unlocked_words = await pg.evaluate("""async () => (await import('./js/state.js')).lessonQueue(400).some((it) => it.kind === 'v')""")
+            if unlocked_words:
+                break
         vocab = await pg.evaluate("""async () => {
           const s = await import('./js/state.js');
           return s.lessonQueue(400).filter((it) => it.kind === 'v').map((it) => it.w).slice(0, 5);
