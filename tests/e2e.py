@@ -74,11 +74,23 @@ async def main():
 
         # A typo in a reading (one kana off) is not graded: try again.
         # A wrong answer can be undone with Backspace.
-        did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = False
+        did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = did_blank = False
         for _ in range(60):
             if not await pg.query_selector('.q-input'):
                 break
             info = await pg.evaluate(ANSWER_JS)
+            if not did_blank:
+                # Enter on a blank answer asks again; Enter a second time marks it wrong.
+                await pg.fill('.q-input', '')
+                await pg.press('.q-input', 'Enter')
+                await pg.wait_for_timeout(50)
+                first_ok = not await pg.query_selector('.q-form.is-wrong') and 'again' in (await pg.text_content('.q-note'))
+                await pg.press('.q-input', 'Enter')
+                await pg.wait_for_selector('.q-form.is-wrong')
+                check(first_ok, 'blank answer: first Enter asks again, second marks it wrong')
+                await pg.keyboard.press('Backspace')
+                await pg.wait_for_selector('.q-input:not([readonly])')
+                did_blank = True
             if not did_undo and info['type'] == 'm':
                 await pg.fill('.q-input', 'zzzz')
                 await pg.press('.q-input', 'Enter')
@@ -89,6 +101,8 @@ async def main():
                 did_undo = True
             elif not did_kata and info['type'] == 'on':
                 romaji = await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toRomaji(k)", info['answer'])
+                if romaji.endswith('n'):
+                    romaji += 'n'  # a final n stays latin until the next key, as with any kana input
                 await pg.fill('.q-input', '')
                 await pg.type('.q-input', romaji)
                 shown = await pg.input_value('.q-input')

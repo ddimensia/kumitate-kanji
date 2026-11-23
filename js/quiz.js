@@ -71,7 +71,8 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
   const unlocked = new Set();
   const total = new Set(cardIds).size;
   let current = null;
-  let answered = null; // { verdict, given, committed }
+  let answered = null; // { ok, given, it, type }
+  let rejected = null; // the last answer sent back to try again (typo, blank, wrong kind)
 
   root.innerHTML = `<section class="quiz mode-${mode}">
     <div class="quiz-top">
@@ -106,6 +107,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
   }
 
   function renderQuestion(prefill = '') {
+    rejected = null;
     const [itemId, type] = splitCardId(current);
     const it = item(itemId);
     const reading = type !== 'm';
@@ -134,13 +136,16 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
 
   function submit(input, it, type) {
     const given = input.value;
-    const res = type === 'm' ? checkMeaning(it, given, getSynonyms(it.id)) : checkReading(it, type, given);
+    let res = type === 'm' ? checkMeaning(it, given, getSynonyms(it.id)) : checkReading(it, type, given);
     const note = stageEl.querySelector('.q-note');
+    // Enter again on the same rejected answer (or still blank) means "I don't know": wrong.
+    if (res.verdict === 'retry' && rejected !== null && given.trim() === rejected) res = { verdict: 'wrong' };
     if (res.verdict === 'retry') {
+      rejected = given.trim();
       input.classList.remove('shake');
       void input.offsetWidth;
       input.classList.add('shake');
-      note.textContent = res.note;
+      note.textContent = `${res.note} Press Enter again to mark it wrong.`;
       note.className = 'q-note is-retry';
       input.select();
       return;

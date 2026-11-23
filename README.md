@@ -25,6 +25,7 @@ Only common readings are asked for. A reading counts as common when it appears i
 - **Close spelling** of a meaning is accepted. Swapped letters count as one slip ("wrok" for "work").
 - **Typo in a reading** (one kana off, as in ひるい for ひろい) isn't graded. The card shakes and you try again. Long vowels, small kana and dakuten are real distinctions, so こ for こう or か for が still counts as wrong.
 - **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently, or a reading typed into a meaning question.
+- **Giving up:** pressing Enter again on the same sent-back answer (or a blank one) marks it wrong.
 - **Undo** (Backspace) reverts a wrong answer so you can fix it, as on Bunpro. You can also accept your wording as one of your own meanings.
 
 **Unlocking.** An item unlocks the kanji and words built on it once every one of its cards has reached 3 days of FSRS stability. In practice that means after the lesson, the 10-minute review and the first review two days later.
