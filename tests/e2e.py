@@ -79,10 +79,10 @@ async def main():
 
         # A typo in a reading (one kana off) is not graded: try again.
         # A wrong answer can be undone with Backspace.
-        did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = did_blank = False
+        did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = did_blank = did_tap_next = False
         async def run_checked_quiz():
             # Answers every card right, exercising each special case once along the way.
-            nonlocal did_typo, did_undo, did_enter_blur, did_reading_btn, did_kata, did_blank
+            nonlocal did_typo, did_undo, did_enter_blur, did_reading_btn, did_kata, did_blank, did_tap_next
             for _ in range(60):
                 if not await pg.query_selector('.q-input'):
                     break
@@ -134,6 +134,15 @@ async def main():
                 await pg.wait_for_selector('.q-form.is-right')
                 if info['type'] != 'm' and not did_reading_btn:
                     did_reading_btn = bool(await pg.query_selector('.q-answer .q-reading[data-say]'))
+                if not did_tap_next:
+                    # Tapping ➜ after answering moves on (phones have no Enter key to press).
+                    before = await pg.get_attribute('.q-card', 'data-card')
+                    await pg.click('.q-submit')
+                    await pg.wait_for_timeout(50)
+                    after = await pg.get_attribute('.q-card', 'data-card') if await pg.query_selector('.q-card') else None
+                    did_tap_next = after != before or not await pg.query_selector('.q-form.is-right')
+                    check(did_tap_next, 'tapping the ➜ button after answering goes to the next card')
+                    continue
                 if not did_enter_blur:
                     # Enter advances even when the answer box isn't focused.
                     before = await pg.get_attribute('.q-card', 'data-card')

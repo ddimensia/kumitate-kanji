@@ -129,7 +129,9 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     input.value = prefill;
     stageEl.querySelector('.q-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!answered) submit(input, it, type);
+      // The ➜ button (or a phone keyboard's Go key) answers, then moves on once answered.
+      if (answered) advance();
+      else submit(input, it, type);
     });
     setTimeout(() => input.focus(), 0);
   }
