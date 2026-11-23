@@ -1,6 +1,6 @@
 // Small UI helpers: escaping, toasts, dialogs, furigana and item rendering.
 
-import { glyph, primaryMeaning, KIND_LABEL } from './data.js';
+import { glyph, primaryMeaning, KIND_LABEL, taughtReadings } from './data.js';
 import { kunDisplay } from './answer.js';
 
 export const esc = (s) =>
@@ -46,16 +46,23 @@ export function furiganaHtml(it, { highlight = null, hide = false } = {}) {
 
 export const READING_KIND = { o: "on'yomi", k: "kun'yomi", j: 'special reading' };
 
-/** On'yomi in katakana, kun'yomi as stem(okurigana). Common readings first. */
+/**
+ * On'yomi in katakana, kun'yomi as stem(okurigana), in three tiers: taught with the kanji
+ * (bold), common but met later through words (plain), and rare (grey).
+ */
 export function readingListHtml(it, kind, { rare = true } = {}) {
+  const taught = taughtReadings(it)[kind];
+  const tier = (r) => (taught.includes(r) ? 0 : r.common ? 1 : 2);
   const list = it[kind].filter((r) => rare || r.common);
   if (!list.length) return '<span class="muted">none</span>';
+  const cls = ['taught', 'later', 'rare'];
+  const title = ['Taught with this kanji', 'You’ll meet this in later words', 'Rarely used'];
   return list
     .slice()
-    .sort((a, b) => b.common - a.common)
+    .sort((a, b) => tier(a) - tier(b))
     .map((r) => {
       const text = kind === 'on' ? r.forms.join('・') : r.forms.filter((f) => !f.startsWith('-') || r.forms.length === 1).map(kunDisplay).join('・');
-      return `<span lang="ja" class="reading${r.common ? ' common' : ' rare'}" data-say="${esc(kind === 'on' ? r.forms[0] : r.forms[0].replace(/[.-]/g, ''))}">${esc(text)}</span>`;
+      return `<span lang="ja" class="reading ${cls[tier(r)]}" title="${title[tier(r)]}" data-say="${esc(kind === 'on' ? r.forms[0] : r.forms[0].replace(/[.-]/g, ''))}">${esc(text)}</span>`;
     })
     .join('');
 }

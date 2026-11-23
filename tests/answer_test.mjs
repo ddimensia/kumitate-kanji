@@ -1,7 +1,7 @@
 // Answer checking against the real curriculum: node tests/answer_test.mjs
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { useCurriculum, item } from '../js/data.js';
+import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow } from '../js/data.js';
 import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
 
 useCurriculum(JSON.parse(readFileSync(new URL('../data/curriculum.json', import.meta.url))));
@@ -46,4 +46,16 @@ ok(checkReading(hi[0], 'r', hi[0].otherReadings[0]), 'retry', 'reading of anothe
 assert.equal(toKanaAnswer('hon'), 'ほん'); n++;
 assert.equal(isKanaTypo('ひるい', 'ひろい'), true); n++;
 assert.equal(isKanaTypo('こここ', 'こうこう'), false); n++;
+// Taught readings: those used in JLPT words up to two levels past the kanji (default).
+const forms = (it, kind) => taughtReadings(it)[kind].map((r) => r.forms[0]);
+assert.deepEqual(forms(item('k:田'), 'on'), [], '田: デン (only N1 words) not taught'); n++;
+assert.deepEqual(forms(item('k:田'), 'kun'), ['た'], '田: た taught'); n++;
+assert.deepEqual(cardTypes(item('k:田')), ['m', 'kun'], '田 has no on\'yomi question'); n++;
+assert.ok(forms(item('k:読'), 'on').includes('ドク'), '読: ドク (読書, N3) taught at window 2'); n++;
+ok(checkReading(item('k:田'), 'kun', 'でん'), 'retry', 'デン typed for the kun card: wrong kind, try again');
+setReadingWindow(1);
+assert.ok(!forms(item('k:読'), 'on').includes('ドク'), '読: ドク not taught at window 1'); n++;
+setReadingWindow('all');
+assert.deepEqual(forms(item('k:田'), 'on'), ['デン'], 'all common readings: デン taught'); n++;
+setReadingWindow(2);
 console.log(`answer_test: ${n} checks passed`);

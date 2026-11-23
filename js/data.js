@@ -41,8 +41,8 @@ export function index(raw) {
   for (const [ch, k] of Object.entries(raw.kanji)) {
     items.set('k:' + ch, {
       id: 'k:' + ch, kind: 'k', ch, meanings: k.m,
-      on: k.on.map(([forms, n, common]) => ({ forms, n, common: !!common })),
-      kun: k.kun.map(([forms, n, common]) => ({ forms, n, common: !!common })),
+      on: k.on.map(([forms, n, common, lv]) => ({ forms, n, common: !!common, lv: lv || 0 })),
+      kun: k.kun.map(([forms, n, common, lv]) => ({ forms, n, common: !!common, lv: lv || 0 })),
       jlpt: k.j, grade: k.g || null, freq: k.f || null, strokes: k.s,
       classical: k.kr && raw.classical?.[k.kr]
         ? { n: k.kr, ch: raw.classical[k.kr][0], name: raw.classical[k.kr][1], id: k.krid || null } : null,
@@ -76,13 +76,44 @@ export function item(id) {
   return DB.items.get(id);
 }
 
+// Which of a kanji's common readings are taught (quizzed) with it. A reading is taught when a
+// JLPT word using it is at most `readingWindow` levels harder than the kanji (2: an N5 kanji
+// teaches readings used in N5-N3 words); others you meet later through those words.
+// 'all' teaches every common reading.
+let readingWindow = 2;
+const taughtCache = new Map();
+
+export function setReadingWindow(w) {
+  if (w !== readingWindow) taughtCache.clear();
+  readingWindow = w;
+}
+
+/** { on: [readings], kun: [readings] } taught with this kanji. */
+export function taughtReadings(it) {
+  let t = taughtCache.get(it.id);
+  if (t) return t;
+  const ok = (r) => r.common && (readingWindow === 'all' || r.lv >= it.jlpt - readingWindow);
+  t = { on: it.on.filter(ok), kun: it.kun.filter(ok) };
+  if (!t.on.length && !t.kun.length) {
+    // Every kanji teaches at least one reading: its most used common one.
+    const best = [...it.on.map((r) => ['on', r]), ...it.kun.map((r) => ['kun', r])]
+      .filter(([, r]) => r.common).sort((a, b) => b[1].n - a[1].n)[0];
+    if (best) t[best[0]] = [best[1]];
+  }
+  taughtCache.set(it.id, t);
+  return t;
+}
+
+export const isTaught = (it, kind, r) => taughtReadings(it)[kind].includes(r);
+
 /** The question types an item is quizzed on. */
 export function cardTypes(it) {
   if (it.kind === 'r') return ['m'];
   if (it.kind === 'v') return ['m', 'r'];
   const t = ['m'];
-  if (it.on.some((r) => r.common)) t.push('on');
-  if (it.kun.some((r) => r.common)) t.push('kun');
+  const taught = taughtReadings(it);
+  if (taught.on.length) t.push('on');
+  if (taught.kun.length) t.push('kun');
   return t;
 }
 
@@ -123,10 +154,11 @@ export function parseKun(form) {
 }
 
 /** Readings of a kanji of one kind, as hiragana strings a learner might type. */
-export function readingAnswers(it, kind, { commonOnly = true } = {}) {
+export function readingAnswers(it, kind, { commonOnly = true, taughtOnly = false } = {}) {
   const out = new Set();
   for (const r of it[kind]) {
     if (commonOnly && !r.common) continue;
+    if (taughtOnly && !isTaught(it, kind, r)) continue;
     for (const f of r.forms) {
       if (kind === 'on') {
         out.add(toHiragana(f.replace(/-/g, '')));

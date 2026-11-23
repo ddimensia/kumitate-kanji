@@ -413,6 +413,7 @@ def main(argv):
     # Reading counts over every candidate word.
     counts = defaultdict(Counter)  # kanji -> Counter({('on', reading): n})
     alone = defaultdict(set)       # readings used by a word written with just that kanji (明るい)
+    easiest = defaultdict(dict)    # kanji -> {reading: easiest JLPT level (5 = N5) of a word using it}
     juku = defaultdict(list)       # kanji -> word ids with a special reading
     on_var, kun_var = {}, {}
     for c in kset:
@@ -434,6 +435,8 @@ def main(argv):
                 if hit:
                     seg.append('o' if hit[0] == 'on' else 'k')
                     counts[c][hit] += weight
+                    if w['jlpt']:
+                        easiest[c][hit] = max(easiest[c].get(hit, 0), w['jlpt'])
                     if [x for x in w['w'] if is_kanji(x)] == [c]:
                         alone[c].add(hit)
             elif len(ks) >= 2 or (len(ks) == 1 and len(ruby) > 1 and '々' not in ruby):
@@ -449,16 +452,19 @@ def main(argv):
         for kind, src in (('on', K[c]['on']), ('kun', K[c]['kun'])):
             # Entries are [forms, count, common]. Kun'yomi sharing a stem are grouped
             # (あ.げる, あ.がる), since a word's furigana only shows the stem.
-            groups, solo = {}, set()
+            groups, solo, level_of = {}, set(), {}
             for r in src:
                 key = r if kind == 'on' else kun_stem(r)
                 n = cnt.get((kind, r), 0)
+                lv = easiest[c].get((kind, r), 0)
                 if key in groups:
                     if r not in groups[key][0]:
                         groups[key][0].append(r)
                     groups[key][1] += n
+                    level_of[key] = max(level_of[key], lv)
                 else:
                     groups[key] = [[r], n]
+                    level_of[key] = lv
                 if (kind, r) in alone[c]:
                     solo.add(key)
             lst = list(groups.values())
@@ -477,6 +483,10 @@ def main(argv):
                 x[2] = 0
             for x in lst:
                 x[2] = min(x[2], 1)
+            # Fourth field: the easiest JLPT level of a word using the reading (0: none), so the
+            # app can teach only readings you'll meet in words soon (田: た yes, デン later).
+            for key, x in groups.items():
+                x.append(level_of[key])
             res[kind] = lst
         if not any(x[2] for k in res.values() for x in k):
             # Rare kanji with no counted words: its first on'yomi (or kun'yomi) counts.

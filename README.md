@@ -24,7 +24,11 @@ Everything runs in the browser. There is no server and no account: progress is s
 | Kanji | meaning, on'yomi (if it has a common one), kun'yomi (if it has a common one) |
 | Word | meaning, reading |
 
-Only common readings are asked for. A reading counts as common when it appears in enough common or JLPT words (counted from JmdictFurigana, allowing for rendaku and small っ), or when the kanji on its own is a word read that way (上 うえ, 明るい). Info cards list all readings, with rare ones greyed out, plus special readings (jukujikun such as 今日 きょう).
+Only readings you'll actually need soon are asked for.
+- **Common:** a reading counts as common when it appears in enough common or JLPT words (counted from JmdictFurigana, allowing for rendaku and small っ), or when the kanji on its own is a word read that way (上 うえ, 明るい).
+- **Taught:** a common reading is taught and quizzed with the kanji only if a JLPT word using it is at most two levels harder than the kanji. 田 (N4) teaches た (田, N3) but not デン, which is only used in N1 words (水田, 田園); you learn デン through those words. Every kanji teaches at least its most used reading.
+- **Setting:** under Settings → Kanji readings to learn, choose one level ahead, two levels ahead or all common readings. Switching adds reading questions for kanji you've learned, or pauses them while keeping their history.
+- **Cards:** info cards show all readings, with taught ones highlighted, readings met later in words plain, and rare ones grey, plus special readings (jukujikun such as 今日 きょう). Any real reading is accepted as an answer.
 
 **Answers.** Meanings are typed in English and readings in kana. Romaji turns into kana as you type, via WanaKana. When an answer isn't graded right, one of four things happens:
 

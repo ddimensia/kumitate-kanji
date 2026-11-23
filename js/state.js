@@ -2,7 +2,7 @@
 
 import * as store from './store.js';
 import { configureSrs, newSrsCard, review, retrievability, Rating, State } from './srs.js';
-import { curriculum, item, cardTypes, cardId, splitCardId } from './data.js';
+import { curriculum, item, cardTypes, cardId, splitCardId, setReadingWindow } from './data.js';
 
 export const DEFAULT_SETTINGS = {
   dailyMax: 15,         // most new items a day
@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS = {
   dayStartHour: 4,      // a study day starts at 4am
   firstReview: '4h',    // wait between a lesson and its first review
   missReview: '1h',     // wait before a missed card comes back
+  readingWindow: 2,     // teach kanji readings used in JLPT words up to this many levels harder ('all': every common one)
 };
 
 const srsOptions = (s) => ({ retention: s.retention, firstStep: s.firstReview, missStep: s.missReview });
@@ -32,6 +33,7 @@ export const DAY = 86400000;
 export async function initState() {
   settings = { ...DEFAULT_SETTINGS, ...((await store.kvGet('settings')) || {}) };
   configureSrs(srsOptions(settings));
+  setReadingWindow(settings.readingWindow);
   cards.clear();
   for (const c of await store.getAll('cards')) cards.set(c.id, c);
   synonyms = (await store.kvGet('synonyms')) || {};
@@ -53,12 +55,43 @@ export async function saveSettings(patch) {
   settings = { ...settings, ...patch };
   if ('retention' in patch || 'firstReview' in patch || 'missReview' in patch) configureSrs(srsOptions(settings));
   await store.kvSet('settings', settings);
+  if ('readingWindow' in patch) {
+    setReadingWindow(settings.readingWindow);
+    await syncReadingCards();
+  }
   emit();
 }
 
 // ---- Items ------------------------------------------------------------------------
 
 export const getCard = (id) => cards.get(id);
+
+/** Is this card one of its item's current questions? (Reading settings can turn some off.) */
+const isActive = (c) => {
+  const it = item(c.item);
+  return !!it && cardTypes(it).includes(c.type);
+};
+
+/**
+ * After the reading setting changes: kanji you've already learned get any reading question
+ * the setting now turns on, starting as if just learned. Questions it turns off keep their
+ * history (unused) in case you switch back. Returns how many were added.
+ */
+export async function syncReadingCards(now = new Date()) {
+  const fresh = [];
+  for (const it of introducedItems()) {
+    if (it.kind !== 'k') continue;
+    for (const t of cardTypes(it)) {
+      const id = cardId(it.id, t);
+      if (cards.has(id)) continue;
+      const c = { id, item: it.id, type: t, introducedAt: now.getTime(), srs: review(newSrsCard(now), Rating.Good, now), right: 0, wrong: 0, marked: true };
+      cards.set(id, c);
+      fresh.push(c);
+    }
+  }
+  await store.putMany('cards', fresh);
+  return fresh.length;
+}
 export const itemCards = (it) => cardTypes(it).map((t) => cards.get(cardId(it.id, t))).filter(Boolean);
 export const isIntroduced = (it) => cards.has(cardId(it.id, 'm'));
 export const isPassed = (id) => !!passed[id];
@@ -133,7 +166,7 @@ export function accuracy(days = 7, now = Date.now()) {
 export function dueCardIds(now = new Date()) {
   const t = now.getTime();
   const out = [];
-  for (const c of cards.values()) if (Date.parse(c.srs.due) <= t) out.push(c.id);
+  for (const c of cards.values()) if (Date.parse(c.srs.due) <= t && isActive(c)) out.push(c.id);
   return out;
 }
 
@@ -245,9 +278,9 @@ export function recentMistakes(now = new Date()) {
   const byItem = new Map();
   for (const e of studied) {
     if (e.ok || e.ts < since) continue;
-    const [itemId] = splitCardId(e.card);
+    const [itemId, type] = splitCardId(e.card);
     const it = item(itemId);
-    if (!it) continue;
+    if (!it || !cardTypes(it).includes(type)) continue;
     const m = byItem.get(itemId) || { it, misses: 0, cards: new Set(), last: 0 };
     m.misses++;
     m.cards.add(e.card);
@@ -363,7 +396,8 @@ export async function removeSynonym(itemId, text) {
 
 /** Forget an item: its cards go away and it returns to the lesson queue. */
 export async function resetItem(it, { quiet = false } = {}) {
-  const ids = cardTypes(it).map((t) => cardId(it.id, t));
+  // Every question, including reading questions the current setting has paused.
+  const ids = [...cards.values()].filter((c) => c.item === it.id).map((c) => c.id);
   for (const id of ids) cards.delete(id);
   await store.deleteMany('cards', ids);
   delete passed[it.id];
@@ -373,9 +407,10 @@ export async function resetItem(it, { quiet = false } = {}) {
 
 // ---- Stats --------------------------------------------------------------------------
 
+/** Items you've started (every item has a meaning question; others can be paused). */
 export function introducedItems() {
   const ids = new Set();
-  for (const c of cards.values()) ids.add(c.item);
+  for (const c of cards.values()) if (c.type === 'm') ids.add(c.item);
   return [...ids].map(item).filter(Boolean);
 }
 
@@ -415,6 +450,7 @@ export function forecast(now = new Date()) {
   ];
   const counts = buckets.map(() => 0);
   for (const c of cards.values()) {
+    if (!isActive(c)) continue;
     const due = Date.parse(c.srs.due);
     const i = buckets.findIndex((b) => due <= b.end);
     if (i >= 0) counts[i]++;

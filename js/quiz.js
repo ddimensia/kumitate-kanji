@@ -6,7 +6,7 @@
 // kind ("that's the kun'yomi") aren't graded at all: the card shakes and you try again.
 
 import { bind, unbind } from '../vendor/wanakana.js';
-import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings } from './data.js';
+import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings, taughtReadings } from './data.js';
 import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc } from './ui.js';
@@ -48,8 +48,7 @@ function expectedHtml(it, type) {
   // Readings are big and clickable: tap one to hear it.
   const say = (kana, text) => `<button type="button" class="q-reading" lang="ja" data-say="${esc(kana)}" title="Play ${esc(kana)}">${esc(text)}</button>`;
   if (type === 'r') return it.readings.map((r) => say(r, r)).join('');
-  return it[type]
-    .filter((r) => r.common)
+  return taughtReadings(it)[type]
     .map((r) => {
       if (type === 'on') return say(r.forms[0], r.forms[0]);
       const forms = r.forms.filter((f) => !f.startsWith('-'));

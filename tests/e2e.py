@@ -18,7 +18,7 @@ ANSWER_JS = """async () => {
   const it = d.item(itemId);
   if (type === 'm') return { id, type, answer: d.meanings(it)[0] };
   if (type === 'r') return { id, type, answer: it.readings[0] };
-  return { id, type, answer: d.readingAnswers(it, type)[0] };
+  return { id, type, answer: d.readingAnswers(it, type, { taughtOnly: true })[0] };
 }"""
 
 
@@ -331,6 +331,26 @@ async def main():
         }""")
         check(await pg.evaluate('window.__said') == [], 'read-aloud setting off: nothing is said')
         await pg.evaluate("async () => (await import('./js/state.js')).saveSettings({ autoplay: true })")
+
+        # --- Reading setting: rarely needed readings aren't quizzed; switching adds/pauses them ---
+        res = await pg.evaluate("""async () => {
+          const s = await import('./js/state.js'); const d = await import('./js/data.js');
+          const ta = d.item('k:田');
+          await s.setLevel([ta], 'solid');
+          const before = s.itemCards(ta).map((c) => c.type);
+          await s.saveSettings({ readingWindow: 'all' });
+          const all = s.itemCards(ta).map((c) => c.type);
+          const onDue = s.getCard('k:田/on').srs.due;
+          await s.saveSettings({ readingWindow: 2 });
+          const after = s.itemCards(ta).map((c) => c.type);
+          const later = new Date(Date.parse(onDue) + 60000);
+          const dueLater = s.dueCardIds(later).includes('k:田/on');
+          await s.setLevel([ta], 'none');
+          return { before, all, after, dueLater };
+        }""")
+        check(res['before'] == ['m', 'kun'], f"田 has meaning and kun'yomi questions by default: {res['before']}")
+        check(res['all'] == ['m', 'on', 'kun'], f"'All common readings' adds an on'yomi question: {res['all']}")
+        check(res['after'] == ['m', 'kun'] and not res['dueLater'], 'switching back pauses it (never comes due)')
 
         # --- "Already know it": set a level from the item page, parts included ---
         await pg.goto(BASE + '#item/k:%E5%83%8D')  # 働

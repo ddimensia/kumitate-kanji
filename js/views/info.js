@@ -99,7 +99,7 @@ function kanjiCard(it) {
         ${hasKun ? `<dt>Kun'yomi <small>訓読み</small></dt><dd>${readingListHtml(it, 'kun')}</dd>` : ''}
         ${juku.length ? `<dt>Special <small>熟字訓</small></dt><dd>${juku.map((v) => `<span class="juku" data-say="${esc(v.readings[0])}">${furiganaHtml(v)}</span>`).join('')}</dd>` : ''}
       </dl>
-      <p class="hint">Bold readings are the common ones you'll be asked for. Tap a reading to hear it.</p>
+      <p class="hint"><span class="reading taught" style="font-size:inherit">Highlighted</span>: taught and quizzed with this kanji. Plain: you’ll meet it later in words. Grey: rare. Tap a reading to hear it.</p>
     </section>
     ${radicalsSection(it)}
     ${it.usedIn.length ? section('Part of', it.usedIn.length, `<div class="tiles">${tiles(it.usedIn, 12)}</div>`) : ''}
