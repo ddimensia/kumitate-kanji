@@ -8,7 +8,13 @@ Everything runs in the browser. There is no server and no account: progress is s
 
 **Order.** Kanji follow the JLPT lists, N5 first, by newspaper frequency within each level (2,211 kanji). Before each kanji come the components it's built from, and after it come the words written with it (about 7,300).
 
-**Radicals.** Components come from KanjiVG's stroke groups, so they nest the way KanjiDamage's do: 働 = 亻 + 動, and 動 = 重 + 力. A part that is a kanji on the list at the same JLPT level, or one level up, is taught as a full kanji first. Any other part is taught as a radical (meaning only): about 400 of them. A radical that is also a kanji takes the kanji's name. The exception is a well-known radical name: the 214 classical radicals (囗 "enclosure") and the side and top forms (亻 "person", 氵 "water", 艹 "grass"), named in `tools/radical_names.py`. Single strokes are skipped. Kanji cards show the breakdown one level deep (働 = 亻 + 動 (= 重 + 力)) and the dictionary radical (部首).
+**Radicals.** Every kanji has radicals, as on KanjiDamage. Components come from KanjiVG's stroke groups, so they nest: 働 = 亻 + 動, and 動 = 重 + 力.
+- A basic kanji that isn't built from smaller parts (口, 日, 山) is first taught as a radical of the same shape, then as a kanji with its readings.
+- When a basic kanji is a part of another kanji, the larger one is built from its radical: 明 = 日 + 月 radicals.
+- A part that is a kanji built from parts of its own stays a kanji part (動 in 働). It is taught first if it's at the same JLPT level or one level up; otherwise it's taught as a radical.
+- Like KanjiDamage, the enclosure 囗 counts as the 口 (mouth) radical.
+- A radical that is also a kanji takes the kanji's name, except where a radical has a well-known name of its own: the 214 classical radicals and the side and top forms (亻 "person", 氵 "water", 艹 "grass"). Those names are in `tools/radical_names.py`. Single strokes are skipped.
+- Kanji cards show the breakdown one level deep, plus the dictionary radical (部首).
 
 **Questions.** Each item has its own cards, each with its own FSRS schedule:
 

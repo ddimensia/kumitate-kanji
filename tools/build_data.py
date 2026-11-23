@@ -33,7 +33,7 @@ import csv, json, os, re, sys, unicodedata
 from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(__file__))
-from radical_names import RADICAL_NAMES, RADICAL_NOTES, IGNORE_PARTS  # noqa: E402
+from radical_names import RADICAL_NAMES, RADICAL_NOTES, IGNORE_PARTS, MERGE  # noqa: E402
 
 
 def is_kanji(c):
@@ -147,7 +147,7 @@ CLASSICAL_FORMS = {
     '无': '旡', '臼': '𦥑', '戶': '戸', '靑': '青', '黑': '黒', '黃': '黄', '齒': '歯', '麥': '麦',
     '夊': '夂', '彐': '⺕彑', '尢': '尤', '水': '氵氺', '心': '忄⺗', '手': '扌', '人': '亻𠆢', '刀': '刂',
     '示': '礻', '衣': '衤', '犬': '⺨犭', '火': '灬', '玉': '王', '老': '耂', '食': '飠', '糸': '糹',
-    '言': '訁', '金': '釒', '肉': '月', '川': '巛', '曰': '日',
+    '言': '訁', '金': '釒', '肉': '月', '川': '巛', '曰': '日', '囗': '口',
 }
 
 
@@ -332,16 +332,35 @@ def main(argv):
     radicals, kanji_parts, radical_users = {}, {}, defaultdict(list)
     unnamed = Counter()
 
+    def usable_parts(c):
+        """A kanji's top-level parts worth teaching (single strokes and junk dropped)."""
+        tree = trees.get(c)
+        out = []
+        for el, orig, strokes in (top_parts(tree, c) if tree else []):
+            el = MERGE.get(el, el)
+            if el == c or el in IGNORE_PARTS or strokes <= 1 and el != '一':
+                continue
+            if el not in [x[0] for x in out]:
+                out.append((el, orig, strokes))
+        return out
+
+    def is_basic(c):
+        """A kanji not built from smaller taught parts: it serves as its own radical."""
+        return not usable_parts(c)
+
     def place_kanji(c, level, chain=()):
         if 'k:' + c in placed or c in chain:
             return
         prereqs = []
-        tree = trees.get(c)
-        for el, orig, strokes in (top_parts(tree, c) if tree else []):
-            if el in IGNORE_PARTS or strokes <= 1 and el != '一':
-                continue
+        for el, orig, strokes in usable_parts(c):
             pid = part_id(el, orig, strokes, level, chain + (c,))
             if pid and pid not in prereqs:
+                prereqs.append(pid)
+        if not prereqs:
+            # Every kanji has a radical: a basic kanji (口, 日, 山) is taught first as a
+            # radical of the same shape, then as a kanji with its readings.
+            pid = place_radical(c, None, K[c]['strokes'])
+            if pid:
                 prereqs.append(pid)
         kanji_parts[c] = prereqs
         for p in prereqs:
@@ -351,11 +370,18 @@ def main(argv):
         order.append('k:' + c)
 
     def part_id(el, orig, strokes, level, chain):
+        # A basic kanji used as a part counts as its radical (明 = 日 + 月 radicals);
+        # a kanji built from parts of its own stays a kanji part (働 = 亻 + 動).
+        if el in jlpt_level and is_basic(el):
+            return place_radical(el, orig, strokes)
         if 'k:' + el in placed:
             return 'k:' + el
         if el in jlpt_level and jlpt_level[el] >= level - 1 and el not in chain:
             place_kanji(el, jlpt_level[el], chain)
             return 'k:' + el
+        return place_radical(el, orig, strokes)
+
+    def place_radical(el, orig, strokes):
         if 'r:' + el in placed:
             return 'r:' + el
         named = radical_name(el, orig, K, jlpt_level)

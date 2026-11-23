@@ -50,7 +50,7 @@ function radicalCard(it) {
   const orig = it.orig ? item('k:' + it.orig) : null;
   return `${header(it)}
     ${meaningsBlock([it.name, ...it.alt], it.id)}
-    ${it.note ? `<section class="info-sec"><h3>Don’t mix it up</h3><p class="radical-note">${esc(it.note).replace(/[\u3400-\u9fff]/g, (c) => `<span lang="ja" class="nj">${c}</span>`)}</p></section>` : ''}
+    ${it.note ? `<section class="info-sec"><h3>Note</h3><p class="radical-note">${esc(it.note).replace(/[\u3400-\u9fff]/g, (c) => `<span lang="ja" class="nj">${c}</span>`)}</p></section>` : ''}
     ${item('k:' + it.ch) ? `<section class="info-sec"><h3>Also a kanji</h3><div class="tiles">${tileHtml(item('k:' + it.ch), { stage: stage(item('k:' + it.ch)) })}</div><p class="hint">On its own, ${esc(it.ch)} is a kanji you’ll learn with its readings.</p></section>` : ''}
     ${it.orig ? `<section class="info-sec"><h3>Form of</h3><p>A variant of <span lang="ja" class="inline-glyph">${esc(it.orig)}</span>${orig ? ` (${esc(primaryMeaning(orig))})` : ''}, as it appears inside other kanji.</p></section>` : ''}
     ${it.users.length ? section('Found in', it.users.length, `<div class="tiles">${tiles(it.users)}</div>`) : ''}`;
@@ -81,9 +81,9 @@ function radicalsSection(it) {
       : `<span lang="ja" class="inline-glyph">${esc(c.ch)}</span>`;
     dict = `<p class="hint dict-radical">Dictionary radical (部首): ${glyphHtml} ${esc(c.name)}, no. ${c.n} of the 214 classical radicals. Dictionaries file the kanji under it.</p>`;
   }
-  const body = it.prereq.length
-    ? `<div class="parts-tree">${partsTree(it.prereq)}</div>`
-    : '<p>A basic shape: it isn’t broken down into smaller parts, and it’s a building block for other kanji.</p>';
+  const own = it.prereq.length === 1 && it.prereq[0] === 'r:' + it.ch;
+  const body = `<div class="parts-tree">${partsTree(it.prereq)}</div>${own
+    ? `<p class="hint">A basic shape: this kanji is its own radical, which you learn first and then meet inside other kanji.</p>` : ''}`;
   return `<section class="info-sec"><h3>Radicals</h3>${body}${dict}</section>`;
 }
 

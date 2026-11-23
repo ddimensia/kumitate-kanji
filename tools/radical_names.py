@@ -35,7 +35,7 @@ RADICAL_NAMES = {
     '攵': ['strike', 'hit', 'taskmaster'],
     '攴': ['strike', 'hit', 'taskmaster'],
     '亠': ['lid', 'top hat', 'pot lid'],
-    '囗': ['enclosure', 'big mouth', 'box', 'border', 'country border'],
+    '口': ['mouth', 'enclosure', 'box', 'big mouth'],
     '冂': ['frame', 'upside-down box', 'border'],
     '儿': ['legs', 'human legs', 'walking legs'],
     '匕': ['spoon', 'ladle', 'sitting person'],
@@ -224,10 +224,12 @@ RADICAL_NAMES = {
 
 # Notes shown on a radical's card, for shapes that are easy to mix up.
 RADICAL_NOTES = {
-    '囗': 'Not the same as 口 (mouth). The enclosure is bigger and wraps around other parts, '
-          'as in 国 and 四; 口 is smaller and sits beside or inside them, as in 名 and 品. '
-          '回 has both: a small 口 inside a big 囗.',
+    '口': 'Also covers the big box around other parts (囗, the enclosure), as in 国 and 四. '
+          'Strictly they are different characters, but they’re treated as one radical here.',
 }
+
+# Shapes taught as one radical, as KanjiDamage does: the enclosure 囗 counts as 口 (mouth).
+MERGE = {'囗': '口'}
 
 # Components never taught on their own (single strokes are skipped automatically).
 IGNORE_PARTS = {'丆', '𥝢', '駦', '𬀷', '䩗', '𩾏', '潘', '筑', '寿'}

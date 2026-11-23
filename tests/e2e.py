@@ -75,71 +75,74 @@ async def main():
         # A typo in a reading (one kana off) is not graded: try again.
         # A wrong answer can be undone with Backspace.
         did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = did_blank = False
-        for _ in range(60):
-            if not await pg.query_selector('.q-input'):
-                break
-            info = await pg.evaluate(ANSWER_JS)
-            if not did_blank:
-                # Enter on a blank answer asks again; Enter a second time marks it wrong.
-                await pg.fill('.q-input', '')
-                await pg.press('.q-input', 'Enter')
-                await pg.wait_for_timeout(50)
-                first_ok = not await pg.query_selector('.q-form.is-wrong') and 'again' in (await pg.text_content('.q-note'))
-                await pg.press('.q-input', 'Enter')
-                await pg.wait_for_selector('.q-form.is-wrong')
-                check(first_ok, 'blank answer: first Enter asks again, second marks it wrong')
-                await pg.keyboard.press('Backspace')
-                await pg.wait_for_selector('.q-input:not([readonly])')
-                did_blank = True
-            if not did_undo and info['type'] == 'm':
-                await pg.fill('.q-input', 'zzzz')
-                await pg.press('.q-input', 'Enter')
-                await pg.wait_for_selector('.q-form.is-wrong')
-                await pg.keyboard.press('Backspace')
-                await pg.wait_for_selector('.q-input:not([readonly])')
-                check(await pg.input_value('.q-input') == 'zzzz', 'undo restores the wrong answer for editing')
-                did_undo = True
-            elif not did_kata and info['type'] == 'on':
-                romaji = await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toRomaji(k)", info['answer'])
-                if romaji.endswith('n'):
-                    romaji += 'n'  # a final n stays latin until the next key, as with any kana input
-                await pg.fill('.q-input', '')
-                await pg.type('.q-input', romaji)
-                shown = await pg.input_value('.q-input')
-                check(shown == await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toKatakana(k)", info['answer']),
-                      f'on\'yomi input shows katakana ({romaji} -> {shown})')
-                await pg.press('.q-input', 'Enter')
+        async def run_checked_quiz():
+            # Answers every card right, exercising each special case once along the way.
+            nonlocal did_typo, did_undo, did_enter_blur, did_reading_btn, did_kata, did_blank
+            for _ in range(60):
+                if not await pg.query_selector('.q-input'):
+                    break
+                info = await pg.evaluate(ANSWER_JS)
+                if not did_blank:
+                    # Enter on a blank answer asks again; Enter a second time marks it wrong.
+                    await pg.fill('.q-input', '')
+                    await pg.press('.q-input', 'Enter')
+                    await pg.wait_for_timeout(50)
+                    first_ok = not await pg.query_selector('.q-form.is-wrong') and 'again' in (await pg.text_content('.q-note'))
+                    await pg.press('.q-input', 'Enter')
+                    await pg.wait_for_selector('.q-form.is-wrong')
+                    check(first_ok, 'blank answer: first Enter asks again, second marks it wrong')
+                    await pg.keyboard.press('Backspace')
+                    await pg.wait_for_selector('.q-input:not([readonly])')
+                    did_blank = True
+                if not did_undo and info['type'] == 'm':
+                    await pg.fill('.q-input', 'zzzz')
+                    await pg.press('.q-input', 'Enter')
+                    await pg.wait_for_selector('.q-form.is-wrong')
+                    await pg.keyboard.press('Backspace')
+                    await pg.wait_for_selector('.q-input:not([readonly])')
+                    check(await pg.input_value('.q-input') == 'zzzz', 'undo restores the wrong answer for editing')
+                    did_undo = True
+                elif not did_kata and info['type'] == 'on':
+                    romaji = await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toRomaji(k)", info['answer'])
+                    if romaji.endswith('n'):
+                        romaji += 'n'  # a final n stays latin until the next key, as with any kana input
+                    await pg.fill('.q-input', '')
+                    await pg.type('.q-input', romaji)
+                    shown = await pg.input_value('.q-input')
+                    check(shown == await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toKatakana(k)", info['answer']),
+                          f'on\'yomi input shows katakana ({romaji} -> {shown})')
+                    await pg.press('.q-input', 'Enter')
+                    await pg.wait_for_selector('.q-form.is-right')
+                    await pg.keyboard.press('Enter')
+                    await pg.wait_for_timeout(30)
+                    did_kata = True
+                    continue
+                elif not did_typo and info['type'] == 'on' and len(info['answer']) >= 3:
+                    wrong = info['answer'][:-1] + ('か' if info['answer'][-1] != 'か' else 'き')
+                    await pg.fill('.q-input', wrong)
+                    await pg.press('.q-input', 'Enter')
+                    note = await pg.text_content('.q-note')
+                    check('typo' in note.lower() and not await pg.query_selector('.q-form.is-wrong'),
+                          f'typo {wrong} for {info["answer"]} asks to try again')
+                    did_typo = True
+                await answer_current(pg)
                 await pg.wait_for_selector('.q-form.is-right')
+                if info['type'] != 'm' and not did_reading_btn:
+                    did_reading_btn = bool(await pg.query_selector('.q-answer .q-reading[data-say]'))
+                if not did_enter_blur:
+                    # Enter advances even when the answer box isn't focused.
+                    before = await pg.get_attribute('.q-card', 'data-card')
+                    await pg.evaluate('document.activeElement.blur()')
+                    await pg.keyboard.press('Enter')
+                    await pg.wait_for_timeout(50)
+                    after = await pg.get_attribute('.q-card', 'data-card') if await pg.query_selector('.q-card') else None
+                    did_enter_blur = after != before or not await pg.query_selector('.q-form.is-right')
+                    continue
                 await pg.keyboard.press('Enter')
                 await pg.wait_for_timeout(30)
-                did_kata = True
-                continue
-            elif not did_typo and info['type'] == 'on' and len(info['answer']) >= 3:
-                wrong = info['answer'][:-1] + ('か' if info['answer'][-1] != 'か' else 'き')
-                await pg.fill('.q-input', wrong)
-                await pg.press('.q-input', 'Enter')
-                note = await pg.text_content('.q-note')
-                check('typo' in note.lower() and not await pg.query_selector('.q-form.is-wrong'),
-                      f'typo {wrong} for {info["answer"]} asks to try again')
-                did_typo = True
-            await answer_current(pg)
-            await pg.wait_for_selector('.q-form.is-right')
-            if info['type'] != 'm' and not did_reading_btn:
-                did_reading_btn = bool(await pg.query_selector('.q-answer .q-reading[data-say]'))
-            if not did_enter_blur:
-                # Enter advances even when the answer box isn't focused.
-                before = await pg.get_attribute('.q-card', 'data-card')
-                await pg.evaluate('document.activeElement.blur()')
-                await pg.keyboard.press('Enter')
-                await pg.wait_for_timeout(50)
-                after = await pg.get_attribute('.q-card', 'data-card') if await pg.query_selector('.q-card') else None
-                did_enter_blur = after != before or not await pg.query_selector('.q-form.is-right')
-                continue
-            await pg.keyboard.press('Enter')
-            await pg.wait_for_timeout(30)
+        await run_checked_quiz()
         check(did_undo, 'undo was exercised')
-        check(did_kata, "an on'yomi was answered in katakana")
-        check(did_enter_blur and did_reading_btn, 'Enter moves on without focus; readings are clickable buttons')
+        check(did_enter_blur, 'Enter moves on without focus')
         await pg.wait_for_selector('.summary')
         check('Learned 5 new items' in await pg.text_content('.summary h2'), 'lesson summary')
         await pg.click('[data-act="done"]')
@@ -158,7 +161,7 @@ async def main():
         await pg.reload()
         await pg.wait_for_selector('.today')
         due = int((await pg.text_content('.hero.reviews .hero-count')).strip())
-        check(due >= 10, f'{due} reviews due after ten minutes')
+        check(due >= 5, f'{due} reviews due after ten minutes (one per radical)')
         await pg.click('[data-act="reviews"]')
         await pg.wait_for_selector('.quiz')
         await finish_quiz(pg)
@@ -183,6 +186,41 @@ async def main():
         await pg.wait_for_selector('.summary')
         text = await pg.text_content('.summary')
         check('Newly unlocked' in text, 'passing reviews unlock new items')
+        kinds = await pg.evaluate("""async () => {
+          const s = await import('./js/state.js');
+          return s.lessonQueue(400).map((it) => it.id);
+        }""")
+        check('k:日' in kinds and not any(k.startswith('v:') for k in kinds),
+              'passing the 日 radical unlocks the 日 kanji, but no words yet')
+
+        # --- Learn the unlocked kanji, then pass them: their words unlock ---
+        await pg.click('[data-act="done"]')
+        await pg.wait_for_selector('.today')
+        await pg.evaluate("""async () => {
+          const s = await import('./js/state.js');
+          await s.saveSettings({ dailyMax: 100, batchSize: 10 });
+        }""")
+        await pg.reload()
+        await pg.wait_for_selector('.today')
+        await pg.click('[data-act="lessons"]')
+        await pg.wait_for_selector('.lesson')
+        n = len(await pg.query_selector_all('.lesson-tabs button'))
+        for _ in range(n):
+            await pg.keyboard.press('ArrowRight')
+        await pg.wait_for_selector('.quiz')
+        await run_checked_quiz()
+        check(did_kata, "an on'yomi was answered in katakana")
+        check(did_reading_btn, 'readings after an answer are clickable buttons')
+        await pg.wait_for_selector('.summary')
+        for hours in (60.2, 120):
+            await pg.clock.set_system_time(start + dt.timedelta(hours=hours))
+            await pg.goto(BASE + '#today')
+            await pg.reload()
+            await pg.wait_for_selector('.today')
+            await pg.click('[data-act="reviews"]')
+            await pg.wait_for_selector('.quiz')
+            await finish_quiz(pg)
+            await pg.wait_for_selector('.summary')
         vocab = await pg.evaluate("""async () => {
           const s = await import('./js/state.js');
           return s.lessonQueue(400).filter((it) => it.kind === 'v').map((it) => it.w).slice(0, 5);
