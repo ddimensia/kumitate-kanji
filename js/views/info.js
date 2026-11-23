@@ -20,7 +20,7 @@ const tiles = (ids, n = 24) =>
 function header(it) {
   const st = stage(it);
   const meta = [];
-  if (it.jlpt) meta.push(`JLPT N${it.jlpt}`);
+  if (it.jlpt) meta.push(it.kind === 'r' ? `Taught with N${it.jlpt} kanji` : `JLPT N${it.jlpt}`);
   if (it.grade) meta.push(it.grade <= 6 ? `Grade ${it.grade}` : 'Secondary school');
   if (it.strokes) meta.push(`${it.strokes} strokes`);
   if (it.kind === 'v' && it.pos.length) meta.push(it.pos.join(', '));
@@ -72,8 +72,12 @@ function radicalsSection(it) {
   const c = it.classical;
   let dict = '';
   if (c) {
-    const target = item('r:' + c.ch) || item('k:' + c.ch);
-    const glyphHtml = target ? `<a href="#item/${encodeURIComponent(target.id)}" lang="ja" class="inline-glyph">${esc(c.ch)}</a>` : `<span lang="ja" class="inline-glyph">${esc(c.ch)}</span>`;
+    // Linked to the form the course teaches: 艸 -> 艹, 阜 -> ⻖, 靑 -> 青.
+    const target = c.id ? item(c.id) : null;
+    const shown = target && target.ch !== c.ch ? ` (taught as <span lang="ja">${esc(target.ch)}</span>)` : '';
+    const glyphHtml = target
+      ? `<a href="#item/${encodeURIComponent(target.id)}" class="dict-link"><span lang="ja" class="inline-glyph">${esc(c.ch)}</span>${shown}</a>`
+      : `<span lang="ja" class="inline-glyph">${esc(c.ch)}</span>`;
     dict = `<p class="hint dict-radical">Dictionary radical (部首): ${glyphHtml} ${esc(c.name)}, no. ${c.n} of the 214 classical radicals. Dictionaries file the kanji under it.</p>`;
   }
   const body = it.prereq.length

@@ -141,6 +141,14 @@ for cp in list(range(0x2F00, 0x2FD6)) + list(range(0x2E80, 0x2EF4)):
     if cp < 0x2FD6:
         CLASSICAL[cp - 0x2F00 + 1] = (base, words)
 CLASSICAL_CHARS = {c for c, _ in CLASSICAL.values()}
+# Other forms of classical radicals: as written inside kanji, or in modern Japanese.
+CLASSICAL_FORMS = {
+    '辵': '⻌辶', '艸': '艹⺾', '阜': '⻖', '邑': '⻏', '攴': '攵', '网': '罒㓁', '襾': '覀', '爪': '⺤爫',
+    '无': '旡', '臼': '𦥑', '戶': '戸', '靑': '青', '黑': '黒', '黃': '黄', '齒': '歯', '麥': '麦',
+    '夊': '夂', '彐': '⺕彑', '尢': '尤', '水': '氵氺', '心': '忄⺗', '手': '扌', '人': '亻𠆢', '刀': '刂',
+    '示': '礻', '衣': '衤', '犬': '⺨犭', '火': '灬', '玉': '王', '老': '耂', '食': '飠', '糸': '糹',
+    '言': '訁', '金': '釒', '肉': '月', '川': '巛', '曰': '日',
+}
 
 
 def kanji_meanings(K, c):
@@ -506,6 +514,34 @@ def main(argv):
             full_order += ['v:' + w['id'] for w in vs]
 
     # -- Output ----------------------------------------------------------------
+    # Where a dictionary radical is taught: the radical itself, the form used inside kanji
+    # (艸 -> 艹, 阜 -> ⻖), its modern form (靑 -> 青), or the kanji of the same character.
+    by_orig = defaultdict(list)
+    for r, info in radicals.items():
+        if info.get('o'):
+            by_orig[info['o']].append(r)
+
+    def classical_item(ch):
+        for c in [ch] + list(CLASSICAL_FORMS.get(ch, '')):
+            if c in radicals:
+                return 'r:' + c
+            if c in kset:
+                return 'k:' + c
+            for r in by_orig.get(c, []):
+                return 'r:' + r
+        return None
+
+    # A radical's level is that of the first kanji that uses it.
+    first_level = {}
+    for item_id in order:
+        if item_id.startswith('k:'):
+            for p in kanji_parts.get(item_id[2:], []):
+                if p.startswith('r:'):
+                    first_level.setdefault(p[2:], jlpt_level[item_id[2:]])
+    for r, info in radicals.items():
+        if r in first_level:
+            info['j'] = first_level[r]
+
     kanji_out = {}
     for c in kanji_list:
         k = K[c]
@@ -518,6 +554,9 @@ def main(argv):
             e['g'] = k['grade']
         if k['rad'] in CLASSICAL:
             e['kr'] = k['rad']
+            target = classical_item(CLASSICAL[k['rad']][0])
+            if target:
+                e['krid'] = target
         if k['freq']:
             e['f'] = k['freq']
         jk = sorted({i for i in juku.get(c, []) if i in chosen},

@@ -29,7 +29,7 @@ export function renderBrowse(root, params, navigate) {
   root.innerHTML = `<section class="browse">
     <div class="browse-controls">
       <nav class="seg" aria-label="Kind">${Object.entries(KINDS).map(([k, l]) => `<a href="#browse/${k}/${level || 'all'}/${status}" class="${k === kind ? 'is-on' : ''}">${l}</a>`).join('')}</nav>
-      ${kind !== 'r' ? `<label>Level <select data-f="level"><option value="all">All</option>${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${n === level ? 'selected' : ''}>N${n}</option>`).join('')}</select></label>` : ''}
+      <label>Level <select data-f="level"><option value="all">All</option>${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${n === level ? 'selected' : ''}>N${n}</option>`).join('')}</select></label>
       <label>Status <select data-f="status">
         <option value="all">All</option>
         <option value="studied" ${status === 'studied' ? 'selected' : ''}>Studied</option>
@@ -39,12 +39,13 @@ export function renderBrowse(root, params, navigate) {
       <input type="search" class="browse-search" placeholder="Search meaning, reading or kanji" aria-label="Search">
     </div>
     <ul class="stage-legend">${STAGES.map((s) => `<li><i class="st-${s}"></i>${esc(STAGE_LABEL[s])}</li>`).join('')}</ul>
+    <div class="level-radicals"></div>
     <p class="browse-count muted"></p>
     <div class="tiles grid"></div>
     <p><button type="button" class="btn more" hidden>Show more</button></p>
   </section>`;
 
-  const grid = root.querySelector('.grid');
+  const grid = root.querySelector('.browse > .grid');
   const countEl = root.querySelector('.browse-count');
   const moreBtn = root.querySelector('.more');
 
@@ -54,13 +55,13 @@ export function renderBrowse(root, params, navigate) {
     navigate(`browse/${kind}/${lv}/${st}`);
   }));
 
-  function draw() {
+  function collect(k) {
     const db = curriculum();
     const now = new Date();
     const list = [];
     for (const id of db.order) {
       const it = db.items.get(id);
-      if (it.kind !== kind) continue;
+      if (it.kind !== k) continue;
       if (level && it.jlpt !== level) continue;
       const st = stage(it);
       const studied = st !== 'locked' && st !== 'available';
@@ -72,8 +73,19 @@ export function renderBrowse(root, params, navigate) {
       if (!matches(it, query)) continue;
       list.push({ it, st, r });
     }
+    return list;
+  }
+  const tilesOf = (list) => list.map(({ it, st, r }) => tileHtml(it, { stage: st, extra: r !== null ? recallBadge(r) : '' })).join('');
+
+  function draw() {
+    const list = collect(kind);
+    // On a level's kanji page, the radicals taught for that level come first.
+    const rads = kind === 'k' && level ? collect('r') : [];
+    root.querySelector('.level-radicals').innerHTML = rads.length
+      ? `<h3>Radicals taught with N${level} kanji <small class="muted">(${rads.length})</small></h3><div class="tiles grid">${tilesOf(rads)}</div><h3>Kanji</h3>`
+      : '';
     countEl.textContent = `${list.length} ${KINDS[kind].toLowerCase()}`;
-    grid.innerHTML = list.slice(0, limit).map(({ it, st, r }) => tileHtml(it, { stage: st, extra: r !== null ? recallBadge(r) : '' })).join('');
+    grid.innerHTML = tilesOf(list.slice(0, limit));
     moreBtn.hidden = list.length <= limit;
   }
 
