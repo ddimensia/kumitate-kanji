@@ -342,6 +342,12 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .settings-form h2:first-child { margin-top: 0; }
 .credits li { margin: 0.3rem 0; }
 
+/* Footer */
+.site-foot { max-width: 980px; margin: 0 auto; padding: 0 clamp(0.75rem, 3vw, 2rem) 2rem; color: var(--ink-soft); font-size: 0.8125rem; }
+.site-foot p { margin: 0; border-top: 1px solid var(--rule-soft); padding-top: 1rem; }
+.site-foot a { margin-left: 0.75rem; white-space: nowrap; }
+body[data-route="study"] .site-foot { display: none; }
+
 /* Dialog and toast */
 .dialog { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--sheet); color: var(--ink); max-width: 28rem; }
 .dialog::backdrop { background: rgb(0 0 0 / 0.35); }
