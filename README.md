@@ -72,7 +72,9 @@ Serve the folder over HTTP, for example:
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000/. For use on other devices, host it on any static host over HTTPS so it can be installed as an app and work offline. GitHub Pages on a **private** repo needs a paid GitHub plan. Cloudflare Pages and Netlify both deploy private repos on their free tiers.
+Then open http://localhost:8000/. For use on other devices, host it on any static host over HTTPS so it can be installed as an app and work offline.
+
+On GitHub, set Settings → Pages → Source to **GitHub Actions**. The Deploy workflow (`.github/workflows/deploy.yml`) then publishes on every push to `main`, and after each monthly data update, once the tests pass. It publishes only the app's own files, and adds the commit id to the offline cache version in `sw.js` so installed copies update. If you host the folder some other way, bump `VERSION` in `sw.js` by hand after changing app files.
 
 Progress stays in the browser you study in. Use **Settings → Export backup** to move it or keep a copy.
 
