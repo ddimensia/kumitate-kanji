@@ -1,0 +1,49 @@
+// Answer checking against the real curriculum: node tests/answer_test.mjs
+import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+import { useCurriculum, item } from '../js/data.js';
+import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
+
+useCurriculum(JSON.parse(readFileSync(new URL('../data/curriculum.json', import.meta.url))));
+const v = (w) => [...item('k:' + [...w][0]).vocab].map(item).find((x) => x.w === w);
+let n = 0;
+const ok = (res, verdict, msg) => { n++; assert.equal(res.verdict, verdict, `${msg}: ${JSON.stringify(res)}`); };
+
+// Meanings
+ok(checkMeaning(item('k:日'), 'Sun'), 'correct', 'exact, case-insensitive');
+ok(checkMeaning(item('k:日'), 'japan'), 'correct', 'any listed meaning');
+ok(checkMeaning(item('k:働'), 'wrok'), 'correct', 'small typo is close enough');
+ok(checkMeaning(item('k:働'), 'play'), 'wrong', 'wrong meaning');
+ok(checkMeaning(item('r:亻'), 'person'), 'correct', 'radical name');
+ok(checkMeaning(item('k:日'), 'nichi'), 'retry', 'typed the reading instead');
+ok(checkMeaning(item('k:日'), 'star', ['star']), 'correct', 'user synonym');
+const hiroi = v('広い');
+ok(checkMeaning(hiroi, 'wide'), 'correct', 'vocab gloss');
+ok(checkMeaning(v('食べる'), 'eat'), 'correct', '"to eat" accepted without "to"');
+
+// Readings
+ok(checkReading(hiroi, 'r', 'hiroi'), 'correct', 'romaji converted');
+ok(checkReading(hiroi, 'r', 'ひろい'), 'correct', 'kana');
+ok(checkReading(hiroi, 'r', 'hirui'), 'retry', 'typo hirui -> retry');
+ok(checkReading(hiroi, 'r', 'ひろ'), 'retry', 'kanji reading only: nudge to type the whole word');
+ok(checkReading(hiroi, 'r', 'せまい'), 'wrong', 'different word');
+ok(checkReading(v('学校'), 'r', 'がっこ'), 'wrong', 'missing long vowel is a real mistake');
+ok(checkReading(v('学校'), 'r', 'かっこう'), 'wrong', 'dakuten is a real mistake');
+ok(checkReading(item('k:日'), 'on', 'にち'), 'correct', 'on reading');
+ok(checkReading(item('k:日'), 'on', 'ニチ'), 'correct', 'katakana typed');
+ok(checkReading(item('k:日'), 'on', 'ひ'), 'retry', 'kun given for on');
+ok(checkReading(item('k:上'), 'kun', 'うえ'), 'correct', 'kun stem');
+ok(checkReading(item('k:上'), 'kun', 'あがる'), 'correct', 'kun with okurigana');
+ok(checkReading(item('k:上'), 'kun', 'じょう'), 'retry', 'on given for kun');
+ok(checkReading(item('k:生'), 'on', 'しょう'), 'correct', 'second common on');
+ok(checkReading(item('k:日'), 'on', 'tsuki'), 'wrong', 'wrong reading');
+ok(checkReading(item('k:日'), 'on', ''), 'retry', 'empty');
+ok(checkReading(item('k:日'), 'on', 'abc'), 'retry', 'leftover latin');
+
+const hi = item('k:日').vocab.map(item).filter((x) => x.w === '日');
+assert.equal(hi.length, 1, 'one word per spelling'); n++;
+ok(checkReading(hi[0], 'r', hi[0].otherReadings[0]), 'retry', 'reading of another word spelled the same');
+assert.equal(toKanaAnswer('hon'), 'ほん'); n++;
+assert.equal(isKanaTypo('ひるい', 'ひろい'), true); n++;
+assert.equal(isKanaTypo('こここ', 'こうこう'), false); n++;
+console.log(`answer_test: ${n} checks passed`);

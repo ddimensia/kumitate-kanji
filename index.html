@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yomitori: kanji, readings and vocabulary</title>
+  <meta name="description" content="Learn radicals, kanji with their readings, and vocabulary in JLPT order, with typed answers and spaced repetition.">
+  <meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#13161d" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Yomitori">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip" href="#view">Skip to content</a>
+  <header class="masthead">
+    <a class="brand" href="#today" aria-label="Yomitori, today">
+      <span class="brand-jp" lang="ja">読み取り</span>
+      <span class="brand-en">Yomitori</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#today">Today <span class="nav-due" hidden></span></a>
+      <a href="#browse">Browse</a>
+      <a href="#settings">Settings</a>
+    </nav>
+  </header>
+  <main id="view" tabindex="-1">
+    <p class="loading">Opening the dictionary…</p>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="warn">Yomitori needs JavaScript to run.</p></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

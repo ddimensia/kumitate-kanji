@@ -1,0 +1,89 @@
+// Browse every radical, kanji and word, coloured by how well you know it.
+
+import { curriculum, meanings, primaryMeaning } from '../data.js';
+import { stage, recall, STAGE_LABEL, STAGES, getSynonyms } from '../state.js';
+import { esc, tileHtml, recallBadge } from '../ui.js';
+import { toHiragana } from '../../vendor/wanakana.js';
+
+const KINDS = { r: 'Radicals', k: 'Kanji', v: 'Vocabulary' };
+const PAGE = 300;
+
+function matches(it, q) {
+  if (!q) return true;
+  const g = it.kind === 'v' ? it.w : it.ch;
+  if (g.includes(q)) return true;
+  const kana = toHiragana(q);
+  if (it.kind === 'v' && it.readings.some((r) => r.startsWith(kana))) return true;
+  if (it.kind === 'k' && [...it.on, ...it.kun].some((r) => r.forms.some((f) => toHiragana(f.replace(/[.-]/g, '')).startsWith(kana)))) return true;
+  const lq = q.toLowerCase();
+  return [...meanings(it), ...getSynonyms(it.id)].some((m) => m.toLowerCase().includes(lq));
+}
+
+export function renderBrowse(root, params, navigate) {
+  const kind = KINDS[params[0]] ? params[0] : 'k';
+  const level = params[1] && /^[1-5]$/.test(params[1]) ? +params[1] : 0;
+  const status = params[2] || 'all';
+  let limit = PAGE;
+  let query = '';
+
+  root.innerHTML = `<section class="browse">
+    <div class="browse-controls">
+      <nav class="seg" aria-label="Kind">${Object.entries(KINDS).map(([k, l]) => `<a href="#browse/${k}/${level || 'all'}/${status}" class="${k === kind ? 'is-on' : ''}">${l}</a>`).join('')}</nav>
+      ${kind !== 'r' ? `<label>Level <select data-f="level"><option value="all">All</option>${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${n === level ? 'selected' : ''}>N${n}</option>`).join('')}</select></label>` : ''}
+      <label>Status <select data-f="status">
+        <option value="all">All</option>
+        <option value="studied" ${status === 'studied' ? 'selected' : ''}>Studied</option>
+        <option value="weak" ${status === 'weak' ? 'selected' : ''}>Weak (under 80%)</option>
+        <option value="new" ${status === 'new' ? 'selected' : ''}>Not studied</option>
+      </select></label>
+      <input type="search" class="browse-search" placeholder="Search meaning, reading or kanji" aria-label="Search">
+    </div>
+    <ul class="stage-legend">${STAGES.map((s) => `<li><i class="st-${s}"></i>${esc(STAGE_LABEL[s])}</li>`).join('')}</ul>
+    <p class="browse-count muted"></p>
+    <div class="tiles grid"></div>
+    <p><button type="button" class="btn more" hidden>Show more</button></p>
+  </section>`;
+
+  const grid = root.querySelector('.grid');
+  const countEl = root.querySelector('.browse-count');
+  const moreBtn = root.querySelector('.more');
+
+  root.querySelectorAll('select[data-f]').forEach((s) => s.addEventListener('change', () => {
+    const lv = root.querySelector('[data-f="level"]')?.value || 'all';
+    const st = root.querySelector('[data-f="status"]').value;
+    navigate(`browse/${kind}/${lv}/${st}`);
+  }));
+
+  function draw() {
+    const db = curriculum();
+    const now = new Date();
+    const list = [];
+    for (const id of db.order) {
+      const it = db.items.get(id);
+      if (it.kind !== kind) continue;
+      if (level && it.jlpt !== level) continue;
+      const st = stage(it);
+      const studied = st !== 'locked' && st !== 'available';
+      if (status === 'studied' && !studied) continue;
+      if (status === 'new' && studied) continue;
+      let r = null;
+      if (studied) r = recall(it, now);
+      if (status === 'weak' && !(studied && r < 0.8)) continue;
+      if (!matches(it, query)) continue;
+      list.push({ it, st, r });
+    }
+    countEl.textContent = `${list.length} ${KINDS[kind].toLowerCase()}`;
+    grid.innerHTML = list.slice(0, limit).map(({ it, st, r }) => tileHtml(it, { stage: st, extra: r !== null ? recallBadge(r) : '' })).join('');
+    moreBtn.hidden = list.length <= limit;
+  }
+
+  moreBtn.addEventListener('click', () => { limit += PAGE; draw(); });
+  let t = null;
+  root.querySelector('.browse-search').addEventListener('input', (e) => {
+    clearTimeout(t);
+    t = setTimeout(() => { query = e.target.value.trim(); limit = PAGE; draw(); }, 150);
+  });
+  draw();
+}
+
+export { primaryMeaning };

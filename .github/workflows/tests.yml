@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Answer checking
+        run: node tests/answer_test.mjs
+      - name: Browser end-to-end
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+          python -m http.server 8000 &
+          sleep 1
+          python tests/e2e.py http://localhost:8000/

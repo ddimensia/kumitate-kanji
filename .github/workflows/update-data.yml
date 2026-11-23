@@ -1,0 +1,75 @@
+# Rebuilds data/curriculum.json every month from the latest dictionaries.
+#
+# The EDRDG licence for KANJIDIC2 and JMdict asks software that uses them to have "a
+# procedure for regular updating of the data from the most recent versions available".
+# This is that procedure. A run commits only when the data changed and
+# tools/check_data.py and the answer tests found nothing wrong. Run it by hand from the
+# Actions tab with "Run workflow".
+
+name: Update course data
+
+on:
+  schedule:
+    - cron: '41 10 3 * *' # 10:41 UTC on the 3rd of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download KANJIDIC2, JMdict, KanjiVG and JmdictFurigana
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/src && cd /tmp/src
+          tag=$(gh release view --repo scriptin/jmdict-simplified --json tagName --jq .tagName)
+          echo "JMDICT_TAG=$tag" >> "$GITHUB_ENV"
+          gh release download "$tag" --repo scriptin/jmdict-simplified \
+            --pattern 'kanjidic2-en-*.json.zip' --pattern 'jmdict-eng-[0-9]*.json.zip'
+          for z in *.zip; do unzip -q "$z"; done
+          gh release download --repo KanjiVG/kanjivg --pattern 'kanjivg-*[0-9].xml.gz'
+          gunzip kanjivg-*.xml.gz
+          gh release download --repo Doublevil/JmdictFurigana --pattern 'JmdictFurigana.json'
+          mkdir -p tanos jlpt-vocab
+          for n in 1 2 3 4 5; do
+            curl -fsSL -o "tanos/n${n}_kanji.csv" \
+              "https://raw.githubusercontent.com/Bluskyo/JLPT_Vocabulary/main/data/kanji/parsedData/n${n}_kanji.csv"
+            curl -fsSL -o "jlpt-vocab/n${n}.csv" \
+              "https://raw.githubusercontent.com/jamsinclair/open-anki-jlpt-decks/main/src/n${n}.csv"
+          done
+          ls -l
+
+      - name: Rebuild data/curriculum.json
+        run: |
+          python3 tools/build_data.py \
+            /tmp/src/kanjidic2-en-*.json /tmp/src/jmdict-eng-[0-9]*.json /tmp/src/kanjivg-*.xml \
+            /tmp/src/JmdictFurigana.json /tmp/src/tanos /tmp/src/jlpt-vocab /tmp/curriculum.json
+
+      - name: Check the new data
+        run: |
+          set -o pipefail
+          python3 tools/check_data.py data/curriculum.json /tmp/curriculum.json | tee -a "$GITHUB_STEP_SUMMARY"
+          cp /tmp/curriculum.json data/curriculum.json
+          node tests/answer_test.mjs
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- data/curriculum.json; then
+            echo "The course data is already up to date." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update course data (jmdict-simplified $JMDICT_TAG)" -- data/curriculum.json
+          git pull --rebase --quiet
+          git push
