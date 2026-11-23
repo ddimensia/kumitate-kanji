@@ -1,10 +1,13 @@
 // Settings, backup and credits.
 
-import { getSettings, saveSettings, DEFAULT_SETTINGS } from '../state.js';
+import { getSettings, saveSettings, DEFAULT_SETTINGS, placeItems, isIntroduced, unstudiedParts } from '../state.js';
+import { kvGet, kvSet } from '../store.js';
+import { fetchWaniKani, matchWaniKani, planImport, STAGE_GROUPS, WkError } from '../wanikani.js';
+import { KIND_LABEL } from '../data.js';
 import { exportAll, importAll, wipeAll } from '../store.js';
 import { curriculum } from '../data.js';
 import { japaneseVoices, speak, speechAvailable } from '../speech.js';
-import { esc, toast, confirmDialog } from '../ui.js';
+import { esc, toast, confirmDialog, plural } from '../ui.js';
 
 export function renderSettings(root, reload) {
   const s = getSettings();
@@ -42,6 +45,20 @@ export function renderSettings(root, reload) {
       <p><button type="button" class="btn small" data-act="test">Test: 日本語を勉強しています</button></p>
       <p class="hint">Changes save as you make them.</p>
     </form>
+
+    <section class="panel wk-import">
+      <h2>Import from WaniKani</h2>
+      <p>Bring in the radicals, kanji and words you’ve already started on WaniKani, at their WaniKani stage, so you don’t have to do their lessons here. Each one gets a matching review schedule here, with its next review at the same time as on WaniKani. Nothing is changed on WaniKani.</p>
+      <p class="hint">You need a read-only API token: on WaniKani, open <a href="https://www.wanikani.com/settings/personal_access_tokens" target="_blank" rel="noopener">Settings → API Tokens</a> and generate one with no permissions ticked.</p>
+      <form class="wk-form">
+        <label class="row"><span>API token</span><input type="password" name="token" autocomplete="off" spellcheck="false" placeholder="xxxxxxxx-xxxx-…" style="width:22rem;max-width:60vw"></label>
+        <label class="row check"><input type="checkbox" name="remember"> <span>Remember the token on this device<small>Kept only in this browser and never included in backups.</small></span></label>
+        <label class="row check"><input type="checkbox" name="skip" checked> <span>Skip items I’ve already studied here</span></label>
+        <label class="row check"><input type="checkbox" name="parts" checked> <span>Also mark the radicals and kanji they’re built from<small>Parts that don’t exist on WaniKani (Yomitori’s radicals differ from WaniKani’s) get the stage of what uses them.</small></span></label>
+        <p class="hero-actions"><button class="btn primary">Check my WaniKani progress</button> <span class="wk-status muted" role="status"></span></p>
+      </form>
+      <div class="wk-preview"></div>
+    </section>
 
     <section class="panel">
       <h2>Backup</h2>
@@ -87,6 +104,8 @@ export function renderSettings(root, reload) {
     if (!speak('にほんごをべんきょうしています')) toast('Speech isn’t available in this browser.', { error: true });
   });
 
+  wireWaniKani(root, reload);
+
   root.querySelector('[data-act="export"]').addEventListener('click', async () => {
     const data = await exportAll();
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -116,5 +135,67 @@ export function renderSettings(root, reload) {
     await wipeAll();
     await reload();
     toast('Progress erased.');
+  });
+}
+
+function wireWaniKani(root, reload) {
+  const form = root.querySelector('.wk-form');
+  const status = root.querySelector('.wk-status');
+  const preview = root.querySelector('.wk-preview');
+  kvGet('wkToken').then((t) => { if (t) { form.token.value = t; form.remember.checked = true; } });
+  let fetched = null;
+
+  function showPlan() {
+    if (!fetched) return;
+    const { user, entries } = fetched;
+    const { matches, unmatched } = matchWaniKani(entries);
+    const plan = planImport(matches, { skipStudied: form.skip.checked, withParts: form.parts.checked }, { isIntroduced, unstudiedParts });
+    const rows = ['r', 'k', 'v'].map((kind) => {
+      const fromWk = plan.filter((p) => p.it.kind === kind && !p.part);
+      const parts = plan.filter((p) => p.it.kind === kind && p.part).length;
+      const byGroup = STAGE_GROUPS.map(([, stages]) => fromWk.filter((p) => stages.includes(p.stage)).length);
+      return `<tr><th>${KIND_LABEL[kind]}</th>${byGroup.map((n) => `<td>${n || ''}</td>`).join('')}<td>${parts || ''}</td><td><b>${fromWk.length + parts}</b></td></tr>`;
+    }).join('');
+    const skipped = matches.filter((m) => isIntroduced(m.it)).length;
+    const miss = unmatched.radical.length + unmatched.kanji.length + unmatched.vocabulary.length;
+    preview.innerHTML = `
+      <h3>${esc(user.username)}, WaniKani level ${user.level}: ${entries.length} items started</h3>
+      <table class="hist wk-table"><thead><tr><th></th>${STAGE_GROUPS.map(([g]) => `<th>${g}</th>`).join('')}<th>Parts</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="hint">
+        ${form.skip.checked && skipped ? `${skipped} already studied here will be left alone. ` : ''}
+        ${miss ? `${plural(miss, 'WaniKani item')} ${miss === 1 ? 'has' : 'have'} no match here and ${miss === 1 ? 'is' : 'are'} skipped: ${plural(unmatched.radical.length, 'radical')} (WaniKani has its own set), ${unmatched.kanji.length} kanji outside the JLPT lists, and ${plural(unmatched.vocabulary.length, 'word')} not in this course.` : ''}
+      </p>
+      <p class="hero-actions"><button type="button" class="btn primary" data-act="wk-import" ${plan.length ? '' : 'disabled'}>Import ${plan.length} items</button></p>`;
+    preview.querySelector('[data-act="wk-import"]').addEventListener('click', async (e) => {
+      e.target.disabled = true;
+      status.textContent = 'Importing…';
+      const n = await placeItems(plan);
+      status.textContent = '';
+      preview.innerHTML = `<p><b>Imported ${plan.length} items</b> (${n} cards). Reviews that are due on WaniKani are due here too.</p>`;
+      fetched = null;
+      toast(`Imported ${plan.length} items from WaniKani.`);
+    });
+  }
+
+  form.skip.addEventListener('change', showPlan);
+  form.parts.addEventListener('change', showPlan);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = form.token.value.trim();
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    preview.innerHTML = '';
+    try {
+      await kvSet('wkToken', form.remember.checked ? token : null);
+      fetched = await fetchWaniKani(token, (msg) => { status.textContent = msg; });
+      status.textContent = '';
+      showPlan();
+    } catch (err) {
+      status.textContent = '';
+      toast(err instanceof WkError ? err.message : 'Something went wrong talking to WaniKani.', { error: true, ms: 6000 });
+      if (!(err instanceof WkError)) console.error(err);
+    } finally {
+      btn.disabled = false;
+    }
   });
 }

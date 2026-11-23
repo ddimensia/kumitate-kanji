@@ -307,7 +307,7 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 /* Browse */
 .browse-controls { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-bottom: 0.5rem; }
 .browse-controls label { font-size: 0.875rem; color: var(--ink-soft); }
-.browse-controls select, .browse-search, .settings input[type="number"], .settings select, .syn-add input {
+.browse-controls select, .browse-search, .settings input[type="number"], .settings select, .wk-form input[name="token"], .syn-add input {
   font: inherit; color: var(--ink); background: var(--sheet); border: 1.5px solid var(--rule-soft); border-radius: 8px; padding: 0.3rem 0.5rem;
 }
 .browse-search { flex: 1; min-width: 12rem; }
@@ -335,9 +335,9 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .syn-list { padding-left: 1.2rem; }
 
 /* Settings */
-.settings-form .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px dashed var(--rule-soft); }
-.settings-form .row small { display: block; color: var(--ink-soft); font-size: 0.8rem; }
-.settings-form .row.check { justify-content: flex-start; }
+.settings-form .row, .wk-form .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px dashed var(--rule-soft); }
+.settings-form .row small, .wk-form .row small { display: block; color: var(--ink-soft); font-size: 0.8rem; }
+.settings-form .row.check, .wk-form .row.check { justify-content: flex-start; }
 .settings-form h2 { margin-top: 1rem; }
 .settings-form h2:first-child { margin-top: 0; }
 .credits li { margin: 0.3rem 0; }

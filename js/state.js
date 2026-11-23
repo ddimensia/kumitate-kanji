@@ -297,25 +297,36 @@ export async function setLevel(items, level, now = new Date()) {
     emit();
     return;
   }
-  const { stability } = LEVELS[level];
+  await placeItems(items.map((it) => ({ it, stability: LEVELS[level].stability })), now);
+}
+
+/**
+ * Put items straight into reviews. Each entry is { it, stability (days), due? }:
+ * stability 0 starts the item as if its lesson was just done; otherwise each card is in
+ * review with that stability, due at `due` or, without one, at a random point in the
+ * interval so a large batch doesn't all come due on one day.
+ */
+export async function placeItems(list, now = new Date()) {
   const out = [];
-  for (const it of items) {
+  for (const { it, stability, due } of list) {
     for (const t of cardTypes(it)) {
       const id = cardId(it.id, t);
       const old = cards.get(id);
       let srs;
-      if (!stability) {
+      if (!stability || stability < 1) {
         srs = review(newSrsCard(now), Rating.Good, now); // as after a lesson
+        if (due && Date.parse(due) > now.getTime()) srs.due = new Date(due).toISOString();
       } else {
-        const wait = stability * (0.25 + Math.random() * 0.75) * DAY;
-        const due = new Date(now.getTime() + wait);
+        const when = due
+          ? new Date(Math.max(now.getTime(), Date.parse(due)))
+          : new Date(now.getTime() + stability * (0.25 + Math.random() * 0.75) * DAY);
         srs = {
           ...newSrsCard(now),
           state: State.Review, stability, difficulty: 5, reps: 1, lapses: 0,
           scheduled_days: Math.round(stability), elapsed_days: 0, learning_steps: 0,
-          due: due.toISOString(),
-          // As if last reviewed one stability ago, so recall at the due date is about 90%.
-          last_review: new Date(due.getTime() - stability * DAY).toISOString(),
+          due: when.toISOString(),
+          // As if last reviewed one stability before it's due, so recall then is about 90%.
+          last_review: new Date(Math.min(now.getTime(), when.getTime() - stability * DAY)).toISOString(),
         };
       }
       const c = {
@@ -331,6 +342,7 @@ export async function setLevel(items, level, now = new Date()) {
   await store.putMany('cards', out);
   await store.kvSet('passed', passed);
   emit();
+  return out.length;
 }
 
 export async function addSynonym(itemId, text) {

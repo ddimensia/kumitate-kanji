@@ -40,6 +40,14 @@ Only common readings are asked for. A reading counts as common when it appears i
 
 **Already know it?** Any item can go straight into reviews at a level you choose (learning, fresh, settling, solid or mastered), skipping its lesson. Do it from the item's page, or press **Select…** in Browse to pick many tiles at once (e.g. "Select all shown" on a level). The radicals and kanji an item is built from can be included. Each card gets matching FSRS stability. Its first review is spread over that interval, so marking hundreds of items doesn't make them all due on one day, and marked items don't count toward the day's new items. "Not studied" sends items back to lessons.
 
+**Import from WaniKani.** In Settings, paste a read-only WaniKani API token and press **Check my WaniKani progress**. You'll see what would be imported, then **Import**.
+- **Matching:** every radical, kanji and word you've started on WaniKani is matched to the same character or word here.
+- **Schedule:** each item gets memory stability equal to its WaniKani stage's interval (Guru I = 7 days, Master = 30, Burned = a year), and its next review lands when WaniKani's does.
+- **Radicals:** WaniKani's radicals mostly differ from these, so by default the radicals and kanji an imported item is built from come along at its stage.
+- **Already studied:** items you've studied here are skipped unless you untick that option.
+- **No match:** image-only radicals, kanji outside the JLPT lists, and words not in this course are listed and skipped.
+- **Privacy:** the token stays in your browser (only if you ask), is never in backups, and nothing is sent to WaniKani beyond reading your progress.
+
 **Your own meanings.** Add extra accepted meanings on a lesson card, after answering in a quiz ("Add a meaning"), or on an item's page.
 
 **Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule.
@@ -96,6 +104,7 @@ Plain ES modules with no build step:
 | `js/store.js` | IndexedDB, backup and restore |
 | `js/quiz.js` | The typed quiz used by lessons and reviews (retry, undo, synonyms) |
 | `js/speech.js` | Web Speech API text-to-speech |
+| `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
 | `js/views/*.js` | Today, lessons, reviews, browse, item pages, settings |
 | `vendor/` | [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) and [WanaKana](https://github.com/WaniKani/WanaKana), both MIT |
 
@@ -104,6 +113,7 @@ Tests:
 ```sh
 node tests/answer_test.mjs          # answer checking against the real data
 python3 tests/e2e.py http://localhost:8000/   # a simulated first week in Chrome (Playwright)
+python3 tests/wanikani_test.py http://localhost:8000/   # WaniKani import against a fake API
 ```
 
 ## Ideas for later
