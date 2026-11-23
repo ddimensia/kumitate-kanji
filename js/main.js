@@ -2,6 +2,7 @@
 
 import { initStore } from './store.js';
 import { initState, dueCardIds, onChange, getSettings, markWelcomed } from './state.js';
+import { startSharing, publishSoon } from './share.js';
 import { loadCurriculum } from './data.js';
 import { renderToday } from './views/today.js';
 import { runLessons, nextBatch } from './views/lessons.js';
@@ -99,15 +100,18 @@ function route() {
   }
   if (name === 'browse') renderBrowse(root, params, navigate);
   else if (name === 'item') renderItem(root, params.join('/'), route);
-  else if (name === 'settings') renderSettings(root, async () => { await initState(); route(); });
+  else if (name === 'settings') renderSettings(root, async () => { await initState(); publishSoon(0); route(); });
   else if (name === 'welcome') renderWelcome(root);
   else renderToday(root, { startLessons, startReviews, startPractice });
   window.scrollTo({ top: 0 });
 }
 
+let persistentStore = false;
+
 async function start() {
   try {
     const { persistent } = await initStore();
+    persistentStore = persistent;
     await Promise.all([initState(), loadCurriculum()]);
     if (!persistent) toast('Progress can’t be saved in this browser mode.', { error: true, ms: 6000 });
   } catch (err) {
@@ -116,6 +120,7 @@ async function start() {
     return;
   }
   onChange(updateNav);
+  if (persistentStore) startSharing();
   updateNav();
   setInterval(() => {
     updateNav();

@@ -113,6 +113,7 @@ Plain ES modules with no build step:
 | `js/quiz.js` | The typed quiz used by lessons and reviews (retry, undo, synonyms) |
 | `js/speech.js` | Web Speech API text-to-speech |
 | `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
+| `js/share.js` | Publishes a summary of your kanji progress for Kakitori (see below) |
 | `js/views/*.js` | Welcome page, Today, lessons, reviews, Extra study, browse, item pages, settings |
 | `vendor/` | [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) and [WanaKana](https://github.com/WaniKani/WanaKana), both MIT |
 
@@ -123,6 +124,19 @@ node tests/answer_test.mjs          # answer checking against the real data
 python3 tests/e2e.py http://localhost:8000/   # a simulated first week in Chrome (Playwright)
 python3 tests/wanikani_test.py http://localhost:8000/   # WaniKani import against a fake API
 ```
+
+## Sharing progress with Kakitori
+
+[Kakitori](https://ddimensia.github.io/kakitori/), the writing app, can follow the kanji you learn here: in its Settings, choose "Kanji you've started in Kumitate Kanji". Both apps are served from `ddimensia.github.io`, so they share the browser's storage. It only works between the hosted apps in the same browser.
+
+Kumitate Kanji keeps a small summary in its own database, `kumitate-share`, and rewrites it a moment after your progress changes. Other apps read that, never the study database (`yomitori`). Format 1, under the key `progress` in the `summary` store:
+
+```js
+{ format: 1, app: 'kumitate-kanji', updatedAt: 1795473653489,
+  kanji: [{ ch: '一', order: 5, jlpt: 5, introducedAt: 1795473653489, passedAt: null, stage: 'learning' }, ...] }
+```
+
+`kanji` lists every kanji you've started, in curriculum order. `passedAt` is when the kanji unlocked the words built on it. `stage` is one of `learning`, `fresh`, `settling`, `solid` or `mastered`. A reader should open the database without a version number and abort the upgrade if one starts, so that it never creates the database. Kumitate Kanji also repairs either database if it finds one that exists but is empty.
 
 ## Ideas for later
 

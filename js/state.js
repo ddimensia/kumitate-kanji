@@ -106,6 +106,8 @@ export async function syncReadingCards(now = new Date()) {
 export const itemCards = (it) => cardTypes(it).map((t) => cards.get(cardId(it.id, t))).filter(Boolean);
 export const isIntroduced = (it) => cards.has(cardId(it.id, 'm'));
 export const isPassed = (id) => !!passed[id];
+/** When an item unlocked what builds on it (ms), or null. */
+export const passedAt = (id) => passed[id] || null;
 export const isUnlocked = (it) => it.prereq.every((p) => passed[p] || !curriculum().items.has(p));
 export const getSynonyms = (itemId) => synonyms[itemId] || [];
 
@@ -417,6 +419,12 @@ export async function resetItem(it, { quiet = false } = {}) {
 }
 
 // ---- Stats --------------------------------------------------------------------------
+
+/** When an item's lesson was done (ms), or null. */
+export function introducedAt(it) {
+  const c = cards.get(cardId(it.id, 'm'));
+  return c ? c.introducedAt : null;
+}
 
 /** Items you've started (every item has a meaning question; others can be paused). */
 export function introducedItems() {

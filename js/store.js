@@ -10,29 +10,43 @@ const KV_KEYS = ['settings', 'synonyms', 'passed', 'notes'];
 let dbPromise = null;
 let memory = null;
 
-function openDb() {
-  if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
+function upgrade(db) {
+  if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+  if (!db.objectStoreNames.contains('cards')) db.createObjectStore('cards', { keyPath: 'id' });
+  if (!db.objectStoreNames.contains('log')) {
+    const log = db.createObjectStore('log', { keyPath: 'id', autoIncrement: true });
+    log.createIndex('ts', 'ts');
+  }
+}
+
+/**
+ * Open a database and make sure its stores exist. If something else on this site opened the
+ * database first (leaving it empty at a version we think is current), open it again one
+ * version higher so the stores get created. Connections close when another tab upgrades.
+ */
+export function openWithStores(name, version, stores, onUpgrade, onClose) {
+  const open = (v) => new Promise((resolve, reject) => {
     let req;
-    try {
-      req = indexedDB.open(DB_NAME, DB_VERSION);
-    } catch (err) {
-      reject(err);
-      return;
-    }
-    req.onupgradeneeded = () => {
-      const db = req.result;
-      if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
-      if (!db.objectStoreNames.contains('cards')) db.createObjectStore('cards', { keyPath: 'id' });
-      if (!db.objectStoreNames.contains('log')) {
-        const log = db.createObjectStore('log', { keyPath: 'id', autoIncrement: true });
-        log.createIndex('ts', 'ts');
-      }
-    };
+    try { req = indexedDB.open(name, v); } catch (err) { reject(err); return; }
+    req.onupgradeneeded = () => onUpgrade(req.result);
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
     req.onblocked = () => reject(new Error('Kumitate Kanji is open in another tab with an older version.'));
   });
+  return open(version).then((db) => {
+    if (stores.every((n) => db.objectStoreNames.contains(n))) return db;
+    const next = db.version + 1;
+    db.close();
+    return open(next);
+  }).then((db) => {
+    db.onversionchange = () => { db.close(); onClose?.(); };
+    return db;
+  });
+}
+
+function openDb() {
+  if (dbPromise) return dbPromise;
+  dbPromise = openWithStores(DB_NAME, DB_VERSION, STORES, upgrade, () => { dbPromise = null; });
   return dbPromise;
 }
 
