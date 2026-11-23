@@ -6,6 +6,7 @@ import { loadCurriculum } from './data.js';
 import { renderToday } from './views/today.js';
 import { runLessons, nextBatch } from './views/lessons.js';
 import { runReviews } from './views/reviews.js';
+import { runPractice } from './views/practice.js';
 import { renderBrowse } from './views/browse.js';
 import { renderItem } from './views/itempage.js';
 import { renderSettings } from './views/settings.js';
@@ -58,6 +59,14 @@ function startReviews() {
   }));
 }
 
+function startPractice(ids) {
+  if (!ids.length) { toast('No recent mistakes to practise.'); return; }
+  startStudy((root) => runPractice(root, ids, {
+    setKeys, onExit: exit,
+    again: () => startPractice(ids),
+  }));
+}
+
 function updateNav() {
   const due = dueCardIds().length;
   const el = document.querySelector('.nav-due');
@@ -81,7 +90,7 @@ function route() {
   if (name === 'browse') renderBrowse(root, params, navigate);
   else if (name === 'item') renderItem(root, params.join('/'), route);
   else if (name === 'settings') renderSettings(root, async () => { await initState(); route(); });
-  else renderToday(root, { startLessons, startReviews });
+  else renderToday(root, { startLessons, startReviews, startPractice });
   window.scrollTo({ top: 0 });
 }
 

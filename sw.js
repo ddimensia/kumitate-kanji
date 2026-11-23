@@ -5,7 +5,7 @@
 // Fonts are cache-first and cached as pages use them (they're split by character range).
 // Bump VERSION after adding or renaming app files.
 
-const VERSION = '1';
+const VERSION = '2';
 const APP_CACHE = `yomitori-app-${VERSION}`;
 const FONT_CACHE = 'yomitori-fonts';
 const SHELL = [
@@ -30,6 +30,7 @@ const SHELL = [
   'js/views/today.js',
   'js/views/lessons.js',
   'js/views/reviews.js',
+  'js/views/practice.js',
   'js/views/browse.js',
   'js/views/itempage.js',
   'js/views/settings.js',

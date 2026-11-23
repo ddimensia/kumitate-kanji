@@ -8,6 +8,13 @@ import { runQuiz } from '../quiz.js';
 import { esc, plural } from '../ui.js';
 import { wireSpeech, speak } from '../speech.js';
 
+const UNIT = { m: 'minute', h: 'hour', d: 'day' };
+/** '4h' -> '4 hours' */
+const waitLabel = (s) => {
+  const n = parseFloat(s), u = UNIT[s.slice(-1)];
+  return u ? `${n} ${u}${n === 1 ? '' : 's'}` : s;
+};
+
 /** Items for the next batch: within today's allowance, or one batch past it with `extra`. */
 export function nextBatch(extra) {
   const size = getSettings().batchSize;
@@ -74,7 +81,7 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
     root.innerHTML = `<section class="panel summary">
       <h2>Learned ${plural(batch.length, 'new item')}</h2>
       <div class="tiles">${batch.map((it) => `<a class="tile kind-${it.kind}" href="#item/${encodeURIComponent(it.id)}"><span class="tile-glyph" lang="ja">${esc(glyph(it))}</span></a>`).join('')}</div>
-      <p>They’ll come up for review in about ten minutes, then again over the next days.</p>
+      <p>They’ll come up for their first review in ${esc(waitLabel(getSettings().firstReview))}, then again over the next days.</p>
       <div class="hero-actions">
         ${more.length ? `<button class="btn primary" data-act="more">Next ${plural(more.length, 'lesson')}</button>` : ''}
         ${due ? `<button class="btn" data-act="reviews">${plural(due, 'review')} due</button>` : ''}

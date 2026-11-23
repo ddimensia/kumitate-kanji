@@ -6,15 +6,23 @@ export { Rating, State };
 
 let scheduler = null;
 
-export function configureSrs({ retention = 0.9, maxInterval = 365 * 3, fuzz = true } = {}) {
+const minutes = (step) => parseFloat(step) * ({ m: 1, h: 60, d: 1440 }[step.slice(-1)] || 1);
+
+/**
+ * firstStep: wait between a lesson and its first review (e.g. '4h').
+ * missStep: wait before a missed card comes back (e.g. '1h').
+ */
+export function configureSrs({ retention = 0.9, maxInterval = 365 * 3, fuzz = true, firstStep = '4h', missStep = '1h' } = {}) {
+  // A new card rated Good (the lesson) goes to the last learning step; Again goes to the first.
+  const learning = [minutes(missStep) <= minutes(firstStep) ? missStep : firstStep, firstStep];
   scheduler = fsrs(
     generatorParameters({
       request_retention: retention,
       maximum_interval: maxInterval,
       enable_fuzz: fuzz,
       enable_short_term: true,
-      learning_steps: ['1m', '10m'],
-      relearning_steps: ['10m'],
+      learning_steps: learning,
+      relearning_steps: [missStep],
     }),
   );
 }

@@ -14,7 +14,11 @@ export const DEFAULT_SETTINGS = {
   voice: '',            // speechSynthesis voice name ('' = best Japanese voice found)
   rate: 0.9,
   dayStartHour: 4,      // a study day starts at 4am
+  firstReview: '4h',    // wait between a lesson and its first review
+  missReview: '1h',     // wait before a missed card comes back
 };
+
+const srsOptions = (s) => ({ retention: s.retention, firstStep: s.firstReview, missStep: s.missReview });
 
 let settings = { ...DEFAULT_SETTINGS };
 const cards = new Map();
@@ -27,7 +31,7 @@ export const DAY = 86400000;
 
 export async function initState() {
   settings = { ...DEFAULT_SETTINGS, ...((await store.kvGet('settings')) || {}) };
-  configureSrs({ retention: settings.retention });
+  configureSrs(srsOptions(settings));
   cards.clear();
   for (const c of await store.getAll('cards')) cards.set(c.id, c);
   synonyms = (await store.kvGet('synonyms')) || {};
@@ -47,7 +51,7 @@ export const getSettings = () => settings;
 
 export async function saveSettings(patch) {
   settings = { ...settings, ...patch };
-  if ('retention' in patch) configureSrs({ retention: settings.retention });
+  if ('retention' in patch || 'firstReview' in patch || 'missReview' in patch) configureSrs(srsOptions(settings));
   await store.kvSet('settings', settings);
   emit();
 }
@@ -220,6 +224,40 @@ export async function recordAnswer(id, ok, now = new Date()) {
   }
   emit();
   return unlocked;
+}
+
+/** Note a miss that isn't a graded review (a lesson-quiz miss), for Extra study. */
+export async function logMiss(id, kind = 'lessonquiz', now = new Date()) {
+  const entry = { ts: now.getTime(), card: id, ok: false, kind };
+  await store.addLogs([entry]);
+  recentLog.push(entry);
+}
+
+/**
+ * Items missed in your latest stretch of study: the 24 hours up to your most recent
+ * lesson or review (further back than a day if you've taken a break). Most-missed first.
+ */
+export function recentMistakes(now = new Date()) {
+  const studied = recentLog.filter((e) => e.kind === 'review' || e.kind === 'lesson' || e.kind === 'lessonquiz');
+  if (!studied.length) return { since: null, items: [] };
+  const last = Math.max(...studied.map((e) => e.ts));
+  const since = last - DAY;
+  const byItem = new Map();
+  for (const e of studied) {
+    if (e.ok || e.ts < since) continue;
+    const [itemId] = splitCardId(e.card);
+    const it = item(itemId);
+    if (!it) continue;
+    const m = byItem.get(itemId) || { it, misses: 0, cards: new Set(), last: 0 };
+    m.misses++;
+    m.cards.add(e.card);
+    m.last = Math.max(m.last, e.ts);
+    byItem.set(itemId, m);
+  }
+  const items = [...byItem.values()]
+    .sort((a, b) => b.misses - a.misses || b.last - a.last)
+    .map((m) => ({ ...m, cards: [...m.cards] }));
+  return { since, until: last, items };
 }
 
 export async function addSynonym(itemId, text) {

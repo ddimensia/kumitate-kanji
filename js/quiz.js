@@ -8,7 +8,7 @@
 import { bind, unbind } from '../vendor/wanakana.js';
 import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings } from './data.js';
 import { checkMeaning, checkReading, kunDisplay } from './answer.js';
-import { recordAnswer, getSynonyms, addSynonym, getSettings } from './state.js';
+import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc } from './ui.js';
 import { speak, speakerButton, wireSpeech } from './speech.js';
 import { infoCardHtml } from './views/info.js';
@@ -61,7 +61,7 @@ function expectedHtml(it, type) {
 
 /**
  * Run a quiz in `root`. Options:
- *   mode: 'review' | 'lesson'
+ *   mode: 'review' | 'lesson' | 'practice' (Extra study: not graded for spaced repetition)
  *   onDone({ total, right, wrong, missed: itemIds, unlocked: itemIds, ended })
  *   setKeys(handler)
  */
@@ -78,7 +78,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     <div class="quiz-top">
       <span class="quiz-title">${esc(title)}</span>
       <span class="quiz-progress" aria-live="polite"></span>
-      <button type="button" class="btn small quiet quiz-end">${mode === 'review' ? 'End session' : 'Back to lesson'}</button>
+      <button type="button" class="btn small quiet quiz-end">${mode === 'lesson' ? 'Back to lesson' : 'End session'}</button>
     </div>
     <div class="quiz-bar"><span></span></div>
     <div class="quiz-stage"></div>
@@ -212,7 +212,10 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       if (mode === 'review') {
         const newly = await recordAnswer(id, ok);
         newly.forEach((x) => unlocked.add(x));
+      } else if (mode === 'lesson' && !ok) {
+        await logMiss(id); // so lesson-quiz slips show up in Extra study
       }
+      // 'practice' (Extra study) doesn't touch the schedule.
     }
     queue.shift();
     if (!ok) {

@@ -2,7 +2,7 @@
 
 import {
   allowance, availableLessonCount, dueCardIds, forecast, accuracy, stageCounts, weakest,
-  recentlyLearned, STAGE_LABEL, isIntroduced,
+  recentlyLearned, STAGE_LABEL, isIntroduced, recentMistakes,
 } from '../state.js';
 import { curriculum } from '../data.js';
 import { esc, tileHtml, recallBadge, plural } from '../ui.js';
@@ -24,7 +24,7 @@ function levelProgress() {
   return rows;
 }
 
-export function renderToday(root, { startLessons, startReviews }) {
+export function renderToday(root, { startLessons, startReviews, startPractice }) {
   const allow = allowance();
   const available = availableLessonCount();
   const lessonsNow = Math.min(allow.remaining, available);
@@ -41,6 +41,10 @@ export function renderToday(root, { startLessons, startReviews }) {
     if (allow.limit < allow.max) return `Today’s limit is ${allow.limit}, down from ${allow.max}, because ${allow.reasons.join(' and ')}. Catching up on reviews raises it again.`;
     return `You’ve learned today’s ${allow.limit} new items.`;
   })();
+
+  const mistakes = recentMistakes();
+  const mistakeCards = mistakes.items.reduce((n, m) => n + m.cards.length, 0);
+  const sinceLabel = mistakes.since ? new Date(mistakes.since).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '';
 
   const fc = forecast();
   const fcMax = Math.max(1, ...fc.map((b) => b.count));
@@ -68,6 +72,13 @@ export function renderToday(root, { startLessons, startReviews }) {
       </article>
     </section>
 
+    ${mistakes.items.length ? `<section class="panel mistakes-panel">
+      <h2>Recent mistakes</h2>
+      <p class="hint">What you missed in your latest stretch of study (since ${esc(sinceLabel)}), in lessons and reviews. Extra study quizzes you on them without changing their review schedule.</p>
+      <div class="tiles">${mistakes.items.slice(0, 30).map(({ it, misses }) => tileHtml(it, { extra: misses > 1 ? `<span class="recall r-weak">×${misses}</span>` : '' })).join('')}</div>
+      <div class="hero-actions"><button class="btn" data-act="practice">Extra study (${plural(mistakeCards, 'card')})</button></div>
+    </section>` : ''}
+
     ${studied ? `<section class="panel recall-panel">
       <h2>How well you know them</h2>
       <p class="hint">Percentages are the chance you’d recall an item right now, from its spaced-repetition history. Low ones are next in line for review.</p>
@@ -93,4 +104,5 @@ export function renderToday(root, { startLessons, startReviews }) {
   root.querySelector('[data-act="lessons"]')?.addEventListener('click', () => startLessons(false));
   root.querySelectorAll('[data-act="more"]').forEach((b) => b.addEventListener('click', () => startLessons(true)));
   root.querySelector('[data-act="reviews"]')?.addEventListener('click', startReviews);
+  root.querySelector('[data-act="practice"]')?.addEventListener('click', () => startPractice(mistakes.items.flatMap((m) => m.cards)));
 }

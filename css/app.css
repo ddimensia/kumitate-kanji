@@ -295,6 +295,8 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
   40%, 80% { transform: translateX(8px); }
 }
 
+.mistakes-panel .hero-actions { margin-top: 0.75rem; }
+
 /* Browse */
 .browse-controls { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-bottom: 0.5rem; }
 .browse-controls label { font-size: 0.875rem; color: var(--ink-soft); }

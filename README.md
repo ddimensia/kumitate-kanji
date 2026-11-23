@@ -34,7 +34,11 @@ Only common readings are asked for. A reading counts as common when it appears i
 - **Giving up:** pressing Enter again on the same sent-back answer (or a blank one) marks it wrong.
 - **Undo** (Backspace) reverts a wrong answer so you can fix it, as on Bunpro. You can also accept your wording as one of your own meanings.
 
-**Unlocking.** An item unlocks the kanji and words built on it once every one of its cards has reached 3 days of FSRS stability. In practice that means after the lesson, the 10-minute review and the first review two days later.
+**Cooling off.** New items come up for their first review 4 hours after the lesson, and a missed card comes back after 1 hour. You can change both in Settings.
+
+**Unlocking.** An item unlocks the kanji and words built on it once every one of its cards has reached 3 days of FSRS stability. In practice that means after the lesson, the 4-hour review and the review two days later.
+
+**Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule.
 
 **Pace.** Lessons come in batches (5 by default) up to a daily maximum (15 by default). With adaptive pacing on, the daily number shrinks when your 7-day accuracy falls below 90% (to zero at 70%) or when more than 150 reviews are waiting. **Learn more anyway** on the Today page always allows another batch.
 

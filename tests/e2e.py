@@ -156,17 +156,60 @@ async def main():
         }""")
         check(res['verdict'] == 'retry', 'kun given for on is a retry')
 
-        # --- Ten minutes later: first reviews ---
-        await pg.clock.set_system_time(start + dt.timedelta(minutes=11))
+        # --- Nothing is due during the cooling-off period after a lesson ---
+        await pg.clock.set_system_time(start + dt.timedelta(minutes=30))
         await pg.reload()
         await pg.wait_for_selector('.today')
         due = int((await pg.text_content('.hero.reviews .hero-count')).strip())
-        check(due >= 5, f'{due} reviews due after ten minutes (one per radical)')
+        check(due == 0, 'no reviews 30 minutes after a lesson (first review waits 4 hours)')
+
+        # --- Four hours later: first reviews, with one miss ---
+        await pg.clock.set_system_time(start + dt.timedelta(hours=4, minutes=5))
+        await pg.reload()
+        await pg.wait_for_selector('.today')
+        due = int((await pg.text_content('.hero.reviews .hero-count')).strip())
+        check(due >= 5, f'{due} reviews due after four hours (one per radical)')
+        await pg.click('[data-act="reviews"]')
+        await pg.wait_for_selector('.quiz')
+        missed = await pg.get_attribute('.q-card', 'data-card')
+        await pg.fill('.q-input', 'zzzz')
+        await pg.press('.q-input', 'Enter')
+        await pg.wait_for_selector('.q-form.is-wrong')
+        await pg.keyboard.press('Enter')
+        await finish_quiz(pg)
+        await pg.wait_for_selector('.summary')
+        check('right' in await pg.text_content('.summary h2'), 'review summary')
+
+        # --- Extra study: the miss is listed, and practising it leaves its schedule alone ---
+        await pg.click('[data-act="done"]')
+        await pg.wait_for_selector('.today')
+        await pg.wait_for_selector('.mistakes-panel')
+        check(await pg.query_selector(f'.mistakes-panel .tile[href="#item/{missed.split("/")[0].replace(":", "%3A")}"]') is not None
+              or missed.split('/')[0] in await pg.evaluate("""async () => (await import('./js/state.js')).recentMistakes().items.map((m) => m.it.id)"""),
+              'the missed card shows under Recent mistakes')
+        due_js = f"""async () => (await import('./js/state.js')).getCard('{missed}').srs.due"""
+        before = await pg.evaluate(due_js)
+        await pg.click('[data-act="practice"]')
+        await pg.wait_for_selector('.quiz')
+        await finish_quiz(pg)
+        await pg.wait_for_selector('.summary')
+        check('right first time' in await pg.text_content('.summary h2'), 'extra study summary')
+        check(await pg.evaluate(due_js) == before, 'extra study does not change the review schedule')
+        await pg.click('[data-act="done"]')
+        await pg.wait_for_selector('.today')
+
+        # The missed card comes back after an hour, not ten minutes.
+        await pg.clock.set_system_time(start + dt.timedelta(hours=4, minutes=30))
+        await pg.reload()
+        await pg.wait_for_selector('.today')
+        check(missed not in await pg.evaluate("async () => (await import('./js/state.js')).dueCardIds()"), 'a missed card waits before coming back')
+        await pg.clock.set_system_time(start + dt.timedelta(hours=5, minutes=30))
+        await pg.reload()
+        await pg.wait_for_selector('.today')
         await pg.click('[data-act="reviews"]')
         await pg.wait_for_selector('.quiz')
         await finish_quiz(pg)
         await pg.wait_for_selector('.summary')
-        check('100% right' in await pg.text_content('.summary h2'), 'review summary shows 100%')
 
         # Vocabulary is still locked: its kanji haven't passed yet.
         locked = await pg.evaluate("""async () => {
@@ -212,7 +255,7 @@ async def main():
         check(did_kata, "an on'yomi was answered in katakana")
         check(did_reading_btn, 'readings after an answer are clickable buttons')
         await pg.wait_for_selector('.summary')
-        for hours in (60.2, 120):
+        for hours in (64.2, 125):
             await pg.clock.set_system_time(start + dt.timedelta(hours=hours))
             await pg.goto(BASE + '#today')
             await pg.reload()

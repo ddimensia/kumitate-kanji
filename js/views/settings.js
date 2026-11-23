@@ -22,6 +22,10 @@ export function renderSettings(root, reload) {
         <input type="number" name="batchSize" min="1" max="20" value="${s.batchSize}"></label>
       <label class="row"><span>Target recall<small>Higher means more frequent reviews.</small></span>
         <select name="retention">${[0.8, 0.85, 0.9, 0.93, 0.95].map((r) => `<option value="${r}" ${r === s.retention ? 'selected' : ''}>${Math.round(r * 100)}%</option>`).join('')}</select></label>
+      <label class="row"><span>First review after a lesson<small>How long new items cool off before you're quizzed on them.</small></span>
+        <select name="firstReview">${[['10m', '10 minutes'], ['1h', '1 hour'], ['2h', '2 hours'], ['4h', '4 hours'], ['8h', '8 hours']].map(([v, l]) => `<option value="${v}" ${v === s.firstReview ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label class="row"><span>Missed cards come back after</span>
+        <select name="missReview">${[['10m', '10 minutes'], ['30m', '30 minutes'], ['1h', '1 hour'], ['4h', '4 hours']].map(([v, l]) => `<option value="${v}" ${v === s.missReview ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
       <label class="row"><span>Unlock after<small>Memory stability an item needs before kanji and words built on it unlock.</small></span>
         <select name="unlockStability">${[1, 2, 3, 5, 7].map((d) => `<option value="${d}" ${d === s.unlockStability ? 'selected' : ''}>${d} day${d > 1 ? 's' : ''}</option>`).join('')}</select></label>
       <label class="row"><span>New day starts at</span>
