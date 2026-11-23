@@ -50,8 +50,36 @@ function radicalCard(it) {
   const orig = it.orig ? item('k:' + it.orig) : null;
   return `${header(it)}
     ${meaningsBlock([it.name, ...it.alt], it.id)}
+    ${item('k:' + it.ch) ? `<section class="info-sec"><h3>Also a kanji</h3><div class="tiles">${tileHtml(item('k:' + it.ch), { stage: stage(item('k:' + it.ch)) })}</div><p class="hint">On its own, ${esc(it.ch)} is a kanji you’ll learn with its readings.</p></section>` : ''}
     ${it.orig ? `<section class="info-sec"><h3>Form of</h3><p>A variant of <span lang="ja" class="inline-glyph">${esc(it.orig)}</span>${orig ? ` (${esc(primaryMeaning(orig))})` : ''}, as it appears inside other kanji.</p></section>` : ''}
     ${it.users.length ? section('Found in', it.users.length, `<div class="tiles">${tiles(it.users)}</div>`) : ''}`;
+}
+
+/**
+ * The parts a kanji is built from, one level further for parts that are kanji: 働 = 亻 + 動 (= 重 + 力).
+ * Each part is a tile linking to its own card.
+ */
+function partsTree(ids, depth = 0) {
+  return ids.map(item).filter(Boolean).map((p) => {
+    const tile = tileHtml(p, { stage: stage(p) });
+    const sub = p.kind === 'k' && p.prereq.length && depth < 1
+      ? `<span class="parts-sub"><span class="eq">=</span>${partsTree(p.prereq, depth + 1)}</span>` : '';
+    return `<span class="part">${tile}${sub}</span>`;
+  }).join('<span class="plus">+</span>');
+}
+
+function radicalsSection(it) {
+  const c = it.classical;
+  let dict = '';
+  if (c) {
+    const target = item('r:' + c.ch) || item('k:' + c.ch);
+    const glyphHtml = target ? `<a href="#item/${encodeURIComponent(target.id)}" lang="ja" class="inline-glyph">${esc(c.ch)}</a>` : `<span lang="ja" class="inline-glyph">${esc(c.ch)}</span>`;
+    dict = `<p class="hint dict-radical">Dictionary radical (部首): ${glyphHtml} ${esc(c.name)}, no. ${c.n} of the 214 classical radicals. Dictionaries file the kanji under it.</p>`;
+  }
+  const body = it.prereq.length
+    ? `<div class="parts-tree">${partsTree(it.prereq)}</div>`
+    : '<p>A basic shape: it isn’t broken down into smaller parts, and it’s a building block for other kanji.</p>';
+  return `<section class="info-sec"><h3>Radicals</h3>${body}${dict}</section>`;
 }
 
 function kanjiCard(it) {
@@ -68,7 +96,7 @@ function kanjiCard(it) {
       </dl>
       <p class="hint">Bold readings are the common ones you'll be asked for. Tap a reading to hear it.</p>
     </section>
-    ${it.prereq.length ? section('Built from', it.prereq.length, `<div class="tiles">${tiles(it.prereq)}</div>`, { long: false }) : ''}
+    ${radicalsSection(it)}
     ${it.usedIn.length ? section('Part of', it.usedIn.length, `<div class="tiles">${tiles(it.usedIn, 12)}</div>`) : ''}
     ${vocab.length ? section('Words', vocab.length, `<ul class="wordlist">${vocab.slice(0, 12).map((v) => wordRow(v, it.ch)).join('')}</ul>`, { long: vocab.length > 3 }) : ''}`;
 }

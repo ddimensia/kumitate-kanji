@@ -62,6 +62,7 @@ def load_kanjidic(path):
             meanings += [m['value'] for m in g.get('meanings') or [] if m.get('lang', 'en') == 'en']
         out[ch['literal']] = {
             'freq': misc.get('frequency'), 'grade': misc.get('grade'),
+            'rad': next((r['value'] for r in ch.get('radicals') or [] if r['type'] == 'classical'), None),
             'strokes': (misc.get('strokeCounts') or [0])[0],
             'on': on, 'kun': kun, 'meanings': meanings,
         }
@@ -126,6 +127,7 @@ def top_parts(tree, self_ch):
 
 # ---- Radical names -----------------------------------------------------------
 KANGXI = {}
+CLASSICAL = {}  # the 214 classical (Kangxi) radicals: number -> (character, English name)
 for cp in list(range(0x2F00, 0x2FD6)) + list(range(0x2E80, 0x2EF4)):
     try:
         name = unicodedata.name(chr(cp))
@@ -136,13 +138,43 @@ for cp in list(range(0x2F00, 0x2FD6)) + list(range(0x2E80, 0x2EF4)):
     KANGXI.setdefault(chr(cp), words)
     if base != chr(cp):
         KANGXI.setdefault(base, words)
+    if cp < 0x2FD6:
+        CLASSICAL[cp - 0x2F00 + 1] = (base, words)
+CLASSICAL_CHARS = {c for c, _ in CLASSICAL.values()}
 
 
-def radical_name(el, orig, K):
-    """(name, alternatives) for a component, or None when nothing sensible is known."""
-    if el in RADICAL_NAMES:
-        names = RADICAL_NAMES[el]
-        return names[0], names[1:]
+def kanji_meanings(K, c):
+    """A kanji's meanings as the course shows them (dictionary notes and abbreviations dropped)."""
+    return [m for m in K[c]['meanings'] if not m.startswith('(') and not re.fullmatch(r'[A-Z][a-z]*\.', m)]
+
+
+UNHELPFUL = re.compile(r'surname|used as|interjection|name of|ancient|RHS|radical|sign of the|term of', re.I)
+
+
+def plain(m):
+    return re.sub(r'^(to|the|a|an) ', '', m)
+
+
+def radical_name(el, orig, K, course):
+    """(name, alternatives) for a component, or None when nothing sensible is known.
+
+    A component that is also a kanji takes the kanji's name, so 口 is "mouth" both ways.
+    The exceptions are components with a well-known radical name of their own: the 214
+    classical radicals and the side/top forms (亻, 氵, 艹 ...), named in radical_names.py.
+    """
+    curated = RADICAL_NAMES.get(el, [])
+    kanji = kanji_meanings(K, el) if el in K else []
+    variant = bool(orig and orig != el) or not ('一' <= el <= '鿿')
+    if curated and (el in CLASSICAL_CHARS or variant):
+        extra = [m for m in kanji[:2] if m not in curated and not UNHELPFUL.search(m)]
+        return curated[0], curated[1:] + extra
+    if el in course and kanji:
+        return kanji[0], [m for m in curated + kanji[1:4] if m != kanji[0] and not UNHELPFUL.search(m)]
+    good = [plain(m) for m in kanji if len(m) <= 22 and not UNHELPFUL.search(m)]
+    if good:
+        return good[0], [m for m in curated + good[1:4] if m != good[0]]
+    if curated:
+        return curated[0], curated[1:]
     for c in (el, orig):
         if c and c in K and K[c]['meanings']:
             m = [x for x in K[c]['meanings'] if len(x) <= 24 and 'radical' not in x]
@@ -318,7 +350,7 @@ def main(argv):
             return 'k:' + el
         if 'r:' + el in placed:
             return 'r:' + el
-        named = radical_name(el, orig, K)
+        named = radical_name(el, orig, K, jlpt_level)
         if not named:
             unnamed[el] += 1
             return None
@@ -478,12 +510,14 @@ def main(argv):
     for c in kanji_list:
         k = K[c]
         e = {
-            'm': [m for m in k['meanings'] if not m.startswith('(') and not re.fullmatch(r'[A-Z][a-z]*\.', m)][:8],
+            'm': kanji_meanings(K, c)[:8],
             'on': readings[c]['on'], 'kun': readings[c]['kun'],
             'j': jlpt_level[c], 's': k['strokes'], 'p': kanji_parts.get(c, []),
         }
         if k['grade']:
             e['g'] = k['grade']
+        if k['rad'] in CLASSICAL:
+            e['kr'] = k['rad']
         if k['freq']:
             e['f'] = k['freq']
         jk = sorted({i for i in juku.get(c, []) if i in chosen},
@@ -516,6 +550,7 @@ def main(argv):
                  'tanos.co.uk, CC BY. This file is shared under CC BY-SA 4.0.',
         'sources': {'kanjidic2': kanjidic_version, 'jmdict': jmdict_version,
                     'kanjivg': os.path.basename(kvg_path)},
+        'classical': {n: CLASSICAL[n] for n in sorted({k['kr'] for k in kanji_out.values() if 'kr' in k})},
         'radicals': radicals, 'kanji': kanji_out, 'vocab': vocab_out, 'order': full_order,
     }
     with open(out_path, 'w', encoding='utf-8') as f:

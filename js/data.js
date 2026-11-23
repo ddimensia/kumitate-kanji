@@ -44,6 +44,7 @@ export function index(raw) {
       on: k.on.map(([forms, n, common]) => ({ forms, n, common: !!common })),
       kun: k.kun.map(([forms, n, common]) => ({ forms, n, common: !!common })),
       jlpt: k.j, grade: k.g || null, freq: k.f || null, strokes: k.s,
+      classical: k.kr && raw.classical?.[k.kr] ? { n: k.kr, ch: raw.classical[k.kr][0], name: raw.classical[k.kr][1] } : null,
       prereq: k.p, juku: (k.jk || []).map((i) => 'v:' + i), vocab: [], usedIn: [],
     });
   }

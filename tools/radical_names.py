@@ -35,6 +35,7 @@ RADICAL_NAMES = {
     '攵': ['strike', 'hit', 'taskmaster'],
     '攴': ['strike', 'hit', 'taskmaster'],
     '亠': ['lid', 'top hat', 'pot lid'],
+    '囗': ['enclosure', 'box', 'border', 'country border'],
     '冂': ['frame', 'upside-down box', 'border'],
     '儿': ['legs', 'human legs', 'walking legs'],
     '匕': ['spoon', 'ladle', 'sitting person'],
