@@ -6,7 +6,7 @@ import { esc, tileHtml } from '../ui.js';
 import { speakerButton, wireSpeech } from '../speech.js';
 
 const REPO = 'https://github.com/ddimensia/kumitate-kanji';
-const KAKITORI = 'https://github.com/ddimensia/kakitori';
+const KAKITORI = 'https://ddimensia.github.io/kakitori/';
 const TIP = 'https://ko-fi.com/ddimensia';
 
 const STEPS = [
