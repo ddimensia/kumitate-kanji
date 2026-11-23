@@ -50,7 +50,7 @@ order       array     study order, as ids: "r:亻", "k:日", "v:1234567"
 | `m` | English meanings, main one first |
 | `on`, `kun` | readings: `[forms, count, common, level]`. `forms` holds KANJIDIC spellings (kun'yomi grouped by stem, e.g. `["あ.げる", "あ.がる"]`). `count` is how many common or JLPT words use the reading (JLPT words count twice). `common` is 1 if the reading counts as common. `level` is the easiest JLPT level of a word using it (5 = N5, 0 = none). |
 | `j` | JLPT level (5 = N5) |
-| `g` | school grade (1–6, 8 = secondary), if any |
+| `g` | KANJIDIC grade, if any: 1–6 elementary school, 8 secondary school, 9–10 jinmeiyō (name kanji) |
 | `f` | newspaper frequency rank, if any |
 | `s` | stroke count |
 | `p` | what it's built from, as ids (`"r:亻"`, `"k:動"`), in writing order |

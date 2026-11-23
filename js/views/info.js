@@ -21,7 +21,7 @@ function header(it) {
   const st = stage(it);
   const meta = [];
   if (it.jlpt) meta.push(it.kind === 'r' ? `Taught with N${it.jlpt} kanji` : `JLPT N${it.jlpt}`);
-  if (it.grade) meta.push(it.grade <= 6 ? `Grade ${it.grade}` : 'Secondary school');
+  if (it.grade) meta.push(it.grade <= 6 ? `Grade ${it.grade}` : it.grade === 8 ? 'Secondary school' : 'Name kanji (jinmeiyō)');
   if (it.strokes) meta.push(`${it.strokes} strokes`);
   if (it.kind === 'v' && it.pos.length) meta.push(it.pos.join(', '));
   const big = it.kind === 'v'
