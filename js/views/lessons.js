@@ -46,7 +46,7 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
   function go(i) {
     index = Math.max(0, Math.min(batch.length - 1, i));
     const it = batch[index];
-    root.querySelector('.lesson-card').innerHTML = `<p class="lesson-step">${KIND_LABEL[it.kind]} ${index + 1} of ${batch.length}</p>${infoCardHtml(it)}`;
+    root.querySelector('.lesson-card').innerHTML = `<p class="lesson-step">${KIND_LABEL[it.kind]} ${index + 1} of ${batch.length}</p>${infoCardHtml(it, { compact: true })}`;
     root.querySelectorAll('.lesson-tabs button').forEach((b, k) => b.classList.toggle('is-on', k === index));
     root.querySelector('[data-act="prev"]').disabled = index === 0;
     root.querySelector('[data-act="next"]').textContent = index === batch.length - 1 ? 'Start quiz →' : 'Next →';

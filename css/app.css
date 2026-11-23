@@ -200,6 +200,12 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .kind-badge.kind-r { color: var(--radical); }
 .kind-badge.kind-v { color: var(--vocab); }
 .info-sec h3 { margin-top: 0.9rem; }
+.fold > summary { cursor: pointer; list-style: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary h3 { display: inline-block; }
+.fold > summary h3::before { content: '▸ '; }
+.fold[open] > summary h3::before { content: '▾ '; }
+.fold > summary small { font-weight: 400; }
 .meanings { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; }
 .meanings span { background: var(--paper-2); border-radius: 6px; padding: 0.1rem 0.55rem; }
 .meanings .primary { font-weight: 700; }
@@ -265,6 +271,13 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .q-note.is-retry { color: var(--warn); }
 .q-note.is-right { color: var(--good); }
 .q-answer { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; font-size: 1.15rem; }
+.q-reading {
+  font: inherit; font-family: var(--font-hand); font-size: 2rem; line-height: 1.2; cursor: pointer;
+  border: 1.5px solid var(--rule-soft); background: var(--sheet); color: var(--ink);
+  border-radius: 10px; padding: 0.1rem 0.6rem;
+}
+.q-reading:hover, .q-reading:focus-visible { border-color: var(--accent); color: var(--accent); }
+.q-answer-text { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; align-items: center; }
 .q-answer-label { font-size: 0.8rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
 .q-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 1rem; }
 .shake { animation: shake 0.35s; }

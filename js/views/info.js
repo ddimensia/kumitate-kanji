@@ -5,6 +5,15 @@ import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge
 import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL } from '../state.js';
 import { speakerButton } from '../speech.js';
 
+// In lessons and quizzes (compact), long lists start collapsed so the buttons stay in view.
+let compactMode = false;
+function section(title, count, body, { long = true } = {}) {
+  if (compactMode && long) {
+    return `<details class="info-sec fold"><summary><h3>${title} <small>(${count})</small></h3></summary>${body}</details>`;
+  }
+  return `<section class="info-sec"><h3>${title}</h3>${body}</section>`;
+}
+
 const tiles = (ids, n = 24) =>
   ids.slice(0, n).map(item).filter(Boolean).map((it) => tileHtml(it, { stage: stage(it) })).join('');
 
@@ -42,7 +51,7 @@ function radicalCard(it) {
   return `${header(it)}
     ${meaningsBlock([it.name, ...it.alt], it.id)}
     ${it.orig ? `<section class="info-sec"><h3>Form of</h3><p>A variant of <span lang="ja" class="inline-glyph">${esc(it.orig)}</span>${orig ? ` (${esc(primaryMeaning(orig))})` : ''}, as it appears inside other kanji.</p></section>` : ''}
-    ${it.users.length ? `<section class="info-sec"><h3>Found in</h3><div class="tiles">${tiles(it.users)}</div></section>` : ''}`;
+    ${it.users.length ? section('Found in', it.users.length, `<div class="tiles">${tiles(it.users)}</div>`) : ''}`;
 }
 
 function kanjiCard(it) {
@@ -59,9 +68,9 @@ function kanjiCard(it) {
       </dl>
       <p class="hint">Bold readings are the common ones you'll be asked for. Tap a reading to hear it.</p>
     </section>
-    ${it.prereq.length ? `<section class="info-sec"><h3>Built from</h3><div class="tiles">${tiles(it.prereq)}</div></section>` : ''}
-    ${it.usedIn.length ? `<section class="info-sec"><h3>Part of</h3><div class="tiles">${tiles(it.usedIn, 12)}</div></section>` : ''}
-    ${vocab.length ? `<section class="info-sec"><h3>Words</h3><ul class="wordlist">${vocab.slice(0, 12).map((v) => wordRow(v, it.ch)).join('')}</ul></section>` : ''}`;
+    ${it.prereq.length ? section('Built from', it.prereq.length, `<div class="tiles">${tiles(it.prereq)}</div>`, { long: false }) : ''}
+    ${it.usedIn.length ? section('Part of', it.usedIn.length, `<div class="tiles">${tiles(it.usedIn, 12)}</div>`) : ''}
+    ${vocab.length ? section('Words', vocab.length, `<ul class="wordlist">${vocab.slice(0, 12).map((v) => wordRow(v, it.ch)).join('')}</ul>`, { long: vocab.length > 3 }) : ''}`;
 }
 
 function wordRow(v, highlight) {
@@ -90,7 +99,8 @@ function vocabCard(it) {
     ${kanjiRows.length ? `<section class="info-sec"><h3>Kanji</h3><ul class="kanji-rows">${kanjiRows.join('')}</ul></section>` : ''}`;
 }
 
-export function infoCardHtml(it) {
+export function infoCardHtml(it, { compact = false } = {}) {
+  compactMode = compact;
   const body = it.kind === 'r' ? radicalCard(it) : it.kind === 'k' ? kanjiCard(it) : vocabCard(it);
   return `<article class="info kind-${it.kind}" data-item="${esc(it.id)}">${body}</article>`;
 }

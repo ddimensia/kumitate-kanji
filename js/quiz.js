@@ -45,11 +45,18 @@ function expectedHtml(it, type) {
     const list = [...meanings(it), ...getSynonyms(it.id)];
     return list.slice(0, 8).map(esc).join(', ');
   }
-  if (type === 'r') return it.readings.map((r) => `<span lang="ja">${esc(r)}</span>`).join('、');
-  const common = it[type].filter((r) => r.common);
-  return common
-    .map((r) => `<span lang="ja">${esc(type === 'on' ? r.forms[0] : r.forms.filter((f) => !f.startsWith('-')).map(kunDisplay).join('・') || kunDisplay(r.forms[0]))}</span>`)
-    .join('、');
+  // Readings are big and clickable: tap one to hear it.
+  const say = (kana, text) => `<button type="button" class="q-reading" lang="ja" data-say="${esc(kana)}" title="Play ${esc(kana)}">${esc(text)}</button>`;
+  if (type === 'r') return it.readings.map((r) => say(r, r)).join('');
+  return it[type]
+    .filter((r) => r.common)
+    .map((r) => {
+      if (type === 'on') return say(r.forms[0], r.forms[0]);
+      const forms = r.forms.filter((f) => !f.startsWith('-'));
+      const f = forms[0] || r.forms[0];
+      return say(f.replace(/[.-]/g, ''), (forms.length ? forms : [f]).map(kunDisplay).join('・'));
+    })
+    .join('');
 }
 
 /**
@@ -119,8 +126,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     input.value = prefill;
     stageEl.querySelector('.q-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      if (answered) advance();
-      else submit(input, it, type);
+      if (!answered) submit(input, it, type);
     });
     setTimeout(() => input.focus(), 0);
   }
@@ -164,7 +170,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
         <button type="button" class="btn small q-info" title="F">${showInfo ? 'Hide' : 'Show'} details <kbd>F</kbd></button>
         <button type="button" class="btn small primary q-next">Next <kbd>⏎</kbd></button>
       </div>
-      ${showInfo ? infoCardHtml(it) : ''}`;
+      ${showInfo ? infoCardHtml(it, { compact: true }) : ''}`;
     after.querySelector('.q-undo')?.addEventListener('click', undo);
     after.querySelector('.q-syn')?.addEventListener('click', acceptAsSynonym);
     after.querySelector('.q-info').addEventListener('click', () => renderAfter(!showInfo));
@@ -224,7 +230,11 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     else if (e.key === 'f' || e.key === 'F') {
       e.preventDefault();
       renderAfter(!stageEl.querySelector('.q-after').dataset.info);
-    } else if (e.key === 'Enter' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'BUTTON') {
+    } else if (e.key === 'Enter') {
+      // Enter moves on from anywhere (a read-only answer box doesn't submit its form in
+      // every browser), except on the Undo / Accept / Details buttons, which Enter presses.
+      const b = document.activeElement?.closest?.('button');
+      if (b && !b.classList.contains('q-next') && !b.classList.contains('q-reading') && stageEl.contains(b)) return;
       e.preventDefault();
       advance();
     }

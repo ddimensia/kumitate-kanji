@@ -74,7 +74,7 @@ async def main():
 
         # A typo in a reading (one kana off) is not graded: try again.
         # A wrong answer can be undone with Backspace.
-        did_typo = did_undo = False
+        did_typo = did_undo = did_enter_blur = did_reading_btn = False
         for _ in range(60):
             if not await pg.query_selector('.q-input'):
                 break
@@ -97,9 +97,21 @@ async def main():
                 did_typo = True
             await answer_current(pg)
             await pg.wait_for_selector('.q-form.is-right')
+            if info['type'] != 'm' and not did_reading_btn:
+                did_reading_btn = bool(await pg.query_selector('.q-answer .q-reading[data-say]'))
+            if not did_enter_blur:
+                # Enter advances even when the answer box isn't focused.
+                before = await pg.get_attribute('.q-card', 'data-card')
+                await pg.evaluate('document.activeElement.blur()')
+                await pg.keyboard.press('Enter')
+                await pg.wait_for_timeout(50)
+                after = await pg.get_attribute('.q-card', 'data-card') if await pg.query_selector('.q-card') else None
+                did_enter_blur = after != before or not await pg.query_selector('.q-form.is-right')
+                continue
             await pg.keyboard.press('Enter')
             await pg.wait_for_timeout(30)
         check(did_undo, 'undo was exercised')
+        check(did_enter_blur and did_reading_btn, 'Enter moves on without focus; readings are clickable buttons')
         await pg.wait_for_selector('.summary')
         check('Learned 5 new items' in await pg.text_content('.summary h2'), 'lesson summary')
         await pg.click('[data-act="done"]')
