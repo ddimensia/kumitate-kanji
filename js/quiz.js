@@ -115,14 +115,15 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       </div>
       <div class="q-prompt ${reading ? 'is-reading' : 'is-meaning'}">${PROMPT[type](it)}</div>
       <form class="q-form" autocomplete="off">
-        <input class="q-input" name="answer" ${reading ? 'lang="ja" placeholder="答え"' : 'placeholder="Your answer"'}
+        <input class="q-input" name="answer" ${reading ? `lang="ja" placeholder="${type === 'on' ? 'カタカナ' : 'ひらがな'}"` : 'placeholder="Your answer"'}
           autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${esc(TYPE_LABEL[type])}">
         <button class="q-submit" aria-label="Submit">➜</button>
       </form>
       <p class="q-note" role="status"></p>
       <div class="q-after"></div>`;
     const input = stageEl.querySelector('.q-input');
-    if (reading) bind(input, { IMEMode: 'toHiragana' });
+    // On'yomi are written in katakana (as on info cards), everything else in hiragana.
+    if (reading) bind(input, { IMEMode: type === 'on' ? 'toKatakana' : 'toHiragana' });
     input.value = prefill;
     stageEl.querySelector('.q-form').addEventListener('submit', (e) => {
       e.preventDefault();

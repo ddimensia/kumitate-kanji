@@ -74,7 +74,7 @@ async def main():
 
         # A typo in a reading (one kana off) is not graded: try again.
         # A wrong answer can be undone with Backspace.
-        did_typo = did_undo = did_enter_blur = did_reading_btn = False
+        did_typo = did_undo = did_enter_blur = did_reading_btn = did_kata = False
         for _ in range(60):
             if not await pg.query_selector('.q-input'):
                 break
@@ -87,6 +87,19 @@ async def main():
                 await pg.wait_for_selector('.q-input:not([readonly])')
                 check(await pg.input_value('.q-input') == 'zzzz', 'undo restores the wrong answer for editing')
                 did_undo = True
+            elif not did_kata and info['type'] == 'on':
+                romaji = await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toRomaji(k)", info['answer'])
+                await pg.fill('.q-input', '')
+                await pg.type('.q-input', romaji)
+                shown = await pg.input_value('.q-input')
+                check(shown == await pg.evaluate("async (k) => (await import('./vendor/wanakana.js')).toKatakana(k)", info['answer']),
+                      f'on\'yomi input shows katakana ({romaji} -> {shown})')
+                await pg.press('.q-input', 'Enter')
+                await pg.wait_for_selector('.q-form.is-right')
+                await pg.keyboard.press('Enter')
+                await pg.wait_for_timeout(30)
+                did_kata = True
+                continue
             elif not did_typo and info['type'] == 'on' and len(info['answer']) >= 3:
                 wrong = info['answer'][:-1] + ('か' if info['answer'][-1] != 'か' else 'き')
                 await pg.fill('.q-input', wrong)
@@ -111,6 +124,7 @@ async def main():
             await pg.keyboard.press('Enter')
             await pg.wait_for_timeout(30)
         check(did_undo, 'undo was exercised')
+        check(did_kata, "an on'yomi was answered in katakana")
         check(did_enter_blur and did_reading_btn, 'Enter moves on without focus; readings are clickable buttons')
         await pg.wait_for_selector('.summary')
         check('Learned 5 new items' in await pg.text_content('.summary h2'), 'lesson summary')
