@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Yomitori: kanji, readings and vocabulary",
-  "short_name": "Yomitori",
+  "name": "Kumitate Kanji: kanji, readings and vocabulary",
+  "short_name": "Kumitate",
   "description": "Learn radicals, kanji with their readings, and vocabulary in JLPT order, with typed answers and spaced repetition.",
   "start_url": "./#today",
   "scope": "./",

@@ -1,4 +1,4 @@
-"""English names for kanji components (radicals), written for Yomitori.
+"""English names for kanji components (radicals), written for Kumitate Kanji.
 
 The first name is the one taught; the rest are also accepted as answers. Components not
 listed here take their first KANJIDIC2 meaning (or the Unicode radical name), which works

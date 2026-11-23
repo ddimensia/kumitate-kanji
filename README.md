@@ -1,6 +1,8 @@
-# Yomitori 読み取り
+# Kumitate Kanji 組み立て漢字
 
-Learn kanji radicals, kanji with their on'yomi and kun'yomi, and the vocabulary that uses them, with typed answers and spaced repetition. It's the reading counterpart to [Kakitori](https://github.com/ddimensia/kakitori) (書き取り, writing).
+Learn kanji radicals, kanji with their on'yomi and kun'yomi, and the vocabulary that uses them, with typed answers and spaced repetition. 組み立て (kumitate) means "assembly": radicals build kanji, and kanji build words. It's the reading companion to [Kakitori](https://github.com/ddimensia/kakitori) (書き取り, writing).
+
+The app was first called Yomitori. Its browser storage keeps that name, so progress saved under the old name carries over, and old backups still import.
 
 Everything runs in the browser. There is no server and no account: progress is stored in IndexedDB, and the host only serves static files.
 

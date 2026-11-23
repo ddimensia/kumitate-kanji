@@ -21,7 +21,7 @@ async def main():
             await pg.set_content(f"""<html><head><base href="{BASE}"><link rel="stylesheet" href="css/fonts.css"></head>
               <body style="margin:0;background:transparent">
               <div id="i" style="width:{size}px;height:{size}px;border-radius:{radius}px;background:#34489a;color:#f4f5f8;
-                display:grid;place-items:center;font:600 {round(size * 0.62)}px 'Klee One';line-height:1">読</div></body></html>""")
+                display:grid;place-items:center;font:600 {round(size * 0.62)}px 'Klee One';line-height:1">組</div></body></html>""")
             await pg.evaluate('document.fonts.ready')
             await pg.wait_for_timeout(300)
             await pg.locator('#i').screenshot(path=os.path.join(ROOT, f'icon-{size}.png'), omit_background=True)

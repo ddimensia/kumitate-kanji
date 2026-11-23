@@ -100,7 +100,7 @@ async function start() {
     await Promise.all([initState(), loadCurriculum()]);
     if (!persistent) toast('Progress can’t be saved in this browser mode.', { error: true, ms: 6000 });
   } catch (err) {
-    main.innerHTML = `<p class="panel warn">Yomitori couldn’t start: ${String(err.message || err)}</p>`;
+    main.innerHTML = `<p class="panel warn">Kumitate Kanji couldn’t start: ${String(err.message || err)}</p>`;
     console.error(err);
     return;
   }

@@ -5,9 +5,9 @@
 // Fonts are cache-first and cached as pages use them (they're split by character range).
 // Bump VERSION after adding or renaming app files.
 
-const VERSION = '3';
-const APP_CACHE = `yomitori-app-${VERSION}`;
-const FONT_CACHE = 'yomitori-fonts';
+const VERSION = '4';
+const APP_CACHE = `kumitate-app-${VERSION}`;
+const FONT_CACHE = 'kumitate-fonts';
 const SHELL = [
   './',
   'index.html',

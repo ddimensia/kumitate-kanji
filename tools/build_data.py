@@ -620,7 +620,7 @@ def main(argv):
             info['note'] = RADICAL_NOTES[r]
 
     out = {
-        'about': 'Radicals, kanji and vocabulary for Yomitori. Kanji meanings, readings, grades and '
+        'about': 'Radicals, kanji and vocabulary for Kumitate Kanji. Kanji meanings, readings, grades and '
                  'frequency: KANJIDIC2; words: JMdict (both EDRDG, CC BY-SA 4.0, '
                  'https://www.edrdg.org/edrdg/licence.html). Components: KanjiVG (Ulrich Apel, CC BY-SA 3.0). '
                  'Furigana: JmdictFurigana (Doublevil, CC BY-SA 4.0). JLPT levels: Jonathan Waller, '

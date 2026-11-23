@@ -56,7 +56,7 @@ export function renderSettings(root, reload) {
         <label class="row"><span>API token</span><input type="password" name="token" autocomplete="off" spellcheck="false" placeholder="xxxxxxxx-xxxx-…" style="width:22rem;max-width:60vw"></label>
         <label class="row check"><input type="checkbox" name="remember"> <span>Remember the token on this device<small>Kept only in this browser and never included in backups.</small></span></label>
         <label class="row check"><input type="checkbox" name="skip" checked> <span>Skip items I’ve already studied here</span></label>
-        <label class="row check"><input type="checkbox" name="parts" checked> <span>Also mark the radicals and kanji they’re built from<small>Parts that don’t exist on WaniKani (Yomitori’s radicals differ from WaniKani’s) get the stage of what uses them.</small></span></label>
+        <label class="row check"><input type="checkbox" name="parts" checked> <span>Also mark the radicals and kanji they’re built from<small>Parts that don’t exist on WaniKani (this app’s radicals differ from WaniKani’s) get the stage of what uses them.</small></span></label>
         <p class="hero-actions"><button class="btn primary">Check my WaniKani progress</button> <span class="wk-status muted" role="status"></span></p>
       </form>
       <div class="wk-preview"></div>
@@ -114,7 +114,7 @@ export function renderSettings(root, reload) {
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `yomitori-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `kumitate-kanji-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });

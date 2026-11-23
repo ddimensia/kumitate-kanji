@@ -1,6 +1,7 @@
 // Persistence: IndexedDB with an in-memory fallback.
 // Stores: kv (settings, synonyms, passed items), cards (one per question), log (answers).
 
+// The app was first called Yomitori; the database keeps that name so saved progress carries over.
 const DB_NAME = 'yomitori';
 const DB_VERSION = 1;
 const STORES = ['kv', 'cards', 'log'];
@@ -30,7 +31,7 @@ function openDb() {
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
-    req.onblocked = () => reject(new Error('Yomitori is open in another tab with an older version.'));
+    req.onblocked = () => reject(new Error('Kumitate Kanji is open in another tab with an older version.'));
   });
   return dbPromise;
 }
@@ -108,7 +109,7 @@ async function clearStore(store) {
 }
 
 export async function exportAll() {
-  const out = { app: 'yomitori', version: 1, exportedAt: new Date().toISOString(), kv: {} };
+  const out = { app: 'kumitate-kanji', version: 1, exportedAt: new Date().toISOString(), kv: {} };
   for (const key of KV_KEYS) out.kv[key] = await kvGet(key);
   out.cards = await getAll('cards');
   out.log = await getAll('log');
@@ -116,7 +117,8 @@ export async function exportAll() {
 }
 
 export async function importAll(data) {
-  if (!data || data.app !== 'yomitori' || !Array.isArray(data.cards)) throw new Error('This file is not a Yomitori backup.');
+  // Backups made before the rename say 'yomitori'.
+  if (!data || !['kumitate-kanji', 'yomitori'].includes(data.app) || !Array.isArray(data.cards)) throw new Error('This file is not a Kumitate Kanji backup.');
   for (const store of STORES) await clearStore(store);
   await putMany('cards', data.cards);
   await addLogs((data.log || []).map((e) => { const { id, ...rest } = e; return rest; }));
