@@ -241,6 +241,8 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .parts-sub .tile-glyph { font-size: 1.25rem; }
 .plus, .eq { color: var(--ink-soft); font-size: 1.1rem; font-weight: 600; }
 .dict-radical { margin-top: 0.5rem; }
+.radical-note .nj { font-size: 1.45em; line-height: 1; }
+.radical-note { margin: 0; padding: 0.5rem 0.75rem; border-left: 3px solid var(--warn); background: var(--paper-2); border-radius: 0 8px 8px 0; }
 
 /* Lessons */
 .lesson-top, .quiz-top { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }

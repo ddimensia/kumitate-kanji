@@ -35,7 +35,7 @@ RADICAL_NAMES = {
     '攵': ['strike', 'hit', 'taskmaster'],
     '攴': ['strike', 'hit', 'taskmaster'],
     '亠': ['lid', 'top hat', 'pot lid'],
-    '囗': ['enclosure', 'box', 'border', 'country border'],
+    '囗': ['enclosure', 'big mouth', 'box', 'border', 'country border'],
     '冂': ['frame', 'upside-down box', 'border'],
     '儿': ['legs', 'human legs', 'walking legs'],
     '匕': ['spoon', 'ladle', 'sitting person'],
@@ -220,6 +220,13 @@ RADICAL_NAMES = {
     '习': ['practice', 'feathers'],
     '显': ['appear', 'manifest'],
     '䒑': ['horns', 'antlers'],
+}
+
+# Notes shown on a radical's card, for shapes that are easy to mix up.
+RADICAL_NOTES = {
+    '囗': 'Not the same as 口 (mouth). The enclosure is bigger and wraps around other parts, '
+          'as in 国 and 四; 口 is smaller and sits beside or inside them, as in 名 and 品. '
+          '回 has both: a small 口 inside a big 囗.',
 }
 
 # Components never taught on their own (single strokes are skipped automatically).

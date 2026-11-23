@@ -33,7 +33,7 @@ import csv, json, os, re, sys, unicodedata
 from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(__file__))
-from radical_names import RADICAL_NAMES, IGNORE_PARTS  # noqa: E402
+from radical_names import RADICAL_NAMES, RADICAL_NOTES, IGNORE_PARTS  # noqa: E402
 
 
 def is_kanji(c):
@@ -580,6 +580,8 @@ def main(argv):
         vocab_out[w['id']] = e
     for r, info in radicals.items():
         info['u'] = radical_users[r][:8]
+        if r in RADICAL_NOTES:
+            info['note'] = RADICAL_NOTES[r]
 
     out = {
         'about': 'Radicals, kanji and vocabulary for Yomitori. Kanji meanings, readings, grades and '

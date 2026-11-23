@@ -50,6 +50,7 @@ function radicalCard(it) {
   const orig = it.orig ? item('k:' + it.orig) : null;
   return `${header(it)}
     ${meaningsBlock([it.name, ...it.alt], it.id)}
+    ${it.note ? `<section class="info-sec"><h3>Don’t mix it up</h3><p class="radical-note">${esc(it.note).replace(/[\u3400-\u9fff]/g, (c) => `<span lang="ja" class="nj">${c}</span>`)}</p></section>` : ''}
     ${item('k:' + it.ch) ? `<section class="info-sec"><h3>Also a kanji</h3><div class="tiles">${tileHtml(item('k:' + it.ch), { stage: stage(item('k:' + it.ch)) })}</div><p class="hint">On its own, ${esc(it.ch)} is a kanji you’ll learn with its readings.</p></section>` : ''}
     ${it.orig ? `<section class="info-sec"><h3>Form of</h3><p>A variant of <span lang="ja" class="inline-glyph">${esc(it.orig)}</span>${orig ? ` (${esc(primaryMeaning(orig))})` : ''}, as it appears inside other kanji.</p></section>` : ''}
     ${it.users.length ? section('Found in', it.users.length, `<div class="tiles">${tiles(it.users)}</div>`) : ''}`;

@@ -35,7 +35,7 @@ export function index(raw) {
   for (const [ch, r] of Object.entries(raw.radicals)) {
     items.set('r:' + ch, {
       id: 'r:' + ch, kind: 'r', ch, name: r.n, alt: r.a || [], orig: r.o || null,
-      strokes: r.s, users: (r.u || []).map((c) => 'k:' + c), prereq: [], jlpt: r.j || null,
+      strokes: r.s, users: (r.u || []).map((c) => 'k:' + c), prereq: [], jlpt: r.j || null, note: r.note || null,
     });
   }
   for (const [ch, k] of Object.entries(raw.kanji)) {
