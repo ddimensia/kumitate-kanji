@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS = {
   dayStartHour: 4,      // a study day starts at 4am
   firstReview: '4h',    // wait between a lesson and its first review
   missReview: '1h',     // wait before a missed card comes back
+  welcomed: false,      // has seen the welcome page
   readingWindow: 2,     // teach kanji readings used in JLPT words up to this many levels harder ('all': every common one)
 };
 
@@ -31,7 +32,8 @@ const listeners = new Set();
 export const DAY = 86400000;
 
 export async function initState() {
-  settings = { ...DEFAULT_SETTINGS, ...((await store.kvGet('settings')) || {}) };
+  const saved = (await store.kvGet('settings')) || {};
+  settings = { ...DEFAULT_SETTINGS, ...saved };
   configureSrs(srsOptions(settings));
   setReadingWindow(settings.readingWindow);
   cards.clear();
@@ -39,6 +41,15 @@ export async function initState() {
   synonyms = (await store.kvGet('synonyms')) || {};
   passed = (await store.kvGet('passed')) || {};
   recentLog = await store.logSince(Date.now() - 30 * DAY);
+  // People who studied before the welcome page existed have seen enough of the app.
+  if (saved.welcomed === undefined && cards.size) settings.welcomed = true;
+}
+
+/** Remember that the welcome page has been seen, so it no longer opens on its own. */
+export async function markWelcomed() {
+  if (settings.welcomed) return;
+  settings.welcomed = true;
+  await store.kvSet('settings', settings);
 }
 
 export function onChange(fn) {

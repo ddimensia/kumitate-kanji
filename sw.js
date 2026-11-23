@@ -5,7 +5,7 @@
 // Fonts are cache-first and cached as pages use them (they're split by character range).
 // Bump VERSION after adding or renaming app files.
 
-const VERSION = '4';
+const VERSION = '5';
 const APP_CACHE = `kumitate-app-${VERSION}`;
 const FONT_CACHE = 'kumitate-fonts';
 const SHELL = [
@@ -35,6 +35,7 @@ const SHELL = [
   'js/views/browse.js',
   'js/views/itempage.js',
   'js/views/settings.js',
+  'js/views/welcome.js',
   'vendor/ts-fsrs.js',
   'vendor/wanakana.js',
   'data/curriculum.json',

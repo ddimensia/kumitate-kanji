@@ -66,6 +66,19 @@ async def main():
         start = dt.datetime(2026, 1, 5, 9, 0)
         await pg.clock.install(time=start)
         await pg.goto(BASE + '#today')
+        # A first visit opens on the welcome page; its button goes to Today, and it doesn't come back.
+        await pg.wait_for_selector('.welcome')
+        check('#welcome' in pg.url and 'Kumitate Kanji' in await pg.text_content('.welcome h1'), 'first visit opens the welcome page')
+        check(await pg.query_selector('.w-assembly a[href*="%E5%83%8D"]') is not None, 'welcome page shows 亻 + 動 → 働 → 働く')
+        await pg.click('.w-intro .btn.primary')
+        await pg.wait_for_selector('.today')
+        await pg.reload()
+        await pg.wait_for_selector('.today')
+        check('#today' in pg.url, 'after that, the app opens on Today')
+        await pg.click('.site-foot a[href="#welcome"]')
+        await pg.wait_for_selector('.welcome')
+        check(True, 'footer has an About link to the welcome page')
+        await pg.goto(BASE + '#today')
         await pg.wait_for_selector('.today')
 
         # --- Lesson batch ---

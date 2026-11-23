@@ -111,7 +111,7 @@ Plain ES modules with no build step:
 | `js/quiz.js` | The typed quiz used by lessons and reviews (retry, undo, synonyms) |
 | `js/speech.js` | Web Speech API text-to-speech |
 | `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
-| `js/views/*.js` | Today, lessons, reviews, browse, item pages, settings |
+| `js/views/*.js` | Welcome page, Today, lessons, reviews, Extra study, browse, item pages, settings |
 | `vendor/` | [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) and [WanaKana](https://github.com/WaniKani/WanaKana), both MIT |
 
 Tests:

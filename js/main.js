@@ -1,7 +1,7 @@
 // App shell: start-up and routing.
 
 import { initStore } from './store.js';
-import { initState, dueCardIds, onChange } from './state.js';
+import { initState, dueCardIds, onChange, getSettings, markWelcomed } from './state.js';
 import { loadCurriculum } from './data.js';
 import { renderToday } from './views/today.js';
 import { runLessons, nextBatch } from './views/lessons.js';
@@ -10,6 +10,7 @@ import { runPractice } from './views/practice.js';
 import { renderBrowse } from './views/browse.js';
 import { renderItem } from './views/itempage.js';
 import { renderSettings } from './views/settings.js';
+import { renderWelcome } from './views/welcome.js';
 import { toast } from './ui.js';
 
 const main = document.getElementById('view');
@@ -76,9 +77,18 @@ function updateNav() {
   }
 }
 
+let firstRoute = true;
+
 function route() {
   setKeys(null);
-  const [name, ...params] = (location.hash.slice(1) || 'today').split('/').map(decodeURIComponent);
+  let [name, ...params] = (location.hash.slice(1) || 'today').split('/').map(decodeURIComponent);
+  // A first visit opens on the welcome page. Going anywhere else (or leaving it) marks it seen.
+  if (firstRoute && name === 'today' && !getSettings().welcomed) {
+    history.replaceState(null, '', '#welcome');
+    name = 'welcome';
+  }
+  firstRoute = false;
+  if (name !== 'welcome') markWelcomed();
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('is-on', a.getAttribute('href') === `#${name}`));
   document.body.dataset.route = name;
   const root = freshRoot();
@@ -90,6 +100,7 @@ function route() {
   if (name === 'browse') renderBrowse(root, params, navigate);
   else if (name === 'item') renderItem(root, params.join('/'), route);
   else if (name === 'settings') renderSettings(root, async () => { await initState(); route(); });
+  else if (name === 'welcome') renderWelcome(root);
   else renderToday(root, { startLessons, startReviews, startPractice });
   window.scrollTo({ top: 0 });
 }

@@ -90,6 +90,7 @@ export function renderToday(root, { startLessons, startReviews, startPractice })
       <h2>Welcome to Kumitate Kanji</h2>
       <p>You’ll learn kanji in JLPT order, N5 first. Each kanji comes after the radicals it’s built from, and words come after their kanji. Answers are typed: meanings in English, readings in kana (type romaji and it turns into kana).</p>
       <p>Start with a lesson. New items unlock as earlier ones settle into memory, usually after your first successful review a couple of days later.</p>
+      <p><a href="#welcome">More about how it works</a></p>
     </section>`}
 
     <section class="panel progress-panel">

@@ -94,7 +94,7 @@ kbd { font-family: var(--font-ui); font-size: 0.7rem; opacity: 0.65; border: 1px
   position: sticky; top: 0; z-index: 5;
 }
 .brand { display: flex; align-items: baseline; gap: 0.5rem; text-decoration: none; color: var(--ink); }
-.brand-jp { font-size: 1.5rem; font-weight: 600; }
+.brand-jp { font-size: 1.5rem; font-weight: 600; white-space: nowrap; }
 .brand-en { font-size: 0.85rem; color: var(--ink-soft); letter-spacing: 0.08em; text-transform: uppercase; }
 .nav { display: flex; gap: 0.25rem; }
 .nav a { text-decoration: none; color: var(--ink-soft); padding: 0.35rem 0.7rem; border-radius: 999px; font-weight: 500; }
@@ -112,6 +112,7 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
   padding: 0.45rem 0.95rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.25rem;
 }
 .btn:hover:not(:disabled) { border-color: var(--accent); }
+a.btn { text-decoration: none; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn.danger { border-color: var(--pen); color: var(--pen); }
@@ -344,6 +345,35 @@ main { max-width: 980px; margin: 0 auto; padding: clamp(0.75rem, 3vw, 2rem); out
 .settings-form h2:first-child { margin-top: 0; }
 .credits li { margin: 0.3rem 0; }
 
+/* Welcome */
+.welcome { max-width: 980px; }
+.welcome section + section { border-top: 1px solid var(--rule-soft); padding-top: 2rem; margin-top: 2.25rem; }
+.welcome h2 { font-size: 1.3rem; }
+.w-hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem; align-items: center; }
+.w-hero h1 { margin: 0 0 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.w-title { font-family: var(--font-hand); font-size: clamp(2.2rem, 6vw, 3.2rem); font-weight: 600; line-height: 1.1; }
+.w-name { font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.w-lead { font-size: 1.05rem; max-width: 52ch; }
+.w-note { color: var(--ink-soft); font-size: 0.875rem; }
+.w-demo { background: var(--sheet); border: 1px solid var(--rule-soft); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+.w-assembly { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+.w-row { display: flex; align-items: center; gap: 0.5rem; }
+.w-arrow { color: var(--ink-soft); font-size: 1.2rem; line-height: 1; }
+.w-word .tile-glyph { font-size: 1.5rem; }
+.w-word rt { font-size: 0.45em; }
+.w-caption { color: var(--ink-soft); font-size: 0.8125rem; margin: 0.75rem 0 0; }
+.w-steps ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.w-steps li { background: var(--sheet); border: 1px solid var(--rule-soft); border-radius: var(--radius); padding: 1rem; }
+.w-steps h3 { margin: 0 0 0.4rem; color: var(--ink); font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.w-steps p { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+.w-step-n { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 0.85rem; flex: none; }
+.w-more { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+.w-more ul { padding-left: 1.1rem; margin: 0; }
+.w-more li { margin: 0.35rem 0; }
+.w-end { text-align: center; }
+@media (max-width: 720px) { .w-hero { grid-template-columns: 1fr; } }
+body[data-route="welcome"] .masthead .nav a.is-on { background: none; }
+
 /* Footer */
 .site-foot { max-width: 980px; margin: 0 auto; padding: 0 clamp(0.75rem, 3vw, 2rem) 2rem; color: var(--ink-soft); font-size: 0.8125rem; }
 .site-foot p { margin: 0; border-top: 1px solid var(--rule-soft); padding-top: 1rem; }
@@ -363,6 +393,9 @@ body[data-route="study"] .site-foot { display: none; }
 
 @media (max-width: 560px) {
   .brand-en { display: none; }
+  .brand-jp { font-size: 1.2rem; }
+  .masthead { gap: 0.5rem; }
+  .nav a { padding: 0.35rem 0.5rem; }
   .info-head { flex-direction: column; align-items: flex-start; }
   .forecast li { grid-template-columns: 6.5rem 1fr 2rem; }
 }
