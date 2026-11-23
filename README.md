@@ -88,7 +88,7 @@ Progress stays in the browser you study in. Use **Settings → Export backup** t
 | Furigana alignment | [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) | CC BY-SA 4.0 |
 | JLPT levels | Jonathan Waller's lists ([tanos.co.uk](https://www.tanos.co.uk/jlpt/)), via [Bluskyo/JLPT_Vocabulary](https://github.com/Bluskyo/JLPT_Vocabulary) and [open-anki-jlpt-decks](https://github.com/jamsinclair/open-anki-jlpt-decks) | CC BY / MIT |
 
-The built file is shared under CC BY-SA 4.0. `.github/workflows/update-data.yml` rebuilds it monthly from the latest releases, as the EDRDG licence asks. Before committing, it checks the result with `tools/check_data.py` and the answer tests.
+The built file is shared under CC BY-SA 4.0. `data/README.md` describes its format and sources, and `data/KanjiVG-COPYING.txt` has KanjiVG's licence. `.github/workflows/update-data.yml` rebuilds it monthly from the latest releases, as the EDRDG licence asks. Before committing, it checks the result with `tools/check_data.py` and the answer tests.
 
 To rebuild by hand, download the files that the workflow downloads, then run:
 
