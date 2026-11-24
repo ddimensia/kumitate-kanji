@@ -73,7 +73,7 @@ function expectedHtml(it, type) {
 /**
  * Run a quiz in `root`. Options:
  *   mode: 'review' | 'lesson' | 'practice' (Extra study: not graded for spaced repetition)
- *   onDone({ total, right, wrong, missed: itemIds, unlocked: itemIds, ended })
+ *   onDone({ total, right, wrong, missed: itemIds, missedCards: cardIds, unlocked: itemIds, ended })
  *   setKeys(handler)
  */
 export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title = 'Reviews' }) {
@@ -272,8 +272,9 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
   function finish(ended) {
     setKeys(null);
     const right = [...first.values()].filter(Boolean).length;
-    const missed = [...new Set([...first].filter(([, v]) => !v).map(([id]) => splitCardId(id)[0]))];
-    onDone({ total, answered: first.size, right, wrong: first.size - right, missed, unlocked: [...unlocked], ended, complete: !queue.length });
+    const missedCards = [...first].filter(([, v]) => !v).map(([id]) => id);
+    const missed = [...new Set(missedCards.map((id) => splitCardId(id)[0]))];
+    onDone({ total, answered: first.size, right, wrong: first.size - right, missed, missedCards, unlocked: [...unlocked], ended, complete: !queue.length });
   }
 
   setKeys((e) => {

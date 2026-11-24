@@ -56,5 +56,35 @@ with sync_playwright() as p:
     check(gaps[2] == 0, 'after the third, straight away')
     check(3 <= gaps[3] <= 6, 'once right, once more a few cards later to check it stuck')
     check(pg.evaluate('window.__done.complete'), 'the session finishes')
+    # The end of Extra study: "again" practises only the missed cards.
+    pg.evaluate('''async (ids) => {
+      const { runPractice } = await import('./js/views/practice.js');
+      window.__again = null;
+      runPractice(document.querySelector('#view') || document.querySelector('main'), ids,
+        { setKeys() {}, onExit() {}, again: (which) => { window.__again = which; } });
+    }''', ['k:一/m', 'k:二/m', 'k:三/m'])
+    missed_once = False
+    for _ in range(10):
+        if pg.locator('.summary').count():
+            break
+        pg.wait_for_selector('.q-input:not([readonly])')
+        card = pg.get_attribute('.q-card', 'data-card')
+        if card == 'k:二/m' and not missed_once:
+            missed_once, answer = True, 'zzzz'
+        else:
+            answer = pg.evaluate("async (id) => { const d = await import('./js/data.js'); return d.meanings(d.item(id.split('/')[0]))[0]; }", card)
+        pg.fill('.q-input', answer)
+        pg.keyboard.press('Enter')
+        pg.wait_for_selector('.q-after .q-next')
+        pg.click('.q-after .q-next')
+        pg.wait_for_timeout(50)
+    pg.wait_for_selector('.summary')
+    check(pg.inner_text('[data-act="missed"]') == 'Practise the missed one again', 'the summary offers the missed card')
+    pg.click('[data-act="missed"]')
+    check(pg.evaluate('window.__again') == ['k:二/m'], 'and practising again uses only that card')
+    check(pg.inner_text('[data-act="all"]') == 'All 3 again', 'with the whole set still an option')
+    pg.click('[data-act="all"]')
+    check(len(pg.evaluate('window.__again')) == 3, 'which practises all three')
+
     check(not errors, 'no page errors' + ('' if not errors else ': ' + '; '.join(errors)))
     b.close()

@@ -59,6 +59,7 @@ function startReviews() {
   startStudy((root) => runReviews(root, ids, {
     setKeys, onExit: exit,
     again: () => startReviews(),
+    practise: (missed) => startPractice(missed),
   }));
 }
 
@@ -66,7 +67,7 @@ function startPractice(ids) {
   if (!ids.length) { toast('No recent mistakes to practise.'); return; }
   startStudy((root) => runPractice(root, ids, {
     setKeys, onExit: exit,
-    again: () => startPractice(ids),
+    again: (which) => startPractice(which || ids),
   }));
 }
 
