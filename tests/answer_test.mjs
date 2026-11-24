@@ -1,7 +1,7 @@
 // Answer checking against the real curriculum: node tests/answer_test.mjs
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow } from '../js/data.js';
+import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow, kunFormsToShow, readingToSay } from '../js/data.js';
 import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
 
 useCurriculum(JSON.parse(readFileSync(new URL('../data/curriculum.json', import.meta.url))));
@@ -58,4 +58,17 @@ assert.ok(!forms(item('k:読'), 'on').includes('ドク'), '読: ドク not taugh
 setReadingWindow('all');
 assert.deepEqual(forms(item('k:田'), 'on'), ['デン'], 'all common readings: デン taught'); n++;
 setReadingWindow(2);
+
+// Kun'yomi pared down: at most two per kanji, the most used, each shown in its most used forms.
+const sei = item('k:生');
+assert.deepEqual(taughtReadings(sei).kun.map((r) => kunFormsToShow(r)), [['い.きる'], ['う.まれる']], '生: い(きる) and う(まれる) only'); n++;
+assert.deepEqual(taughtReadings(sei).kun.map((r) => readingToSay('kun', r)), ['い', 'う'], '生: read aloud without okurigana'); n++;
+assert.ok(taughtReadings(item('k:上')).kun.length <= 2, '上: no more than two kun\'yomi taught'); n++;
+assert.deepEqual(kunFormsToShow(item('k:立').kun.find((r) => r.forms.includes('た.つ'))), ['た.つ', 'た.てる'], '立: た(つ)・た(てる), not た(ち)〜'); n++;
+ok(checkReading(sei, 'kun', 'なま'), 'correct', '生: なま is still accepted though not taught');
+
+// A one-kanji word answered with its kanji's other reading: explained, not "another word".
+const ichi = checkReading(v('市'), 'r', 'し');
+ok(ichi, 'retry', '市 answered し');
+assert.match(ichi.note, /^し is 市’s on’yomi, used in words like \S+ \(\S+\)\. On its own, 市/, 'explains on\'yomi vs on its own'); n++;
 console.log(`answer_test: ${n} checks passed`);

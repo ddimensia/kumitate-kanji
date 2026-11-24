@@ -116,6 +116,21 @@ export function isKanaTypo(given, target) {
   return true;
 }
 
+/**
+ * 市 answered し: "し is 市’s on’yomi, used in words like 市長 (しちょう). On its own, 市 is read いち."
+ */
+function otherKanjiReadingNote(word, k, given) {
+  const kind = readingAnswers(k, 'on', { commonOnly: false }).includes(given) ? 'on’yomi' : 'kun’yomi';
+  // An example word that uses this reading of the kanji (easiest first).
+  const example = k.vocab.map(item).find((v) => v && v.id !== word.id && v.w.length > 1 && v.furi
+    && v.furi.some(([ruby, rt]) => ruby === k.ch && toHiragana(rt || '') === given));
+  const where = example ? `, used in words like ${example.w} (${example.readings[0]})` : ', used in compound words';
+  // When the dictionary also lists that reading on its own (方: ほう, direction), say which word this is.
+  const alsoAlone = word.otherReadings.some((r) => toHiragana(r) === given);
+  const which = alsoAlone ? ` meaning “${word.senses[0][0]}”` : "";
+  return `${given} is ${k.ch}’s ${kind}${where}. On its own, ${word.w}${which} is read ${word.readings[0]}.`;
+}
+
 export function checkReading(it, type, answer) {
   if (!answer || !answer.trim()) return { verdict: 'retry', note: 'Type an answer first.' };
   const given = toKanaAnswer(answer);
@@ -126,20 +141,18 @@ export function checkReading(it, type, answer) {
   if (it.kind === 'v') {
     const accepted = it.readings.map((r) => toHiragana(r));
     if (accepted.includes(given)) return { verdict: 'correct' };
-    if (it.otherReadings.map((r) => toHiragana(r)).includes(given)) {
-      return { verdict: 'retry', note: `That’s another word written ${it.w}. We want the one meaning “${it.senses[0][0]}”.` };
-    }
-    // A single-kanji word answered with the kanji's other reading.
+    // A one-kanji word answered with another reading of its kanji (市: し, not いち). Checked
+    // first: it's usually that kanji's reading in compounds, not really a different word.
     if (it.prereq.length === 1 && [...it.w].filter((c) => c >= '一').length === 1) {
       const k = item(it.prereq[0]);
       if (k && readingsOf(k).includes(given)) {
         const okurigana = [...it.w].some((c) => c < '一');
-        return {
-          verdict: 'retry',
-          note: okurigana ? 'That’s the kanji’s reading. Type the whole word, kana included.'
-            : 'That’s a reading of the kanji, but not how this word is read.',
-        };
+        if (okurigana) return { verdict: 'retry', note: 'That’s the kanji’s reading. Type the whole word, kana included.' };
+        return { verdict: 'retry', note: otherKanjiReadingNote(it, k, given) };
       }
+    }
+    if (it.otherReadings.map((r) => toHiragana(r)).includes(given)) {
+      return { verdict: 'retry', note: `That’s another word written ${it.w}. We want the one meaning “${it.senses[0][0]}”.` };
     }
     if (accepted.some((a) => isKanaTypo(given, a))) return { verdict: 'retry', note: 'Looks like a typo. Try again.', typo: true };
     return { verdict: 'wrong' };

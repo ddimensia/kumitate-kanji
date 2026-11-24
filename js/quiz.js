@@ -6,7 +6,7 @@
 // kind ("that's the kun'yomi") aren't graded at all: the card shakes and you try again.
 
 import { bind, unbind } from '../vendor/wanakana.js';
-import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings, taughtReadings } from './data.js';
+import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
 import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc } from './ui.js';
@@ -51,9 +51,7 @@ function expectedHtml(it, type) {
   return taughtReadings(it)[type]
     .map((r) => {
       if (type === 'on') return say(r.forms[0], r.forms[0]);
-      const forms = r.forms.filter((f) => !f.startsWith('-'));
-      const f = forms[0] || r.forms[0];
-      return say(f.replace(/[.-]/g, ''), (forms.length ? forms : [f]).map(kunDisplay).join('・'));
+      return say(readingToSay('kun', r), kunFormsToShow(r).map(kunDisplay).join('・'));
     })
     .join('');
 }

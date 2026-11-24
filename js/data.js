@@ -42,7 +42,7 @@ export function index(raw) {
     items.set('k:' + ch, {
       id: 'k:' + ch, kind: 'k', ch, meanings: k.m,
       on: k.on.map(([forms, n, common, lv]) => ({ forms, n, common: !!common, lv: lv || 0 })),
-      kun: k.kun.map(([forms, n, common, lv]) => ({ forms, n, common: !!common, lv: lv || 0 })),
+      kun: k.kun.map(([forms, n, common, lv, show]) => ({ forms, n, common: !!common, lv: lv || 0, show: show || 2 })),
       jlpt: k.j, grade: k.g || null, freq: k.f || null, strokes: k.s,
       classical: k.kr && raw.classical?.[k.kr]
         ? { n: k.kr, ch: raw.classical[k.kr][0], name: raw.classical[k.kr][1], id: k.krid || null } : null,
@@ -89,11 +89,28 @@ export function setReadingWindow(w) {
 }
 
 /** { on: [readings], kun: [readings] } taught with this kanji. */
+const MAX_KUN = 2;
+
+/** The forms of a kun'yomi worth showing, most used first: 生 い.きる (not い.かす, い.ける). */
+export function kunFormsToShow(r) {
+  const forms = r.forms.filter((f) => !f.startsWith('-'));
+  return forms.length ? forms.slice(0, r.show || 2) : r.forms.slice(0, 1);
+}
+
+/** What to say for a reading: the kanji's own part, without okurigana (生きる -> い, 上 -> うわ). */
+export function readingToSay(kind, r) {
+  if (kind === 'on') return r.forms[0].replace(/-/g, '');
+  return parseKun(kunFormsToShow(r)[0]).stem;
+}
+
 export function taughtReadings(it) {
   let t = taughtCache.get(it.id);
   if (t) return t;
   const ok = (r) => r.common && (readingWindow === 'all' || r.lv >= it.jlpt - readingWindow);
-  t = { on: it.on.filter(ok), kun: it.kun.filter(ok) };
+  // At most two kun'yomi, the most used (生 teaches い(きる) and う(まれる); なま comes with its word).
+  const kun = it.kun.filter(ok);
+  const topKun = new Set(kun.slice().sort((a, b) => b.n - a.n).slice(0, MAX_KUN));
+  t = { on: it.on.filter(ok), kun: kun.filter((r) => topKun.has(r)) };
   if (!t.on.length && !t.kun.length) {
     // Every kanji teaches at least one reading: its most used common one.
     const best = [...it.on.map((r) => ['on', r]), ...it.kun.map((r) => ['kun', r])]

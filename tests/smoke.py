@@ -19,6 +19,8 @@ async def main():
         errs = []
         pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
         pg.on('pageerror', lambda e: errs.append('page error: ' + str(e)))
+        await pg.goto(BASE + '#browse')  # any page but Today counts as having seen the welcome page
+        await pg.wait_for_selector('.browse, .page', state='attached')
         await pg.goto(BASE + '#today')
         await pg.wait_for_selector('.today', timeout=15000)
         await pg.screenshot(path=f'{OUT}/today.png', full_page=True)

@@ -1,6 +1,6 @@
 // Small UI helpers: escaping, toasts, dialogs, furigana and item rendering.
 
-import { glyph, primaryMeaning, KIND_LABEL, taughtReadings } from './data.js';
+import { glyph, primaryMeaning, KIND_LABEL, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
 import { kunDisplay } from './answer.js';
 
 export const esc = (s) =>
@@ -61,8 +61,11 @@ export function readingListHtml(it, kind, { rare = true } = {}) {
     .slice()
     .sort((a, b) => tier(a) - tier(b))
     .map((r) => {
-      const text = kind === 'on' ? r.forms.join('・') : r.forms.filter((f) => !f.startsWith('-') || r.forms.length === 1).map(kunDisplay).join('・');
-      return `<span lang="ja" class="reading ${cls[tier(r)]}" title="${title[tier(r)]}" data-say="${esc(kind === 'on' ? r.forms[0] : r.forms[0].replace(/[.-]/g, ''))}">${esc(text)}</span>`;
+      const text = kind === 'on' ? r.forms.join('・') : kunFormsToShow(r).map(kunDisplay).join('・');
+      // Other forms of the same kun'yomi (生: い(かす), い(ける)) are listed on hover.
+      const more = kind === 'kun' ? r.forms.filter((f) => !kunFormsToShow(r).includes(f)).map(kunDisplay) : [];
+      const tip = title[tier(r)] + (more.length ? `. Also: ${more.join('、')}` : '');
+      return `<span lang="ja" class="reading ${cls[tier(r)]}" title="${esc(tip)}" data-say="${esc(readingToSay(kind, r))}">${esc(text)}</span>`;
     })
     .join('');
 }

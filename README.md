@@ -28,15 +28,16 @@ Everything runs in the browser. There is no server and no account: progress is s
 
 Only readings you'll actually need soon are asked for.
 - **Common:** a reading counts as common when it appears in enough common or JLPT words (counted from JmdictFurigana, allowing for rendaku and small っ), or when the kanji on its own is a word read that way (上 うえ, 明るい).
-- **Taught:** a common reading is taught and quizzed with the kanji only if a JLPT word using it is at most two levels harder than the kanji. 田 (N4) teaches た (田, N3) but not デン, which is only used in N1 words (水田, 田園); you learn デン through those words. Every kanji teaches at least its most used reading.
+- **Taught:** a common reading is taught and quizzed with the kanji only if a JLPT word using it is at most two levels harder than the kanji. 田 (N4) teaches た (田, N3) but not デン, which is only used in N1 words (水田, 田園); you learn デン through those words. At most two kun'yomi are taught, the most used: 生 teaches い(きる) and う(まれる), while は(える) and なま come with their words. Every kanji teaches at least its most used reading.
 - **Setting:** under Settings → Kanji readings to learn, choose one level ahead, two levels ahead or all common readings. Switching adds reading questions for kanji you've learned, or pauses them while keeping their history.
+- **Forms:** a kun'yomi with many okurigana forms shows only its most used one or two, picked by counting the dictionary's words (生 い(きる), not い(かす)・い(ける)); the others are listed on hover. Nouns and prefixes made from a verb count toward the verb (上り坂 counts for のぼ(る)).
 - **Cards:** info cards show all readings, with taught ones highlighted, readings met later in words plain, and rare ones grey, plus special readings (jukujikun such as 今日 きょう). Any real reading is accepted as an answer.
 
 **Answers.** Meanings are typed in English and readings in kana. Romaji turns into kana as you type, via WanaKana. When an answer isn't graded right, one of four things happens:
 
 - **Close spelling** of a meaning is accepted. Swapped letters count as one slip ("wrok" for "work").
 - **Typo in a reading** (one kana off, as in ひるい for ひろい) isn't graded. The card shakes and you try again. Long vowels, small kana and dakuten are real distinctions, so こ for こう or か for が still counts as wrong.
-- **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently, or a reading typed into a meaning question.
+- **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently (市 answered し is explained as 市's on'yomi, used in words like 市民, while 市 on its own is read いち), or a reading typed into a meaning question.
 - **Giving up:** pressing Enter again on the same sent-back answer (or a blank one) marks it wrong.
 - **Undo** (Backspace) reverts a wrong answer so you can fix it, as on Bunpro. You can also accept your wording as one of your own meanings.
 
@@ -62,7 +63,7 @@ Only readings you'll actually need soon are asked for.
 
 **Recall.** Today shows your weakest and most recently learned items, each with the current chance you'd recall it. Browse colours every radical, kanji and word by stage, from learning to mastered.
 
-**Audio.** Words and readings are spoken with the browser's Japanese voice (Web Speech API). With **Read kanji and words aloud** on (Settings), a kanji's common on'yomi and kun'yomi, or a word's reading, are said when its lesson card opens and after you answer a reading question. Tapping any reading always plays it. The voice is always given kana, so it can't misread a kanji. Voice quality depends on the OS: macOS, iOS, Android and Windows have good Japanese voices. Google Translate's speech endpoint isn't usable from a web page (unofficial, against its terms, and blocked by CORS).
+**Audio.** Words and readings are spoken with the browser's Japanese voice (Web Speech API). With **Read kanji and words aloud** on (Settings), a kanji's taught on'yomi and kun'yomi (without okurigana: 生きる is said as い), or a word's reading, are said when its lesson card opens and after you answer a reading question. Tapping any reading always plays it. The voice is always given kana, so it can't misread a kanji. Voice quality depends on the OS: macOS, iOS, Android and Windows have good Japanese voices. Google Translate's speech endpoint isn't usable from a web page (unofficial, against its terms, and blocked by CORS).
 
 ## Running it
 

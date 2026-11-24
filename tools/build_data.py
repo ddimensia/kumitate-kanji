@@ -310,6 +310,56 @@ def kun_stem(k):
     return k.strip('-').split('.')[0]
 
 
+def kun_okuri(k):
+    k = k.strip('-')
+    return k.split('.', 1)[1] if '.' in k else ''
+
+
+I_ROW = dict(zip('うくぐすつぬぶむる', 'いきぎしちにびみり'))
+
+
+def rank_kun_forms(forms, use):
+    """Usage per form with a verb's noun and prefix forms (のぼ.り, た.ち-) credited to the verb.
+    Returns (use, derived forms)."""
+    total = Counter({f: use[f] for f in forms})
+    derived = set()
+    verbs = [f for f in forms if not f.startswith('-') and not f.endswith('-') and kun_okuri(f)[-1:] in I_ROW]
+    for f in forms:
+        o = kun_okuri(f).rstrip('-')
+        for v in verbs:
+            ov = kun_okuri(v)
+            if v != f and o and (o == ov[:-1] + I_ROW[ov[-1]] or (ov.endswith('る') and o == ov[:-1])):
+                total[v] += use[f]
+                derived.add(f)
+                break
+    return total, derived
+
+
+def count_forms(use, kun, stem, after, weight):
+    """Credit the kun'yomi form a word uses: 生きる -> い.きる, 生き物 -> い.きる (half), 生 -> なま."""
+    rest = ''
+    for seg in after:  # the kana right after the kanji
+        if any(is_kanji(ch) for ch in seg[0]):
+            break
+        rest += hira(seg[0])
+    forms = [k for k in kun if kun_stem(k) == stem]
+    full = [k for k in forms if kun_okuri(k) and rest.startswith(hira(kun_okuri(k)))]
+    if full:
+        longest = max(len(kun_okuri(k)) for k in full)
+        for k in full:
+            if len(kun_okuri(k)) == longest:
+                use[k] += 2 * weight
+        return
+    # A verb's stem inside a compound (生き物, 値上げ) counts half for each form it could be.
+    part = [k for k in forms if len(kun_okuri(k)) >= 2 and rest.startswith(hira(kun_okuri(k))[:-1])]
+    for k in part:
+        use[k] += weight
+    if not part:
+        for k in forms:
+            if not kun_okuri(k):
+                use[k] += weight
+
+
 # ---- main ----------------------------------------------------------------------
 def main(argv):
     kanjidic_path, jmdict_path, kvg_path, furi_path, tanos_dir, vocab_dir, out_path = argv[1:8]
@@ -415,6 +465,7 @@ def main(argv):
     alone = defaultdict(set)       # readings used by a word written with just that kanji (明るい)
     easiest = defaultdict(dict)    # kanji -> {reading: easiest JLPT level (5 = N5) of a word using it}
     juku = defaultdict(list)       # kanji -> word ids with a special reading
+    form_use = defaultdict(Counter)  # kanji -> Counter({kun form: use}), to rank 生きる over 生ける
     on_var, kun_var = {}, {}
     for c in kset:
         on_var[c] = {r: variants(hira(r), True) for r in K[c]['on']}
@@ -425,7 +476,7 @@ def main(argv):
         if not segs:
             continue
         weight = 2 if w['jlpt'] else 1
-        for seg in segs:
+        for si, seg in enumerate(segs):
             ruby, rt = seg[0], seg[1]
             ks = [c for c in ruby if is_kanji(c) and c != '々']
             if len(ks) == 1 and len(ruby) == 1 and ruby in kset:
@@ -439,6 +490,8 @@ def main(argv):
                         easiest[c][hit] = max(easiest[c].get(hit, 0), w['jlpt'])
                     if [x for x in w['w'] if is_kanji(x)] == [c]:
                         alone[c].add(hit)
+                    if hit[0] == 'kun':
+                        count_forms(form_use[c], K[c]['kun'], kun_stem(hit[1]), segs[si + 1:], weight)
             elif len(ks) >= 2 or (len(ks) == 1 and len(ruby) > 1 and '々' not in ruby):
                 seg.append('j')
                 for c in set(ks):
@@ -487,6 +540,19 @@ def main(argv):
             # app can teach only readings you'll meet in words soon (田: た yes, デン later).
             for key, x in groups.items():
                 x.append(level_of[key])
+            if kind == 'kun':
+                # Most used form first (生: い.きる before い.かす, い.ける); nouns and prefixes made
+                # from a verb (のぼ.り, た.ち-) count toward the verb and go after it, and suffix-only
+                # forms (-う) go last. Fifth field: how many forms are worth showing, 1 or 2 (a
+                # second only if it's used at least half as often as the first).
+                for x in lst:
+                    use, derived = rank_kun_forms(x[0], form_use[c])
+                    first_seen = {f: i for i, f in enumerate(x[0])}
+                    x[0].sort(key=lambda f: (f.startswith('-'), f in derived or f.endswith('-'), -use[f], first_seen[f]))
+                    shown = [f for f in x[0] if not f.startswith('-')]
+                    top_use = use[shown[0]] if shown else 0
+                    x.append(1 + (len(shown) > 1 and shown[1] not in derived and not shown[1].endswith('-')
+                                  and top_use > 0 and use[shown[1]] * 2 >= top_use))
             res[kind] = lst
         if not any(x[2] for k in res.values() for x in k):
             # Rare kanji with no counted words: its first on'yomi (or kun'yomi) counts.

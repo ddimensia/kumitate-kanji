@@ -2,7 +2,7 @@
 // Always given kana, so the voice can't guess the wrong reading of a kanji.
 
 import { getSettings } from './state.js';
-import { taughtReadings } from './data.js';
+import { taughtReadings, readingToSay } from './data.js';
 
 let voices = [];
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -57,9 +57,8 @@ export function speak(...kana) {
 /** What to say for a kanji's readings of one kind: its common ones, as kana (あげる for あ.げる). */
 export function kanjiReadingsToSay(it, kind) {
   return taughtReadings(it)[kind]
-    .map((r) => r.forms.find((f) => !f.startsWith('-') && !f.endsWith('-'))) // skip affix-only forms (〜か)
-    .filter(Boolean)
-    .map((f) => f.replace(/[.-]/g, ''));
+    .filter((r) => r.forms.some((f) => !f.startsWith('-') && !f.endsWith('-'))) // skip affix-only readings (〜か)
+    .map((r) => readingToSay(kind, r));
 }
 
 /** Read an item aloud if the "read aloud" setting is on: a word's reading, a kanji's common readings. */
