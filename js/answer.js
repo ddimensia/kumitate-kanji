@@ -5,7 +5,7 @@
 //   { verdict: 'wrong' }                       wrong
 // 'retry' is what keeps a slip like ひるい for ひろい from counting as a miss.
 
-import { toHiragana, toKana, isKana, isRomaji } from '../vendor/wanakana.js';
+import { toHiragana, toKana, toRomaji, isKana, isRomaji } from '../vendor/wanakana.js';
 import { meanings, readingAnswers, parseKun, item } from './data.js';
 
 // ---- Meanings -------------------------------------------------------------------
@@ -97,13 +97,42 @@ function baseKana(c) {
  * Japanese (こうこう vs ここ, かいしゃ vs がいしゃ), so differences there count as wrong;
  * any other single-kana slip (ひるい for ひろい) is treated as a typo.
  */
+const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+/** Keys next to each other on a QWERTY keyboard (including diagonals). */
+function adjacentKeys(a, b) {
+  const pos = (c) => { for (let r = 0; r < 3; r++) { const i = KEY_ROWS[r].indexOf(c); if (i >= 0) return [r, i + r * 0.5]; } return null; };
+  const p = pos(a), q = pos(b);
+  return !!p && !!q && Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1;
+}
+
+/**
+ * Could typing `given` instead of `target` be a slip of the fingers? The romaji must be one
+ * edit away, and a swapped consonant must be a neighbouring key: hirui for hiroi (vowels) and
+ * shpu for shou (o, p) yes, chou for shou (c, s) no.
+ */
+export function isRomajiSlip(given, target) {
+  const a = toRomaji(given), b = toRomaji(target);
+  if (levenshtein(a, b) !== 1) return false;
+  if (a.length !== b.length) {
+    // A letter added or dropped is a slip only if a kana was (ひろいい); with the same number of
+    // kana it means a different kana, like しょく for しょう (k added).
+    return [...given].length !== [...target].length;
+  }
+  const diff = [...a].map((c, i) => (c === b[i] ? -1 : i)).filter((i) => i >= 0);
+  if (diff.length === 2) return true; // two letters swapped
+  const x = a[diff[0]], y = b[diff[0]];
+  return ('aeiou'.includes(x) && 'aeiou'.includes(y)) || adjacentKeys(x, y); // vowel mix-ups count too
+}
+
 export function isKanaTypo(given, target) {
   if (target.length < 3 || given === target) return false;
   if (levenshtein(given, target) !== 1) return false;
+  if (!isRomajiSlip(given, target)) return false;
   if (given.length === target.length) {
     const i = [...given].findIndex((c, k) => c !== target[k]);
     const a = given[i], b = target[i];
     if (baseKana(a) === baseKana(b)) return false; // dakuten or small/large kana
+    if ('ゃゅょ'.includes(a) && 'ゃゅょ'.includes(b)) return false; // しゅう for しょう: a different sound
     if ('うおいーえ'.includes(a) && 'うおいーえ'.includes(b) && i > 0) return false; // long vowel spelling
     return true;
   }

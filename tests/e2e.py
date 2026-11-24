@@ -135,8 +135,12 @@ async def main():
                     await pg.wait_for_timeout(30)
                     did_kata = True
                     continue
-                elif not did_typo and info['type'] == 'on' and len(info['answer']) >= 3:
-                    wrong = info['answer'][:-1] + ('か' if info['answer'][-1] != 'か' else 'き')
+                elif not did_typo and info['type'] == 'on' and len(info['answer']) >= 3 and (wrong := await pg.evaluate(
+                        '''async (a) => { // a one-kana change the app itself counts as a slip (ちゅう -> ちゃう)
+                          const { isKanaTypo } = await import('./js/answer.js');
+                          const kana = [...'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん'];
+                          for (let i = 0; i < a.length; i++) for (const k of kana) { const w = a.slice(0, i) + k + a.slice(i + 1); if (isKanaTypo(w, a)) return w; }
+                          return null; }''', info['answer'])):
                     await pg.fill('.q-input', wrong)
                     await pg.press('.q-input', 'Enter')
                     note = await pg.text_content('.q-note')

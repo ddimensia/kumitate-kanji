@@ -37,7 +37,7 @@ Only readings you'll actually need soon are asked for.
 **Answers.** Meanings are typed in English and readings in kana. Romaji turns into kana as you type, via WanaKana. When an answer isn't graded right, one of four things happens:
 
 - **Close spelling** of a meaning is accepted. Swapped letters count as one slip ("wrok" for "work").
-- **Typo in a reading** (one kana off, as in ひるい for ひろい) isn't graded. The card shakes and you try again. Long vowels, small kana and dakuten are real distinctions, so こ for こう or か for が still counts as wrong.
+- **Typo in a reading** isn't graded: the card shakes and you try again. A typo is a slip of the fingers, one kana and one romaji letter off: a vowel mixed up (ひるい, hirui, for ひろい), a neighbouring key (shpu for shou) or two letters swapped. A different sound is a real mistake even when it's close: ちょう (chou) or しゅう (shuu) for しょう, しょく for しょう, and long vowels, small kana and dakuten (こ for こう, か for が).
 - **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently (市 answered し is explained as 市's on'yomi, used in words like 市民, without giving away the answer), or a reading typed into a meaning question.
 - **Giving up:** pressing Enter again on the same sent-back answer (or a blank one) marks it wrong.
 - **Undo** (Backspace) reverts a wrong answer so you can fix it, as on Bunpro. You can also accept your wording as one of your own meanings.

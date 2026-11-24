@@ -80,4 +80,10 @@ assert.equal(parts('食べる'), "食 た kun'yomi+べる", '食べる breakdown
 assert.equal(parts('手紙'), "手 て kun'yomi+紙 がみ kun'yomi (from かみ)", '手紙: rendaku'); n++;
 assert.equal(parts('切手'), "切 きっ kun'yomi (from き(る))+手 て kun'yomi", '切手: untagged in the data, still explained'); n++;
 assert.equal(parts('大人'), '大人 おとな special reading for the whole word', '大人: jukujikun'); n++;
+// Typos are slips of the fingers: one romaji letter, a swapped consonant on a neighbouring key.
+ok(checkReading(sei, 'on', 'chou'), 'wrong', 'ちょう for しょう: c and s are far apart');
+ok(checkReading(sei, 'on', 'shoku'), 'wrong', 'しょく for しょう: a different kana, not a slip');
+ok(checkReading(sei, 'on', 'shuu'), 'wrong', 'しゅう for しょう: a different sound');
+ok(checkReading(sei, 'on', 'shpu'), 'retry', 'しょう typed with p for o (neighbouring keys)');
+ok(checkReading(sei, 'on', 'hsou'), 'retry', 'two letters swapped');
 console.log(`answer_test: ${n} checks passed`);
