@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow, kunFormsToShow, readingToSay, meaningWord } from '../js/data.js';
 import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
-import { readingBreakdownHtml } from '../js/ui.js';
+import { readingBreakdownHtml, usageHtml } from '../js/ui.js';
+import { glyph as glyphOf } from '../js/data.js';
 
 useCurriculum(JSON.parse(readFileSync(new URL('../data/curriculum.json', import.meta.url))));
 const v = (w) => [...item('k:' + [...w][0]).vocab].map(item).find((x) => x.w === w);
@@ -91,4 +92,16 @@ for (const [c, w] of [['糸', 'meaning'], ['日', 'meaning'], ['又', 'meaning']
   assert.equal(meaningWord(item('r:' + c)), w, `radical ${c} asks for its ${w}`); n++;
 }
 assert.equal(meaningWord(item('k:糸')), 'meaning', 'kanji always ask for a meaning'); n++;
+// Counters, prefixes and suffixes show where the rest goes, with an example.
+const byW = (w) => item('k:月').vocab.map(item).find((x) => x.w === w) || v(w);
+assert.equal(glyphOf(byW('か月')), '〜か月', 'counter shown as 〜か月'); n++;
+assert.equal(glyphOf(v('再')), '再〜', 'prefix shown as 再〜'); n++;
+assert.equal(glyphOf(v('向け')), '〜向け', 'suffix shown as 〜向け'); n++;
+assert.equal(glyphOf(v('以前')), '以前', '以前 also stands alone: no 〜'); n++;
+assert.equal(glyphOf(v('画')), '画', '画 is also a noun: no 〜'); n++;
+const kagetsu = usageHtml(byW('か月')).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+assert.match(kagetsu, /Goes after a number: 二か月 にかげつ two months/, 'か月 example'); n++;
+assert.match(kagetsu, /三月 \(さんがつ\) is March/, 'か月 contrasted with 三月'); n++;
+assert.match(usageHtml(v('再')), /Goes before a word/, 'prefix usage'); n++;
+assert.equal(usageHtml(v('学校')), '', 'ordinary words have no usage line'); n++;
 console.log(`answer_test: ${n} checks passed`);

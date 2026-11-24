@@ -9,7 +9,7 @@ import { bind, unbind } from '../vendor/wanakana.js';
 import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, typeLabel, meaningWord, meanings, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
 import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
-import { esc, readingBreakdownHtml } from './ui.js';
+import { esc, readingBreakdownHtml, usageHtml } from './ui.js';
 import { speak, speakerButton, wireSpeech, readAloud } from './speech.js';
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './views/info.js';
 
@@ -176,6 +176,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
         <span class="q-answer-text">${expectedHtml(it, type)}</span> ${say}
       </div>
       ${type === 'r' ? `<p class="q-gloss">“${esc(it.senses[0][0])}”</p>` : ''}
+      ${usageHtml(it)}
       ${type === 'r' ? readingBreakdownHtml(it) : ''}
       <div class="q-actions">
         ${ok ? '' : '<button type="button" class="btn small q-undo" title="Backspace">Undo <kbd>⌫</kbd></button>'}

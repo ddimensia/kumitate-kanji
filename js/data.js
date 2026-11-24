@@ -7,6 +7,8 @@
 
 import { toHiragana } from '../vendor/wanakana.js';
 
+import { affixOf } from './usage.js';
+
 export const KIND_LABEL = { r: 'Radical', k: 'Kanji', v: 'Vocabulary' };
 export const TYPE_LABEL = { m: 'Meaning', on: "On'yomi", kun: "Kun'yomi", r: 'Reading' };
 
@@ -55,6 +57,7 @@ export function index(raw) {
       id: 'v:' + id, kind: 'v', w: v.w, readings: v.r, senses: v.g, pos: v.p || [],
       furi: v.f || null, jlpt: v.j || null, common: !!v.c, prereq: kanji, otherReadings: v.ar || [],
     });
+    items.get('v:' + id).affix = affixOf({ w: v.w, pos: v.p || [] });
     for (const k of kanji) items.get(k).vocab.push('v:' + id);
   }
   // The JLPT level an item is taught in: a word's is the harder of its own level and its
@@ -160,8 +163,10 @@ export const splitCardId = (id) => {
 };
 
 /** What is shown as the question: the character or word. */
+/** How an item is shown: counters and suffixes with 〜 before (〜か月), prefixes after (再〜). */
 export function glyph(it) {
-  return it.kind === 'v' ? it.w : it.ch;
+  if (it.kind !== 'v') return it.ch;
+  return it.affix === 'suffix' ? '〜' + it.w : it.affix === 'prefix' ? it.w + '〜' : it.w;
 }
 
 /** What a meaning question asks for: a radical's name unless it's also a kanji with that meaning. */

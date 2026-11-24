@@ -35,6 +35,7 @@ Only readings you'll actually need soon are asked for.
 - **Setting:** under Settings → Kanji readings to learn, choose one level ahead, two levels ahead or all common readings. Switching adds reading questions for kanji you've learned, or pauses them while keeping their history.
 - **Forms:** a kun'yomi with many okurigana forms shows only its most used one or two, picked by counting the dictionary's words (生 い(きる), not い(かす)・い(ける)); the others are listed on hover. Nouns and prefixes made from a verb count toward the verb (上り坂 counts for のぼ(る)).
 - **Words:** after a word's reading question, the answer shows which reading each kanji uses, with sound changes traced back: 学校 is 学 がっ, on'yomi (from がく) + 校 こう, on'yomi; 切手 is 切 きっ, kun'yomi (from き(る)) + 手 て, kun'yomi. Words read as a whole (大人 おとな) are marked as special readings.
+- **Counters, prefixes and suffixes** are shown with 〜 where the rest goes (〜か月, 再〜) and come with an example (二か月 にかげつ, two months; 再開 さいかい, reopening). Some have a note on sound changes or a word they're easily confused with: 三か月 is three months, 三月 is March. Examples and notes are in `js/usage.js`.
 - **Cards:** info cards show all readings, with taught ones highlighted, readings met later in words plain, and rare ones grey, plus special readings (jukujikun such as 今日 きょう). Any real reading is accepted as an answer.
 
 **Answers.** Meanings are typed in English and readings in kana. Romaji turns into kana as you type, via WanaKana. When an answer isn't graded right, one of four things happens:
@@ -121,6 +122,7 @@ Plain ES modules with no build step:
 | `js/speech.js` | Web Speech API text-to-speech |
 | `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
 | `js/views/peek.js` | Item details over a session, with back returning to it |
+| `js/usage.js` | Examples and notes for counters, prefixes and suffixes |
 | `js/share.js` | Publishes a summary of your kanji progress for Kakitori (see below) |
 | `js/views/*.js` | Welcome page, Today, lessons, reviews, Extra study, browse, item pages, settings |
 | `vendor/` | [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) and [WanaKana](https://github.com/WaniKani/WanaKana), both MIT |

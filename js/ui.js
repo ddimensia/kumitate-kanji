@@ -2,6 +2,7 @@
 
 import { glyph, primaryMeaning, KIND_LABEL, taughtReadings, kunFormsToShow, readingToSay, readingAnswers, item } from './data.js';
 import { kunDisplay } from './answer.js';
+import { exampleOf, noteOf } from './usage.js';
 import { parseKun } from './data.js';
 
 export const esc = (s) =>
@@ -37,12 +38,28 @@ export function confirmDialog({ title, body, confirm = 'Confirm', danger = false
 
 /** A word with furigana over its kanji. `highlight` marks one kanji's reading. */
 export function furiganaHtml(it, { highlight = null, hide = false } = {}) {
-  if (!it.furi) return `<span lang="ja">${esc(it.w)}</span>`;
-  return `<span lang="ja" class="furi">${it.furi.map(([ruby, rt, kind]) => {
+  const pre = it.affix === 'suffix' ? '〜' : '', post = it.affix === 'prefix' ? '〜' : '';
+  if (!it.furi) return `<span lang="ja">${pre}${esc(it.w)}${post}</span>`;
+  return `<span lang="ja" class="furi">${pre}${it.furi.map(([ruby, rt, kind]) => {
     if (!rt) return esc(ruby);
     const hl = highlight && ruby.includes(highlight) ? ' class="hl"' : '';
     return `<ruby${hl}>${esc(ruby)}<rt${kind ? ` data-k="${kind}"` : ''}>${hide ? '' : esc(rt)}</rt></ruby>`;
-  }).join('')}</span>`;
+  }).join('')}${post}</span>`;
+}
+
+/**
+ * How a counter, prefix or suffix is used, with an example (〜か月: 二か月 にかげつ, two months),
+ * and any note (sound changes, easily confused words). Empty for other words.
+ */
+export function usageHtml(it) {
+  if (it.kind !== 'v') return '';
+  const ex = exampleOf(it), note = noteOf(it);
+  if (!ex && !note) return '';
+  const where = it.affix === 'prefix' ? 'Goes before a word' : (it.pos || []).includes('counter') ? 'Goes after a number' : it.affix ? 'Goes after a word' : 'Example';
+  return `<div class="usage">
+    ${ex ? `<p>${where}: <span lang="ja" class="usage-ex" data-say="${esc(ex.r)}">${esc(ex.w)}</span> <span lang="ja" class="usage-r">${esc(ex.r)}</span>${ex.meaning ? ` <span class="usage-m">${esc(ex.meaning)}</span>` : ''}</p>` : ''}
+    ${note ? `<p class="usage-note">${esc(note)}</p>` : ''}
+  </div>`;
 }
 
 export const READING_KIND = { o: "on'yomi", k: "kun'yomi", j: 'special reading' };

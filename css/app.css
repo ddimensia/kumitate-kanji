@@ -287,6 +287,12 @@ a.btn { text-decoration: none; }
 .q-note { min-height: 1.5em; text-align: center; margin: 0.5rem 0; font-weight: 500; }
 .q-note.is-retry { color: var(--warn); }
 .q-note.is-right { color: var(--good); }
+.usage { margin: 0.4rem 0 0; font-size: 0.95rem; color: var(--ink-soft); }
+.q-after > .usage { text-align: center; }
+.usage p { margin: 0.2rem 0; }
+.usage-ex { font-size: 1.15rem; color: var(--ink); cursor: pointer; }
+.usage-r { color: var(--ink); }
+.usage-m::before { content: '· '; }
 .q-gloss { margin: 0.3rem 0 0; text-align: center; font-size: 1.05rem; color: var(--ink-soft); }
 .q-answer { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; font-size: 1.15rem; }
 .q-reading {

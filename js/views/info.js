@@ -1,7 +1,7 @@
 // Info cards: what's shown in lessons, after an answer, and on an item's page.
 
 import { item, primaryMeaning, KIND_LABEL, glyph, meaningWord } from '../data.js';
-import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading } from '../ui.js';
+import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading, usageHtml } from '../ui.js';
 import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL, addSynonym, removeSynonym, LEVELS, setLevel, unstudiedParts } from '../state.js';
 import { speakerButton } from '../speech.js';
 
@@ -126,6 +126,7 @@ function vocabCard(it) {
   return `${header(it)}
     <section class="info-sec"><h3>Reading</h3>
       <p class="vreadings">${it.readings.map((r) => `<span lang="ja" class="reading common" data-say="${esc(r)}">${esc(r)}</span>`).join('')}</p></section>
+    ${usageHtml(it) ? `<section class="info-sec"><h3>How it’s used</h3>${usageHtml(it)}</section>` : ''}
     <section class="info-sec"><h3>Meanings</h3>
       <ol class="senses">${it.senses.map((s) => `<li>${esc(s.join('; '))}</li>`).join('')}</ol>
       ${getSynonyms(it.id).length ? `<p class="meanings">${getSynonyms(it.id).map((s) => `<span class="syn">${esc(s)}</span>`).join('')}</p>` : ''}
