@@ -8,6 +8,8 @@ import { speakerButton } from '../speech.js';
 
 // In lessons and quizzes (compact), long lists start collapsed so the buttons stay in view.
 let compactMode = false;
+let focusKind = null; // 'on' | 'kun' while a lesson teaches one kind of reading
+let focusLater = true;
 function section(title, count, body, { long = true } = {}) {
   if (compactMode && long) {
     return `<details class="info-sec fold"><summary><h3>${title} <small>(${count})</small></h3></summary>${body}</details>`;
@@ -88,18 +90,26 @@ function radicalsSection(it) {
   return `<section class="info-sec"><h3>Radicals</h3>${body}${dict}</section>`;
 }
 
+const KIND_NAME = { on: 'on’yomi', kun: 'kun’yomi' };
+
 function kanjiCard(it) {
   const juku = it.juku.map(item).filter(Boolean);
-  const vocab = it.vocab.map(item).filter(Boolean);
+  let vocab = it.vocab.map(item).filter(Boolean);
   const hasKun = it.kun.length > 0;
+  const f = focusKind;
+  if (f) vocab = vocab.filter((v) => v.furi?.some(([ruby, , k]) => ruby === it.ch && k === (f === 'on' ? 'o' : 'k')));
+  const other = f === 'on' ? 'kun' : 'on';
+  const focusNote = f && taughtReadings(it)[other].length
+    ? `<p class="lesson-focus-note">${focusLater ? `This lesson teaches the ${KIND_NAME[f]}. The ${KIND_NAME[other]} gets its own lesson once you’ve reviewed this one.` : `You learned this kanji’s ${KIND_NAME[other]} earlier. This lesson adds its ${KIND_NAME[f]}.`}</p>` : '';
   return `${header(it)}
     ${meaningsBlock(it.meanings, it.id)}
     <section class="info-sec readings-sec"><h3>Readings</h3>
       <dl class="readings">
-        <dt>On'yomi <small>音読み</small></dt><dd>${readingListHtml(it, 'on')}</dd>
-        ${hasKun ? `<dt>Kun'yomi <small>訓読み</small></dt><dd>${readingListHtml(it, 'kun')}</dd>` : ''}
+        ${f !== 'kun' ? `<dt>On'yomi <small>音読み</small></dt><dd>${readingListHtml(it, 'on')}</dd>` : ''}
+        ${hasKun && f !== 'on' ? `<dt>Kun'yomi <small>訓読み</small></dt><dd>${readingListHtml(it, 'kun')}</dd>` : ''}
         ${juku.length ? `<dt>Special <small>熟字訓</small></dt><dd>${juku.map((v) => `<span class="juku" data-say="${esc(v.readings[0])}">${furiganaHtml(v)}</span>`).join('')}</dd>` : ''}
       </dl>
+      ${focusNote}
       <p class="hint"><span class="reading taught" style="font-size:inherit">Highlighted</span>: taught and quizzed with this kanji. Plain: you’ll meet it later in words. Grey: rare. Tap a reading to hear it.</p>
     </section>
     ${mnemonicsSection(it)}
@@ -113,8 +123,8 @@ function mnemonicsSection(it) {
   if (!it.mnemonics) return '';
   const t = taughtReadings(it);
   const rows = [
-    ...t.on.map((r) => [r.forms[0], r.forms[0], 'on']),
-    ...t.kun.map((r) => [kunFormsToShow(r)[0], kunFormsToShow(r).map(kunDisplay).join('・'), 'kun']),
+    ...(focusKind === 'kun' ? [] : t.on.map((r) => [r.forms[0], r.forms[0], 'on'])),
+    ...(focusKind === 'on' ? [] : t.kun.map((r) => [kunFormsToShow(r)[0], kunFormsToShow(r).map(kunDisplay).join('・'), 'kun'])),
   ].filter(([key]) => it.mnemonics[key]);
   if (!rows.length) return '';
   return `<section class="info-sec mnemonics"><h3>Mnemonics</h3>
@@ -151,8 +161,15 @@ function vocabCard(it) {
     ${kanjiRows.length ? `<section class="info-sec"><h3>Kanji</h3><ul class="kanji-rows">${kanjiRows.join('')}</ul></section>` : ''}`;
 }
 
-export function infoCardHtml(it, { compact = false } = {}) {
+/**
+ * focus ('on' | 'kun'): in a kanji lesson that teaches one kind of reading, show only that kind
+ * (its readings, mnemonics and words), with a note about the other. later: the other kind comes
+ * in a later lesson (true) or came in an earlier one (false).
+ */
+export function infoCardHtml(it, { compact = false, focus = null, later = true } = {}) {
   compactMode = compact;
+  focusKind = it.kind === 'k' ? focus : null;
+  focusLater = later;
   const body = it.kind === 'r' ? radicalCard(it) : it.kind === 'k' ? kanjiCard(it) : vocabCard(it);
   return `<article class="info kind-${it.kind}" data-item="${esc(it.id)}">${body}</article>`;
 }

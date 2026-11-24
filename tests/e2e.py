@@ -175,7 +175,7 @@ async def main():
         check(did_undo, 'undo was exercised')
         check(did_enter_blur, 'Enter moves on without focus')
         await pg.wait_for_selector('.summary')
-        check('Learned 5 new items' in await pg.text_content('.summary h2'), 'lesson summary')
+        check('Finished 5 lessons' in await pg.text_content('.summary h2'), 'lesson summary')
         await pg.click('[data-act="done"]')
         await pg.wait_for_selector('.today')
         check((await pg.text_content('.hero.lessons .hero-count')).strip() == '10', '10 lessons left today')
@@ -415,6 +415,13 @@ async def main():
         await pg.reload()
         await pg.wait_for_selector('.today')
         await pg.click('[data-act="lessons"]')
+        await pg.wait_for_selector('.lesson .lesson-card .info')
+        # A kanji's second-reading lesson has no meaning editor: move to a card that does.
+        for _ in range(10):
+            if await pg.query_selector('.lesson .syn-add input'):
+                break
+            await pg.keyboard.press('ArrowRight')
+            await pg.wait_for_timeout(100)
         await pg.wait_for_selector('.lesson .syn-add input')
         item_id = await pg.get_attribute('.lesson .info', 'data-item')
         await pg.fill('.lesson .syn-add input', 'my lesson meaning')

@@ -2,7 +2,7 @@
 
 import * as store from './store.js';
 import { configureSrs, newSrsCard, review, retrievability, Rating, State } from './srs.js';
-import { curriculum, item, cardTypes, cardId, splitCardId, setReadingWindow } from './data.js';
+import { curriculum, item, cardTypes, cardId, splitCardId, setReadingWindow, firstReadingKind } from './data.js';
 
 export const DEFAULT_SETTINGS = {
   dailyMax: 15,         // most new items a day
@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS = {
   firstReview: '4h',    // wait between a lesson and its first review
   missReview: '1h',     // wait before a missed card comes back
   welcomed: false,      // has seen the welcome page
+  splitReadings: true,  // teach a kanji's on'yomi and kun'yomi in separate lessons, the second once the first has been reviewed
   lessonsAhead: 'next', // lessons from: 'next' = your current JLPT level and the next one; 'all' = anything unlocked
   readingWindow: 2,     // teach kanji readings used in JLPT words up to this many levels harder ('all': every common one)
 };
@@ -27,6 +28,7 @@ let settings = { ...DEFAULT_SETTINGS };
 const cards = new Map();
 let synonyms = {};
 let passed = {};
+let pendingReadings = {}; // kanji id -> 'on' | 'kun': a reading saved for its own, later lesson
 let recentLog = [];
 const listeners = new Set();
 
@@ -41,6 +43,7 @@ export async function initState() {
   for (const c of await store.getAll('cards')) cards.set(c.id, c);
   synonyms = (await store.kvGet('synonyms')) || {};
   passed = (await store.kvGet('passed')) || {};
+  pendingReadings = (await store.kvGet('pendingReadings')) || {};
   recentLog = await store.logSince(Date.now() - 30 * DAY);
   // People who studied before the welcome page existed have seen enough of the app.
   if (saved.welcomed === undefined && cards.size) settings.welcomed = true;
@@ -95,7 +98,7 @@ export async function syncReadingCards(now = new Date()) {
     if (it.kind !== 'k') continue;
     for (const t of cardTypes(it)) {
       const id = cardId(it.id, t);
-      if (cards.has(id)) continue;
+      if (cards.has(id) || pendingReadings[it.id] === t) continue; // waiting for its own lesson
       const c = { id, item: it.id, type: t, introducedAt: now.getTime(), srs: review(newSrsCard(now), Rating.Good, now), right: 0, wrong: 0, marked: true };
       cards.set(id, c);
       fresh.push(c);
@@ -145,7 +148,10 @@ export function stage(it) {
 function checkPassed(it, now) {
   if (passed[it.id]) return false;
   const cs = itemCards(it);
-  if (cs.length < cardTypes(it).length) return false;
+  // A reading saved for its own lesson doesn't hold the kanji back: words that use the reading
+  // already learned unlock as usual, and the saved lesson comes before them in the queue.
+  const needed = cardTypes(it).filter((t) => pendingReadings[it.id] !== t);
+  if (cs.length < needed.length) return false;
   if (cs.every((c) => c.srs.state === State.Review && c.srs.stability >= settings.unlockStability)) {
     passed[it.id] = now.getTime();
     return true;
@@ -221,7 +227,18 @@ export function currentLevel() {
   return level || 1;
 }
 
-/** Items available for lessons, in course order. */
+/**
+ * A kanji's saved reading lesson, once the first part has passed its first review: the kanji
+ * itself, marked with the one reading type to teach (lessonTypes).
+ */
+function readingLesson(it) {
+  const kind = pendingReadings[it.id];
+  if (!kind || !isIntroduced(it) || !cardTypes(it).includes(kind)) return null;
+  if (itemCards(it).some((c) => c.srs.state !== State.Review)) return null; // still learning the first part
+  return Object.create(it, { lessonTypes: { value: [kind] }, lessonReading: { value: kind } });
+}
+
+/** Items available for lessons, in course order (a kanji's second reading at the kanji's place). */
 export function lessonQueue(n = Infinity) {
   const db = curriculum();
   const out = [];
@@ -229,11 +246,27 @@ export function lessonQueue(n = Infinity) {
   const floor = settings.lessonsAhead === 'all' ? 0 : currentLevel() - 1;
   for (const id of db.order) {
     const it = db.items.get(id);
+    if (pendingReadings[id]) {
+      const r = readingLesson(it);
+      if (r) { out.push(r); if (out.length >= n) break; }
+      continue;
+    }
     if (it.level < floor || isIntroduced(it) || !isUnlocked(it)) continue;
     out.push(it);
     if (out.length >= n) break;
   }
   return out;
+}
+
+/**
+ * The card types a lesson entry teaches: a saved reading lesson its one reading; a kanji with
+ * both readings, when they're split, its meaning and first reading; anything else, everything.
+ */
+export function lessonTypes(it) {
+  if (it.lessonTypes) return it.lessonTypes;
+  const types = cardTypes(it);
+  if (it.kind !== 'k' || !settings.splitReadings || !(types.includes('on') && types.includes('kun'))) return types;
+  return ['m', firstReadingKind(it)];
 }
 
 export function availableLessonCount() {
@@ -246,7 +279,13 @@ export function availableLessonCount() {
 export async function introduceItems(items, now = new Date()) {
   const fresh = [], logs = [];
   for (const it of items) {
-    for (const t of cardTypes(it)) {
+    const types = lessonTypes(it);
+    if (it.lessonReading) delete pendingReadings[it.id];
+    else {
+      const later = cardTypes(it).filter((t) => !types.includes(t));
+      if (later.length) pendingReadings[it.id] = later[0];
+    }
+    for (const t of types) {
       const id = cardId(it.id, t);
       if (cards.has(id)) continue;
       const c = {
@@ -260,6 +299,7 @@ export async function introduceItems(items, now = new Date()) {
   }
   await store.putMany('cards', fresh);
   await store.addLogs(logs);
+  await store.kvSet('pendingReadings', pendingReadings);
   recentLog.push(...logs);
   emit();
 }
@@ -371,6 +411,8 @@ export async function setLevel(items, level, now = new Date()) {
  */
 export async function placeItems(list, now = new Date()) {
   const out = [];
+  for (const { it } of list) delete pendingReadings[it.id]; // placed items get every card
+  await store.kvSet('pendingReadings', pendingReadings);
   for (const { it, stability, due } of list) {
     for (const t of cardTypes(it)) {
       const id = cardId(it.id, t);
@@ -432,6 +474,8 @@ export async function resetItem(it, { quiet = false } = {}) {
   await store.deleteMany('cards', ids);
   delete passed[it.id];
   await store.kvSet('passed', passed);
+  delete pendingReadings[it.id];
+  await store.kvSet('pendingReadings', pendingReadings);
   if (!quiet) emit();
 }
 

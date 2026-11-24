@@ -5,7 +5,7 @@
 const DB_NAME = 'yomitori';
 const DB_VERSION = 1;
 const STORES = ['kv', 'cards', 'log'];
-const KV_KEYS = ['settings', 'synonyms', 'passed', 'notes'];
+const KV_KEYS = ['settings', 'synonyms', 'passed', 'notes', 'pendingReadings'];
 
 let dbPromise = null;
 let memory = null;

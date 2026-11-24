@@ -66,6 +66,12 @@ Only readings you'll actually need soon are asked for.
 
 **Mnemonics (N5 and N4 kanji).** Kanji cards show a short mnemonic for each taught reading. The meaning is in bold, and the part that sounds like the reading is underlined: "A **big** vat of <u>dye</u>" for 大 ダイ. Each reading has one English sound-alike, reused by every kanji with that reading. Only the part spelled the way you'd type the reading is underlined (<u>to</u>e for と, <u>shi</u>p for し), so a sound-alike never teaches a romaji near miss. "sun" for サン would type すん, so サン is <u>san</u>d. The mnemonics are generated (`tools/mnemonics_n5.py` and `tools/mnemonics_n4.py`; `tools/build_mnemonics.py` merges them into `data/mnemonics.json`). `tests/mnemonics_test.mjs` checks that every N5 and N4 reading has one, that it uses its sound-alike (never one that types as a near miss of the reading) and a meaning of the kanji, that it stays under 25 words, and that it avoids a list of words. They were also reviewed independently.
 
+**Separate reading lessons.** A kanji with both on'yomi and kun'yomi is taught in two lessons.
+- **First lesson:** its meaning and one kind of reading, whichever its easiest word uses. The card shows and reads aloud only that kind.
+- **Second lesson:** once the first part has passed its first review, the other kind becomes its own lesson, placed at the kanji's spot in the queue (ahead of its words). Its card shows only that kind, with its mnemonics and the words that use it.
+- **Unlocking:** words using the reading you've learned unlock as usual, without waiting for the second lesson.
+- **Exceptions:** kanji imported from WaniKani or marked "Already know it?" get every card at once. Turn this off in Settings (**Separate reading lessons**).
+
 **Hints.** Press Enter on a blank reading answer for a hint. Press it again to mark the card wrong.
 - **A kanji's on'yomi or kun'yomi:** words you've already learned that use it ("as in 学校, 大学"), so you can find the reading through a word you know The kanji's own one-character word (山 for 山) doesn't count, since it just repeats the question.
 - **No hint:** if there isn't one (no learned word with that reading yet, or a meaning question), it says so. That doesn't count as a hint.

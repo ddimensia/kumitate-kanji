@@ -170,6 +170,22 @@ export function cardTypes(it) {
 }
 
 export const cardId = (itemId, type) => `${itemId}/${type}`;
+
+/**
+ * Which reading a kanji's first lesson teaches when its on'yomi and kun'yomi get separate
+ * lessons: the kind its easiest word uses (生 -> セイ if that word is 先生), else on'yomi.
+ */
+export function firstReadingKind(it) {
+  const types = cardTypes(it);
+  if (!types.includes('on') || !types.includes('kun')) return types.includes('kun') ? 'kun' : 'on';
+  for (const id of it.vocab) {
+    const v = DB?.items.get(id);
+    const seg = v?.furi?.find(([ruby, rt]) => ruby === it.ch && rt);
+    if (seg?.[2] === 'o') return 'on';
+    if (seg?.[2] === 'k') return 'kun';
+  }
+  return 'on';
+}
 export const splitCardId = (id) => {
   const i = id.lastIndexOf('/');
   return [id.slice(0, i), id.slice(i + 1)];

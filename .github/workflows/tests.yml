@@ -36,3 +36,4 @@ jobs:
           python tests/lesson_order_test.py http://localhost:8000/
           python tests/retry_test.py http://localhost:8000/
           python tests/hint_test.py http://localhost:8000/
+          python tests/split_test.py http://localhost:8000/
