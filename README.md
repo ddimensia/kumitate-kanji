@@ -17,14 +17,15 @@ Everything runs in the browser. There is no server and no account: progress is s
 - Like KanjiDamage, the enclosure 囗 counts as the 口 (mouth) radical.
 - A radical that is also a kanji takes the kanji's name, except where a radical has a well-known name of its own: the 214 classical radicals and the side and top forms (亻 "person", 氵 "water", 艹 "grass"). Those names are in `tools/radical_names.py`. Single strokes are skipped.
 - Kanji cards show the breakdown one level deep, plus the dictionary radical (部首).
+- Radical cards ask for the radical's **name** (幺 "short thread", 酉 "sake jar", 亻 "person"). They say **meaning** only when the same character is a kanji in the course with that meaning (糸 "thread", 日 "day").
 
 **Questions.** Each item has its own cards, each with its own FSRS schedule:
 
 | Item | Cards |
 | --- | --- |
-| Radical | meaning |
+| Radical | name (meaning, when it's also a kanji in the course with that meaning) |
 | Kanji | meaning, on'yomi (if it has a common one), kun'yomi (if it has a common one) |
-| Word | meaning, reading |
+| Word | meaning, reading (the answer also shows the word's first meaning) |
 
 Only readings you'll actually need soon are asked for.
 - **Common:** a reading counts as common when it appears in enough common or JLPT words (counted from JmdictFurigana, allowing for rendaku and small っ), or when the kanji on its own is a word read that way (上 うえ, 明るい).

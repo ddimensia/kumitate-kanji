@@ -1,7 +1,7 @@
 // Answer checking against the real curriculum: node tests/answer_test.mjs
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow, kunFormsToShow, readingToSay } from '../js/data.js';
+import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow, kunFormsToShow, readingToSay, meaningWord } from '../js/data.js';
 import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
 import { readingBreakdownHtml } from '../js/ui.js';
 
@@ -86,4 +86,9 @@ ok(checkReading(sei, 'on', 'shoku'), 'wrong', 'しょく for しょう: a differ
 ok(checkReading(sei, 'on', 'shuu'), 'wrong', 'しゅう for しょう: a different sound');
 ok(checkReading(sei, 'on', 'shpu'), 'retry', 'しょう typed with p for o (neighbouring keys)');
 ok(checkReading(sei, 'on', 'hsou'), 'retry', 'two letters swapped');
+// A radical's name, unless it's also a kanji with that meaning.
+for (const [c, w] of [['糸', 'meaning'], ['日', 'meaning'], ['又', 'meaning'], ['幺', 'name'], ['酉', 'name'], ['亻', 'name'], ['氵', 'name']]) {
+  assert.equal(meaningWord(item('r:' + c)), w, `radical ${c} asks for its ${w}`); n++;
+}
+assert.equal(meaningWord(item('k:糸')), 'meaning', 'kanji always ask for a meaning'); n++;
 console.log(`answer_test: ${n} checks passed`);

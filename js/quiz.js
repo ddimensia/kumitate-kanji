@@ -6,7 +6,7 @@
 // kind ("that's the kun'yomi") aren't graded at all: the card shakes and you try again.
 
 import { bind, unbind } from '../vendor/wanakana.js';
-import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, meanings, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
+import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, typeLabel, meaningWord, meanings, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
 import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
 import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
 import { esc, readingBreakdownHtml } from './ui.js';
@@ -34,7 +34,7 @@ export function arrange(ids) {
 }
 
 const PROMPT = {
-  m: (it) => `${KIND_LABEL[it.kind]} <b>meaning</b>`,
+  m: (it) => `${KIND_LABEL[it.kind]} <b>${meaningWord(it)}</b>`,
   on: () => `Kanji <b>on'yomi</b> reading`,
   kun: () => `Kanji <b>kun'yomi</b> reading`,
   r: () => `Vocabulary <b>reading</b>`,
@@ -115,7 +115,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       <div class="q-prompt ${reading ? 'is-reading' : 'is-meaning'}">${PROMPT[type](it)}</div>
       <form class="q-form" autocomplete="off">
         <input class="q-input" name="answer" ${reading ? `lang="ja" placeholder="${type === 'on' ? 'カタカナ' : 'ひらがな'}"` : 'placeholder="Your answer"'}
-          autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${esc(TYPE_LABEL[type])}">
+          autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${esc(typeLabel(it, type))}">
         <button class="q-submit" aria-label="Submit">➜</button>
       </form>
       <p class="q-note" role="status"></p>
@@ -175,11 +175,12 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
         <span class="q-answer-label">${ok ? 'Answer' : 'Correct answer'}</span>
         <span class="q-answer-text">${expectedHtml(it, type)}</span> ${say}
       </div>
+      ${type === 'r' ? `<p class="q-gloss">“${esc(it.senses[0][0])}”</p>` : ''}
       ${type === 'r' ? readingBreakdownHtml(it) : ''}
       <div class="q-actions">
         ${ok ? '' : '<button type="button" class="btn small q-undo" title="Backspace">Undo <kbd>⌫</kbd></button>'}
         ${!ok && type === 'm' && given.trim() ? `<button type="button" class="btn small q-syn">Accept “${esc(given.trim())}” as mine</button>` : ''}
-        <button type="button" class="btn small q-addsyn">${showSyn ? 'Hide my meanings' : 'Add a meaning'}</button>
+        <button type="button" class="btn small q-addsyn">${showSyn ? `Hide my ${meaningWord(it)}s` : `Add a ${meaningWord(it)}`}</button>
         <button type="button" class="btn small q-info" title="F">${showInfo ? 'Hide' : 'Show'} details <kbd>F</kbd></button>
         <button type="button" class="btn small primary q-next">Next <kbd>⏎</kbd></button>
       </div>
@@ -197,7 +198,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       if (added) {
         const note = stageEl.querySelector('.q-note');
         note.className = 'q-note is-right';
-        note.textContent = `Added “${added}” to your meanings.`;
+        note.textContent = `Added “${added}” to your ${meaningWord(it)}s.`;
       }
       after.querySelector('.syn-add input')?.focus();
     });
@@ -219,7 +220,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     stageEl.querySelector('.q-form').classList.replace('is-wrong', 'is-right');
     const note = stageEl.querySelector('.q-note');
     note.className = 'q-note is-right';
-    note.textContent = `Added “${answered.given.trim()}” to your meanings.`;
+    note.textContent = `Added “${answered.given.trim()}” to your ${meaningWord(answered.it)}s.`;
     renderAfter();
   }
 

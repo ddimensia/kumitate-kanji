@@ -1,6 +1,6 @@
 // Info cards: what's shown in lessons, after an answer, and on an item's page.
 
-import { item, primaryMeaning, KIND_LABEL, glyph } from '../data.js';
+import { item, primaryMeaning, KIND_LABEL, glyph, meaningWord } from '../data.js';
 import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading } from '../ui.js';
 import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL, addSynonym, removeSynonym, LEVELS, setLevel, unstudiedParts } from '../state.js';
 import { speakerButton } from '../speech.js';
@@ -39,9 +39,9 @@ function header(it) {
   </header>`;
 }
 
-function meaningsBlock(list, itemId) {
+function meaningsBlock(list, itemId, word = 'meaning') {
   const syn = getSynonyms(itemId);
-  return `<section class="info-sec"><h3>Meanings</h3>
+  return `<section class="info-sec"><h3>${word === 'name' ? (list.length > 1 ? 'Names' : 'Name') : 'Meanings'}</h3>
     <p class="meanings">${list.map((m, i) => `<span class="${i ? '' : 'primary'}">${esc(m)}</span>`).join('')}
     ${syn.map((s) => `<span class="syn" title="Your own answer">${esc(s)}</span>`).join('')}</p></section>`;
 }
@@ -49,7 +49,7 @@ function meaningsBlock(list, itemId) {
 function radicalCard(it) {
   const orig = it.orig ? item('k:' + it.orig) : null;
   return `${header(it)}
-    ${meaningsBlock([it.name, ...it.alt], it.id)}
+    ${meaningsBlock([it.name, ...it.alt], it.id, meaningWord(it))}
     ${it.note ? `<section class="info-sec"><h3>Note</h3><p class="radical-note">${esc(it.note).replace(/[\u3400-\u9fff]/g, (c) => `<span lang="ja" class="nj">${c}</span>`)}</p></section>` : ''}
     ${item('k:' + it.ch) ? `<section class="info-sec"><h3>Also a kanji</h3><div class="tiles">${tileHtml(item('k:' + it.ch), { stage: stage(item('k:' + it.ch)) })}</div><p class="hint">On its own, ${esc(it.ch)} is a kanji you’ll learn with its readings.</p></section>` : ''}
     ${it.orig ? `<section class="info-sec"><h3>Form of</h3><p>A variant of <span lang="ja" class="inline-glyph">${esc(it.orig)}</span>${orig ? ` (${esc(primaryMeaning(orig))})` : ''}, as it appears inside other kanji.</p></section>` : ''}
@@ -144,10 +144,11 @@ export { glyph };
 /** Your own extra meanings for an item, with a box to add more. */
 export function synonymEditorHtml(it) {
   const syn = getSynonyms(it.id);
+  const word = meaningWord(it);
   return `<div class="syn-editor" data-item="${esc(it.id)}">
-    <span class="syn-label">Your meanings:</span>
+    <span class="syn-label">Your ${word}s:</span>
     ${syn.map((s) => `<span class="syn-chip">${esc(s)}<button type="button" class="syn-rm" data-rm="${esc(s)}" aria-label="Remove ${esc(s)}">✕</button></span>`).join('') || '<span class="muted">none yet</span>'}
-    <form class="syn-add"><input name="syn" placeholder="Add a meaning" aria-label="Add a meaning" autocomplete="off"><button class="btn small">Add</button></form>
+    <form class="syn-add"><input name="syn" placeholder="Add a ${word}" aria-label="Add a ${word}" autocomplete="off"><button class="btn small">Add</button></form>
   </div>`;
 }
 

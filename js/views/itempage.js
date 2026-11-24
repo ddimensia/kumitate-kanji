@@ -1,6 +1,6 @@
 // One item's page: its info card, your progress on each question, and your own meanings.
 
-import { item, cardTypes, TYPE_LABEL } from '../data.js';
+import { item, cardTypes, typeLabel, meaningWord } from '../data.js';
 import { itemHistory, resetItem, isIntroduced, isUnlocked, isPassed, recall } from '../state.js';
 import { retrievability, formatInterval } from '../srs.js';
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors, levelPickerHtml, wireLevelPicker } from './info.js';
@@ -22,7 +22,7 @@ export function renderItem(root, id, rerender, { inSession = false } = {}) {
     <section class="panel">
       <h2>Your progress</h2>
       ${hist.length ? `<table class="hist"><thead><tr><th>Question</th><th>Recall now</th><th>Next review</th><th>Memory</th><th>Right / wrong</th></tr></thead><tbody>
-        ${hist.map((h) => `<tr><td>${esc(TYPE_LABEL[h.type])}</td>
+        ${hist.map((h) => `<tr><td>${esc(typeLabel(it, h.type))}</td>
           <td>${Math.round(retrievability(h.srs) * 100)}%</td>
           <td>${Date.parse(h.srs.due) <= now ? 'due now' : 'in ' + formatInterval(Date.parse(h.srs.due) - now)}</td>
           <td>${h.srs.stability ? formatInterval(h.srs.stability * 86400000) : '–'}</td>
@@ -34,7 +34,7 @@ export function renderItem(root, id, rerender, { inSession = false } = {}) {
       ${inSession ? '' : `<h3>Already know it?</h3>
       <p class="hint">Put it straight into reviews at the level you think it’s at, skipping the lesson. Its parts can come along too.</p>
       ${levelPickerHtml({ partsCount: unstudiedParts(it).length })}`}
-      <h3>Your meanings</h3>
+      <h3>Your ${meaningWord(it)}s</h3>
       <p class="hint">Extra English answers you want accepted for this ${it.kind === 'r' ? 'radical' : it.kind === 'k' ? 'kanji' : 'word'}.</p>
       ${synonymEditorHtml(it)}
       ${hist.length && !inSession ? `<p><button type="button" class="btn small danger" data-act="reset">Reset this item</button></p>` : ''}

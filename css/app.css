@@ -287,6 +287,7 @@ a.btn { text-decoration: none; }
 .q-note { min-height: 1.5em; text-align: center; margin: 0.5rem 0; font-weight: 500; }
 .q-note.is-retry { color: var(--warn); }
 .q-note.is-right { color: var(--good); }
+.q-gloss { margin: 0.3rem 0 0; text-align: center; font-size: 1.05rem; color: var(--ink-soft); }
 .q-answer { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; font-size: 1.15rem; }
 .q-reading {
   font: inherit; font-family: var(--font-hand); font-size: 2rem; line-height: 1.2; cursor: pointer;

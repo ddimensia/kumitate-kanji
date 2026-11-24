@@ -57,6 +57,15 @@ export function index(raw) {
     });
     for (const k of kanji) items.get(k).vocab.push('v:' + id);
   }
+  // A radical has a meaning when it's also a kanji in the course with that meaning (糸 thread);
+  // otherwise what you learn is its name (幺 short thread, 酉 sake jar).
+  const norm = (s) => s.toLowerCase().replace(/[^a-z ]/g, '').trim();
+  for (const it of items.values()) {
+    if (it.kind !== 'r') continue;
+    const k = items.get('k:' + it.ch);
+    const n = norm(it.name);
+    it.hasMeaning = !!k && k.meanings.some((m) => norm(m) === n || norm(m) === 'or ' + n); // 又: again / or again
+  }
   const rank = (v) => [-(v.jlpt || 0), v.common ? 0 : 1, v.w.length];
   const cmp = (a, b) => { const x = rank(a), y = rank(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; };
   for (const it of items.values()) {
@@ -143,6 +152,16 @@ export const splitCardId = (id) => {
 /** What is shown as the question: the character or word. */
 export function glyph(it) {
   return it.kind === 'v' ? it.w : it.ch;
+}
+
+/** What a meaning question asks for: a radical's name unless it's also a kanji with that meaning. */
+export function meaningWord(it) {
+  return it.kind === 'r' && !it.hasMeaning ? 'name' : 'meaning';
+}
+
+/** The label for an item's question type: 'Name' for most radicals, otherwise TYPE_LABEL. */
+export function typeLabel(it, type) {
+  return type === 'm' && meaningWord(it) === 'name' ? 'Name' : TYPE_LABEL[type];
 }
 
 /** Main meaning shown in lists. */
