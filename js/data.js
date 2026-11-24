@@ -22,7 +22,7 @@ export async function loadCurriculum(url = 'data/curriculum.json') {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Could not load ${url}: ${res.status}`);
   DB = index(await res.json());
-  // Mnemonics for kanji readings (a pilot, N5 only so far): optional.
+  // Mnemonics for kanji readings (N5 and N4 so far): optional.
   try {
     const m = await fetch(url.replace(/curriculum\.json$/, 'mnemonics.json'));
     if (m.ok) useMnemonics(await m.json());

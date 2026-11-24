@@ -1,4 +1,5 @@
-"""Pilot mnemonics for the N5 kanji's taught readings. Writes data/mnemonics.json.
+"""Mnemonics for the N5 kanji's taught readings. tools/build_mnemonics.py merges the sets into
+data/mnemonics.json.
 
 Markup: **meaning** (a meaning of the kanji), [[sound]] (the sound-alike, only the part that
 matches the reading). Every reading has one sound-alike, reused wherever the reading appears.

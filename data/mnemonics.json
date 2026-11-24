@@ -1,5 +1,5 @@
 {
- "about": "Generated mnemonics for kanji readings (pilot: JLPT N5). **meaning**, [[sound-alike]]: only the part spelled the way you would type the reading ([[to]]e for と, [[shi]]p for し). CC BY-SA 4.0, like the rest of the data.",
+ "about": "Generated mnemonics for kanji readings (JLPT N5 and N4). **meaning**, [[sound-alike]]: only the part spelled the way you would type the reading ([[to]]e for と, [[shi]]p for し). CC BY-SA 4.0, like the rest of the data.",
  "sounds": {
   "ニチ": "Ni chi",
   "ジツ": "jitsu",
@@ -152,7 +152,210 @@
   "ひだり": "hi Dari",
   "やす.む": "Ya Su",
   "ちち": "chee chee",
-  "あめ": "Ame"
+  "あめ": "Ame",
+  "ゲン": "gen",
+  "バイ": "Bye",
+  "カイ": "Kai",
+  "ドウ": "dough",
+  "ハツ": "hats",
+  "チ": "chi",
+  "ホウ": "ho",
+  "リツ": "Ritz",
+  "シン": "shin",
+  "イン": "in",
+  "シュ": "Shu",
+  "リョク": "Leo cook",
+  "モン": "mon",
+  "キョウ": "Kyo",
+  "ツウ": "tsu",
+  "リ": "ri",
+  "オン": "on",
+  "イ": "i",
+  "サク": "sack",
+  "ヨウ": "Yo",
+  "ゴウ": "go",
+  "ヤ": "ya",
+  "セ": "Se",
+  "タ": "ta",
+  "アン": "An",
+  "ガン": "gan",
+  "ガ": "ga",
+  "カク": "cack",
+  "シュウ": "Shoo",
+  "ベツ": "bets",
+  "ブツ": "Boots",
+  "モツ": "moat",
+  "ヒン": "hin",
+  "ケイ": "Kay",
+  "トク": "Tok",
+  "ウン": "un",
+  "リョウ": "Leo",
+  "クウ": "coo",
+  "ソウ": "so",
+  "セツ": "sets",
+  "ソク": "soak",
+  "ラク": "rack",
+  "チャク": "Chuck",
+  "ビョウ": "bee yo",
+  "シツ": "sheets",
+  "ゾク": "Zo coo",
+  "ギン": "gin",
+  "サッ": "Sat",
+  "エイ": "Ei",
+  "キョ": "Kyo",
+  "コ": "co",
+  "ミ": "Mi",
+  "アク": "Ack",
+  "ズ": "zu",
+  "ト": "to",
+  "ホ": "ho",
+  "フウ": "foo",
+  "セキ": "sec",
+  "オク": "oak",
+  "エキ": "e key",
+  "リョ": "Leo",
+  "フク": "foo coo",
+  "シャク": "shack",
+  "ニク": "Nick",
+  "ベン": "Ben",
+  "チャ": "Cha",
+  "デ": "de",
+  "ギュウ": "gyu",
+  "ギョ": "gyo",
+  "い.う": "i",
+  "こと": "Co to",
+  "う.れる": "Ooh",
+  "あ.う": "Ow",
+  "おな.じ": "Oh na",
+  "みずか.ら": "Mi zu ca",
+  "もの": "mono",
+  "かた": "Cata",
+  "た.つ": "Ta tsu",
+  "あたら.しい": "A ta ra",
+  "あら.た": "ara",
+  "ば": "Ba",
+  "ひら.く": "hi ra",
+  "あ.ける": "Ah",
+  "て": "Te",
+  "ちから": "chi cara",
+  "と.う": "To",
+  "か.わる": "Ca wa",
+  "かわ.る": "ca wa",
+  "あか.るい": "Aca",
+  "おも": "Oh mo",
+  "かさ.ねる": "casa",
+  "うご.く": "Ooh go",
+  "め": "me",
+  "とお.る": "to",
+  "かよ.う": "ca yo",
+  "からだ": "cara da",
+  "た": "Ta",
+  "ぬし": "Nu shi",
+  "おと": "Oh to",
+  "ね": "ne",
+  "つく.る": "Tsu coo",
+  "もち.いる": "mochi",
+  "たび": "ta bi",
+  "つよ.い": "tsu yo",
+  "も.つ": "mo tsu",
+  "の": "No",
+  "おも.う": "Oh mo",
+  "いえ": "ie",
+  "や": "Ya",
+  "よ": "Yo",
+  "おお.い": "Oh",
+  "と.める": "To",
+  "や.む": "Ya",
+  "ただ.しい": "Tada",
+  "やす": "Ya Su",
+  "もと": "moto",
+  "こころ": "Coco ro",
+  "おし.える": "Oh shi",
+  "おそ.わる": "Oh so",
+  "ちか.い": "Chi ca",
+  "かんが.える": "kanga",
+  "うみ": "Ooh mi",
+  "し.らせる": "shi",
+  "みち": "Mi chi",
+  "あつ.まる": "A tsu",
+  "わか.れる": "Wa ca",
+  "つか.う": "Tsu ca",
+  "しな": "shi na",
+  "はか.らう": "haka",
+  "はか.る": "haka",
+  "わたくし": "wa ta cushi",
+  "わたし": "wa ta shi",
+  "はじ.める": "Ha Ji",
+  "あさ": "A sa",
+  "はこ.ぶ": "Ha co",
+  "ふゆ": "Foo Yu",
+  "お.える": "Oh",
+  "おわ.る": "Oh wa",
+  "ひろ.い": "hi ro",
+  "す.む": "Su",
+  "くち": "Ku chi",
+  "すく.ない": "su coo",
+  "すこ.し": "su co",
+  "まち": "Ma chi",
+  "た.てる": "Ta te",
+  "そら": "so ra",
+  "あ.く": "Ah",
+  "いそ.ぐ": "i so",
+  "おく.る": "Oh coo",
+  "き.る": "ki",
+  "ころ.ぶ": "Co ro",
+  "あし": "A shi",
+  "た.りる": "Ta ri",
+  "たの.しい": "Ta no",
+  "はし.る": "Ha shi",
+  "お.こす": "Oh co",
+  "つ.く": "tsu",
+  "みせ": "Mi se",
+  "ま.つ": "Ma tsu",
+  "ため.す": "Ta me",
+  "はや": "Ha ya",
+  "うつ.る": "Ooh tsu",
+  "は.える": "Ha",
+  "おや": "Oh ya",
+  "した.しい": "shi Ta",
+  "さ.る": "Sa",
+  "あじ": "A Ji",
+  "うつ.す": "Ooh tsu",
+  "こた.える": "Co Ta",
+  "よる": "Yo ru",
+  "そそ.ぐ": "so so",
+  "かえ.る": "ca",
+  "ふる.い": "Fu ru",
+  "うた": "Ooh ta",
+  "か.う": "cow",
+  "わる.い": "Wa ru",
+  "ある.く": "A ru",
+  "かぜ": "ca Ze",
+  "かみ": "Ca mi",
+  "くろ": "Ku ro",
+  "はな": "Ha na",
+  "はる": "Ha ru",
+  "あか": "Aca",
+  "あお": "Ah oh",
+  "いろ": "i ro",
+  "あき": "Ah ki",
+  "なつ": "Na tsu",
+  "なら.う": "Na ra",
+  "ゆう": "Yu",
+  "か.りる": "ca",
+  "の.む": "No",
+  "か.す": "ca",
+  "かし-": "ca shi",
+  "とり": "to ri",
+  "めし": "me shi",
+  "ひる": "hi ru",
+  "おとうと": "Oh to to",
+  "うし": "Ooh shi",
+  "さかな": "Sa ca na",
+  "あに": "Ah ni",
+  "いぬ": "i Nu",
+  "いもうと": "i mo u to",
+  "あね": "Ah ne"
  },
  "kanji": {
   "日": {
@@ -481,6 +684,653 @@
   },
   "雨": {
    "あめ": "Pray for **rain**: \"[[Ame]]n!\" あめ."
+  },
+  "言": {
+   "ゲン": "**Say** it in Copenha[[gen]]: 言語 (げんご), language.",
+   "い.う": "Sk[[i]]ers **say** \"Wheee!\" on the way down: いう.",
+   "こと": "[[Co]]ld [[to]]es make you choose your **word**s: 言葉 (ことば)."
+  },
+  "売": {
+   "バイ": "**Sell** it and say \"[[Bye]]!\": 商売 (しょうばい), trade.",
+   "う.れる": "\"[[Ooh]], that will **sell**!\" うれる; うる, to sell."
+  },
+  "会": {
+   "カイ": "The [[Kai]]ser calls a **meeting**: 会社 (かいしゃ), company.",
+   "あ.う": "\"[[Ow]]!\" We bump heads when we **meet**: あう."
+  },
+  "同": {
+   "ドウ": "Two loaves of the **same** [[dough]]: 同時 (どうじ), at the same time.",
+   "おな.じ": "\"[[Oh]], [[na]]chos again? The **same**!\" おなじ."
+  },
+  "事": {
+   "ジ": "\"[[Gee]], what's the **matter**?\" 食事 (しょくじ), a meal.",
+   "こと": "[[Co]]ld [[to]]es are no small **matter**: こと."
+  },
+  "自": {
+   "ジ": "\"[[Gee]], I did it my**self**!\" 自分 (じぶん), oneself.",
+   "みずか.ら": "**Oneself**: [[Mi]]x the [[zu]]cchini [[ca]]lmly, all on your own. みずから."
+  },
+  "社": {
+   "シャ": "A [[sha]]rk runs the **company**: 会社 (かいしゃ)."
+  },
+  "発": {
+   "ハツ": "[[Hats]] off at the **departure** of a new idea: 発明 (はつめい), invention."
+  },
+  "者": {
+   "シャ": "A [[sha]]rk is a scary **someone**: 医者 (いしゃ), doctor.",
+   "もの": "A **person** in [[mono]]chrome: もの."
+  },
+  "地": {
+   "チ": "[[Chi]]ps all over the **ground**: 地図 (ちず), map.",
+   "ジ": "\"[[Gee]], the **earth** shook!\" 地震 (じしん), earthquake."
+  },
+  "業": {
+   "ギョウ": "[[Gyo]]za is big **business**: 工業 (こうぎょう), industry."
+  },
+  "方": {
+   "ホウ": "Which **direction** is [[ho]]me? 両方 (りょうほう), both.",
+   "かた": "A [[cata]]maran crew: that **person** knows the way. かた, as in 読み方 (よみかた), way of reading."
+  },
+  "立": {
+   "リツ": "**Stand up** in the [[Ritz]]: 国立 (こくりつ), national.",
+   "た.つ": "In [[Ta]]hiti, **stand up** to surf the [[tsu]]nami-sized waves: たつ."
+  },
+  "新": {
+   "シン": "A **new** bruise on your [[shin]]: 新聞 (しんぶん), newspaper.",
+   "あたら.しい": "[[A]] [[ta]]co and [[ra]]men combo, all **new**: あたらしい.",
+   "あら.た": "Rain makes the Sah[[ara]] bloom **new** again: あらた."
+  },
+  "場": {
+   "ジョウ": "[[Jo]]e's favourite **place**: 会場 (かいじょう), venue.",
+   "ば": "The [[ba]]r is my favourite **place**: ば."
+  },
+  "員": {
+   "イン": "Every **member** stays at the [[in]]n: 店員 (てんいん), shop clerk."
+  },
+  "開": {
+   "カイ": "The [[Kai]]ser **open**s the gate: 開始 (かいし), start.",
+   "ひら.く": "A [[hi]]ppo slurps [[ra]]men, then **open**s the gate: ひらく.",
+   "あ.ける": "\"[[Ah]]!\" you sigh as you **open** the door: あける."
+  },
+  "手": {
+   "シュ": "\"[[Shu]]sh!\" The singer raises a **hand**: 歌手 (かしゅ), singer.",
+   "て": "[[Te]]n fingers on two **hand**s: て."
+  },
+  "力": {
+   "リョク": "[[Leo]] [[cook]]s with all his **strength**: 実力 (じつりょく), ability.",
+   "ちから": "**Power** snack: [[chi]]ps and [[cara]]mel. ちから."
+  },
+  "問": {
+   "モン": "A [[mon]]ster asks a **question**: 問題 (もんだい), problem.",
+   "と.う": "A [[to]]ad croaks a **question**: とう, to ask."
+  },
+  "代": {
+   "ダイ": "[[Dye]] a **substitute** shirt: 時代 (じだい), era.",
+   "か.わる": "A [[ca]]r [[wa]]sh is a **substitute** for rain: かわる.",
+   "かわ.る": "A [[ca]]r [[wa]]sh can **substitute** for rain: かわる."
+  },
+  "明": {
+   "メイ": "[[May]] mornings are **bright**: 説明 (せつめい), explanation.",
+   "あ.ける": "\"[[Ah]]!\" The sky gets **bright** at dawn: 明ける (あける).",
+   "あか.るい": "**Bright** sun in [[Aca]]pulco: あかるい."
+  },
+  "重": {
+   "ジュウ": "[[Ju]]ice jugs are **heavy**: 重要 (じゅうよう), important.",
+   "チョウ": "The **important** one is [[cho]]sen: 貴重 (きちょう), precious.",
+   "おも": "\"[[Oh]], [[mo]]ve it, it's **heavy**!\" おもい.",
+   "かさ.ねる": "Stack the **heavy** bricks of the [[casa]]: かさねる, to pile up."
+  },
+  "動": {
+   "ドウ": "[[Dough]] starts to **move** as it rises: 動物 (どうぶつ), animal.",
+   "うご.く": "\"[[Ooh]], [[go]]!\" It starts to **move**: うごく."
+  },
+  "京": {
+   "キョウ": "[[Kyo]]to was the old **capital**: 東京 (とうきょう), Tokyo."
+  },
+  "目": {
+   "モク": "Don't [[mock]] my **eye**: 目的 (もくてき), purpose.",
+   "め": "A [[me]]lon-sized **eye**: め."
+  },
+  "通": {
+   "ツウ": "**Traffic** stops for a [[tsu]]nami of ducklings crossing: 交通 (こうつう), traffic.",
+   "とお.る": "**Pass through** on tip[[to]]e: とおる.",
+   "かよ.う": "Stuck in **traffic**, a [[ca]]r full of [[yo]]-yos: かよう, to commute."
+  },
+  "理": {
+   "リ": "There's a **reason** the [[ri]]ver floods: 理由 (りゆう), reason."
+  },
+  "体": {
+   "タイ": "A [[tie]] around your **body**: 体育 (たいいく), PE.",
+   "からだ": "A **body** full of [[cara]]mel, [[da]]rling: からだ."
+  },
+  "田": {
+   "た": "**Rice field**s in [[Ta]]hiti? た, as in 田中 (たなか)."
+  },
+  "主": {
+   "シュ": "\"[[Shu]]sh, the **master** is here!\" 主人 (しゅじん), master.",
+   "ぬし": "The **master** brings [[Nu]]tella on his [[shi]]p: ぬし.",
+   "おも": "\"[[Oh]], [[mo]]re!\" says the **chief**: おも (主に, おもに, mainly)."
+  },
+  "題": {
+   "ダイ": "[[Dye]] the **topic** in red: 宿題 (しゅくだい), homework."
+  },
+  "音": {
+   "オン": "Turn the **sound** [[on]]: 音楽 (おんがく), music.",
+   "おと": "\"[[Oh]]!\" What a lovely [[to]]ne, what a **sound**: おと.",
+   "ね": "A **sound** from my [[ne]]ck: ね, as in 音色 (ねいろ), tone."
+  },
+  "意": {
+   "イ": "On the sk[[i]] lift I get an **idea**: 意味 (いみ), meaning."
+  },
+  "不": {
+   "フ": "No [[foo]]d? That's **bad**: 不便 (ふべん), inconvenient."
+  },
+  "作": {
+   "サク": "**Make** a [[sack]] of rice: 作文 (さくぶん), composition.",
+   "サ": "**Make** [[sa]]lsa: 作業 (さぎょう), work.",
+   "つく.る": "**Make** a [[tsu]]nami-sized pile of [[coo]]kies: つくる."
+  },
+  "用": {
+   "ヨウ": "[[Yo]]ga is my **business**: 用事 (ようじ), errand.",
+   "もち.いる": "**Utilize** [[mochi]] in every dessert: もちいる."
+  },
+  "度": {
+   "ド": "[[Dough]] rises a few **degrees**: 今度 (こんど), this time.",
+   "たび": "**Time** for a [[ta]]xi to the [[bi]]g city: たび."
+  },
+  "強": {
+   "キョウ": "[[Kyo]]to wrestlers are **strong**: 勉強 (べんきょう), study.",
+   "ゴウ": "A **strong** [[go]]alkeeper: 強引 (ごういん), pushy.",
+   "つよ.い": "A **strong** [[tsu]]nami of [[yo]]-yos: つよい."
+  },
+  "公": {
+   "コウ": "The [[co]]-op is a **public** place: 公園 (こうえん), park."
+  },
+  "持": {
+   "ジ": "\"[[Gee]], **hold** this!\" 持参 (じさん), bringing along.",
+   "も.つ": "**Hold** a [[mo]]p at the water park's [[tsu]]nami ride: もつ."
+  },
+  "野": {
+   "ヤ": "A [[ya]]rd on the **plains**: 野菜 (やさい), vegetables.",
+   "の": "[[No]] fences on the **plains**: の."
+  },
+  "以": {
+   "イ": "Sk[[i]] **by means of** two poles: 以上 (いじょう), more than."
+  },
+  "思": {
+   "シ": "**Think** it over on a [[shi]]p: 意思 (いし), intention.",
+   "おも.う": "\"[[Oh]], [[mo]]m, I **think**...\" おもう."
+  },
+  "家": {
+   "カ": "A [[ca]]r at the **house**: 家族 (かぞく), family.",
+   "ケ": "[[Ke]]tchup for the whole **family**: 本家 (ほんけ), main family.",
+   "いえ": "A f[[ie]]sta at my **house**: いえ.",
+   "や": "A [[ya]]rd around the **house**: や, as in 大家 (おおや), landlord."
+  },
+  "世": {
+   "セイ": "[[Say]] hello to the **world**: 世紀 (せいき), century.",
+   "セ": "[[Se]]t the **world** in order: 世界 (せかい), the world.",
+   "よ": "\"[[Yo]], **world**!\" よ, as in 世の中 (よのなか), society."
+  },
+  "多": {
+   "タ": "**Many** [[ta]]cos: 多数 (たすう), a large number.",
+   "おお.い": "\"[[Oh]], so **many**!\" おおい."
+  },
+  "止": {
+   "シ": "**Stop** the [[shi]]p: 中止 (ちゅうし), cancellation.",
+   "と.める": "[[To]]e on the brake: **stop**! とめる.",
+   "や.む": "\"[[Ya]]y, the rain **stop**ped!\" やむ."
+  },
+  "正": {
+   "セイ": "[[Say]] the **correct** answer: 正解 (せいかい).",
+   "ショウ": "The **correct** [[show]] for New Year: 正月 (しょうがつ).",
+   "ただ.しい": "\"[[Tada]]!\" The **correct** answer: ただしい."
+  },
+  "安": {
+   "アン": "[[An]]ts **relax** in the sun: 安心 (あんしん), peace of mind.",
+   "やす": "\"[[Ya]]hoo! [[Su]]shi is **cheap**!\" やすい."
+  },
+  "元": {
+   "ゲン": "Copenha[[gen]], the **origin** of good health: 元気 (げんき), lively.",
+   "ガン": "A [[gan]]der flies back to its **origin**: 元日 (がんじつ), New Year's Day.",
+   "もと": "Ride the [[moto]] back to its **origin**: もと."
+  },
+  "院": {
+   "イン": "An **institution** run like an [[in]]n: 病院 (びょういん), hospital."
+  },
+  "心": {
+   "シン": "A **heart** drawn on my [[shin]] guard: 安心 (あんしん), peace of mind.",
+   "こころ": "[[Coco]]nut [[ro]]lls warm the **heart**: こころ."
+  },
+  "界": {
+   "カイ": "The [[Kai]]ser ruled the **world**: 世界 (せかい)."
+  },
+  "教": {
+   "キョウ": "**Teach** in [[Kyo]]to: 教室 (きょうしつ), classroom.",
+   "おし.える": "\"[[Oh]], [[shi]]ps! **Teach** me to sail!\" おしえる.",
+   "おそ.わる": "\"[[Oh]], [[so]] that's it!\" when someone will **teach** you: おそわる, to be taught."
+  },
+  "文": {
+   "ブン": "A [[bun]] in every **sentence**: 文化 (ぶんか), culture.",
+   "モン": "A [[mon]]ster writes **literature**: 文句 (もんく), complaint."
+  },
+  "近": {
+   "キン": "My [[kin]] live **near**by: 最近 (さいきん), recently.",
+   "ちか.い": "The [[Chi]]p [[Ca]]fe is **near**: ちかい."
+  },
+  "考": {
+   "コウ": "**Consider** joining the [[co]]-op: 参考 (さんこう), reference.",
+   "かんが.える": "A [[kanga]]roo **consider**s its next jump: かんがえる."
+  },
+  "画": {
+   "ガ": "A **picture** of a [[ga]]rden: 映画 (えいが), movie.",
+   "カク": "Hens [[cack]]le at every **brush-stroke**: 計画 (けいかく), plan."
+  },
+  "海": {
+   "カイ": "The [[Kai]]ser's **sea**: 海外 (かいがい), overseas.",
+   "うみ": "\"[[Ooh]], [[mi]]nnows in the **sea**!\" うみ."
+  },
+  "知": {
+   "チ": "[[Chi]]ps are all I **know**: 知識 (ちしき), knowledge.",
+   "し.らせる": "A [[shi]]p's horn lets you **know** it's arriving: しらせる, to let know."
+  },
+  "道": {
+   "ドウ": "A **road** paved with [[dough]]: 水道 (すいどう), water supply.",
+   "みち": "[[Mi]]lk and [[chi]]ps along the **road**: みち."
+  },
+  "集": {
+   "シュウ": "\"[[Shoo]]!\" But the crowd keeps **gather**ing: 集中 (しゅうちゅう), concentration.",
+   "あつ.まる": "[[A]] [[tsu]]nami of fans **gather**s at the gate: あつまる."
+  },
+  "別": {
+   "ベツ": "Place [[bets]] on **separate** horses: 特別 (とくべつ), special.",
+   "わか.れる": "[[Wa]]tch the [[ca]]rs **separate** at the fork: わかれる."
+  },
+  "物": {
+   "ブツ": "[[Boots]] are a **thing**: 動物 (どうぶつ), animal.",
+   "モツ": "A **thing** in the [[moat]]: 荷物 (にもつ), luggage.",
+   "もの": "Every **thing** in [[mono]]chrome: もの."
+  },
+  "使": {
+   "シ": "**Use** the [[shi]]p: 使用 (しよう), use.",
+   "つか.う": "Surfers **use** a [[tsu]]nami-sized wave to [[ca]]tch air: つかう."
+  },
+  "品": {
+   "ヒン": "A [[hin]]t of fine **goods**: 作品 (さくひん), a work.",
+   "しな": "A [[shi]]p full of [[na]]chos: **goods** to sell. しな."
+  },
+  "計": {
+   "ケイ": "[[Kay]] makes a **plan**: 計画 (けいかく).",
+   "はか.らう": "Do a [[haka]] to **plan** the party: はからう, to arrange."
+  },
+  "死": {
+   "シ": "A [[shi]]p sinks: **death** at sea. 死亡 (しぼう)."
+  },
+  "特": {
+   "トク": "[[Tok]]yo is a **special** city: 特別 (とくべつ), special."
+  },
+  "私": {
+   "シ": "A **private** [[shi]]p: 私立 (しりつ), private.",
+   "わたくし": "**I** [[wa]]tch [[ta]]cos from a [[cushi]]on: わたくし.",
+   "わたし": "**I** [[wa]]tch [[ta]]cos from a [[shi]]p: わたし."
+  },
+  "台": {
+   "ダイ": "[[Dye]] the **pedestal** red: 台所 (だいどころ), kitchen.",
+   "タイ": "A [[tie]] on the **stand**: 台風 (たいふう), typhoon."
+  },
+  "始": {
+   "シ": "**Begin** on a [[shi]]p: 開始 (かいし), start.",
+   "はじ.める": "[[Ha]]ppy [[Ji]]m will **begin**: はじめる."
+  },
+  "朝": {
+   "あさ": "[[A]] [[sa]]lsa breakfast every **morning**: あさ."
+  },
+  "運": {
+   "ウン": "**Carry** the t[[un]]a to the boat: 運動 (うんどう), exercise.",
+   "はこ.ぶ": "[[Ha]]ppy to **carry** the [[co]]coa: はこぶ."
+  },
+  "冬": {
+   "ふゆ": "[[Foo]]d at [[Yu]]le, in **winter**: ふゆ."
+  },
+  "終": {
+   "シュウ": "\"[[Shoo]]!\" It's the **end**: 最終 (さいしゅう), last.",
+   "お.える": "\"[[Oh]]!\" The movie's over, the **end**: おえる.",
+   "おわ.る": "\"[[Oh]], [[wa]]tch, it's the **end**!\" おわる."
+  },
+  "広": {
+   "コウ": "The [[co]]-op ad is so **wide**: 広告 (こうこく), advertisement.",
+   "ひろ.い": "A [[hi]]ppo [[ro]]lls on the **wide** lawn: ひろい."
+  },
+  "住": {
+   "ジュウ": "[[Ju]]ice where you **live**: 住所 (じゅうしょ), address.",
+   "す.む": "[[Su]]shi chefs **live** above the shop: すむ."
+  },
+  "真": {
+   "シン": "A **true** bruise on the [[shin]]: 写真 (しゃしん), photograph.",
+   "ま": "[[Ma]] tells the **true** story: ま, as in 真っ白 (まっしろ), pure white."
+  },
+  "有": {
+   "ユウ": "At [[Yu]]le, **have** a party: 有名 (ゆうめい), famous."
+  },
+  "口": {
+   "コウ": "So many **mouth**s to feed at the [[co]]-op: 人口 (じんこう), population.",
+   "くち": "[[Ku]]ng fu [[chi]]ps in your **mouth**: くち."
+  },
+  "少": {
+   "ショウ": "Only a **few** at the [[show]]: 少年 (しょうねん), boy.",
+   "すく.ない": "**Few** [[su]]shi left; the [[coo]]ks are sad: すくない.",
+   "すこ.し": "A **little** [[su]]shi and [[co]]coa: すこし."
+  },
+  "町": {
+   "チョウ": "The **town** has [[cho]]sen: 町長 (ちょうちょう), mayor.",
+   "まち": "[[Ma]] buys [[chi]]ps in **town**: まち."
+  },
+  "料": {
+   "リョウ": "[[Leo]] charges a **fee**: 料金 (りょうきん), fare."
+  },
+  "工": {
+   "コウ": "The [[co]]-op's **craft** shop: 工場 (こうじょう), factory."
+  },
+  "建": {
+   "ケン": "[[Ken]] can **build** anything: 建築 (けんちく), architecture.",
+   "た.てる": "In [[Ta]]hiti, **build** [[te]]nts: たてる."
+  },
+  "空": {
+   "クウ": "Pigeons [[coo]] in the **sky**: 空港 (くうこう), airport.",
+   "そら": "A [[so]]da and [[ra]]men picnic under the open **sky**: そら.",
+   "あ.く": "\"[[Ah]]!\" The seat is **empty**: あく."
+  },
+  "急": {
+   "キュウ": "**Hurry**, take your [[cue]]: 急行 (きゅうこう), express.",
+   "いそ.ぐ": "**Hurry** down the sk[[i]] slope, [[so]] fast! いそぐ."
+  },
+  "送": {
+   "ソウ": "**Send** the [[so]]ap: 放送 (ほうそう), broadcast.",
+   "おく.る": "\"[[Oh]], [[coo]]l, you'll **send** it!\" おくる."
+  },
+  "切": {
+   "セツ": "**Cut** the [[sets]] in half: 大切 (たいせつ), important.",
+   "き.る": "A karate [[ki]]ck can **cut** a board: きる."
+  },
+  "転": {
+   "テン": "It **turn**s around [[ten]] times: 運転 (うんてん), driving.",
+   "ころ.ぶ": "[[Co]]coa [[ro]]lls **turn** over and fall: ころぶ."
+  },
+  "研": {
+   "ケン": "[[Ken]] **polish**es his shoes: 研究 (けんきゅう), research."
+  },
+  "足": {
+   "ソク": "[[Soak]] each tired **foot**: 不足 (ふそく), shortage.",
+   "あし": "[[A]] [[shi]]p's captain with a wooden **leg**: あし.",
+   "た.りる": "[[Ta]]hiti has **sufficient** [[ri]]vers: たりる."
+  },
+  "究": {
+   "キュウ": "**Research** the pool [[cue]]: 研究 (けんきゅう), research."
+  },
+  "楽": {
+   "ガク": "People [[gawk]] at the **music**: 音楽 (おんがく), music.",
+   "ラク": "A [[rack]] of **comfort**s: 楽 (らく), easy.",
+   "たの.しい": "[[Ta]]cos and [[no]] work: **comfort**! たのしい."
+  },
+  "走": {
+   "はし.る": "[[Ha]]rry, the [[shi]]p's rat, can **run**: はしる."
+  },
+  "起": {
+   "キ": "A [[key]] to help you **wake up**: 起床 (きしょう), getting up.",
+   "お.こす": "\"[[Oh]], [[co]]ld water! Time to **wake up**!\" おこす."
+  },
+  "着": {
+   "チャク": "[[Chuck]] will **arrive** soon: 到着 (とうちゃく), arrival.",
+   "き.る": "Put on a [[ki]]mono to **wear**: きる.",
+   "つ.く": "A [[tsu]]nami of ducks will **arrive**: つく."
+  },
+  "店": {
+   "テン": "[[Ten]] **shop**s in a row: 店員 (てんいん), shop clerk.",
+   "みせ": "[[Mi]]lk [[se]]t on the **shop** counter: みせ."
+  },
+  "病": {
+   "ビョウ": "A [[bee]] on a [[yo]]-yo makes you **sick**: 病気 (びょうき), illness."
+  },
+  "質": {
+   "シツ": "Clean [[sheets]] are good **quality**: 質問 (しつもん), question."
+  },
+  "待": {
+   "タイ": "**Wait** in a [[tie]]: 期待 (きたい), expectation.",
+   "ま.つ": "[[Ma]] **wait**s in line for the [[tsu]]nami ride at the water park: まつ."
+  },
+  "試": {
+   "シ": "**Test** the [[shi]]p: 試験 (しけん), exam.",
+   "ため.す": "[[Ta]]cos with [[me]]lon? **Try** it: ためす."
+  },
+  "族": {
+   "ゾク": "[[Zo]]e [[coo]]ks for the **family**: 家族 (かぞく)."
+  },
+  "銀": {
+   "ギン": "[[Gin]]gham with **silver** thread: 銀行 (ぎんこう), bank."
+  },
+  "早": {
+   "サッ": "[[Sat]] down **early**: 早速 (さっそく), at once.",
+   "はや": "[[Ha]]ppy [[ya]]rd, up **early**: はやい."
+  },
+  "映": {
+   "エイ": "[[Ei]]ght screens **reflect** it: 映画 (えいが), movie.",
+   "うつ.る": "\"[[Ooh]], [[tsu]]nami-sized waves **reflect** the sun!\" うつる.",
+   "は.える": "\"[[Ha]]!\" A **reflection** shines: はえる."
+  },
+  "親": {
+   "シン": "A **parent** with a bruised [[shin]]: 両親 (りょうしん), parents.",
+   "おや": "\"[[Oh]], [[ya]]!\" a **parent** sighs: おや.",
+   "した.しい": "**Intimacy** on a [[shi]]p to [[Ta]]hiti: したしい."
+  },
+  "験": {
+   "ケン": "[[Ken]] does the **testing**: 試験 (しけん), exam."
+  },
+  "英": {
+   "エイ": "[[Ei]]ght **English** heroes: 英語 (えいご), English."
+  },
+  "医": {
+   "イ": "A sk[[i]] **doctor** waits at the bottom of the slope: 医者 (いしゃ), doctor."
+  },
+  "仕": {
+   "シ": "**Attend** the [[shi]]p: 仕事 (しごと), work."
+  },
+  "去": {
+   "キョ": "[[Kyo]]to is in the **past**: 去年 (きょねん), last year.",
+   "コ": "[[Co]]coa from the **past**: 過去 (かこ), the past.",
+   "さ.る": "The [[sa]]lsa is **gone**: さる, to leave."
+  },
+  "味": {
+   "ミ": "[[Mi]]lk's **flavor**: 意味 (いみ), meaning.",
+   "あじ": "\"[[A]]h, [[Ji]]ll, **taste** this!\" あじ."
+  },
+  "写": {
+   "シャ": "A [[sha]]rk gets **photographed**: 写真 (しゃしん), photo.",
+   "うつ.す": "\"[[Ooh]], I **photographed** a [[tsu]]nami-sized wave at the surf contest!\" うつす."
+  },
+  "字": {
+   "ジ": "\"[[Gee]], nice **letter**s!\" 漢字 (かんじ), kanji."
+  },
+  "答": {
+   "トウ": "**Answer** on tip[[to]]e: 回答 (かいとう), reply.",
+   "こた.える": "[[Co]]coa in [[Ta]]hiti? That's the **answer**: こたえる."
+  },
+  "夜": {
+   "ヤ": "A [[ya]]rd at **night**: 今夜 (こんや), tonight.",
+   "よ": "\"[[Yo]], good **night**!\" よ, as in 夜中 (よなか), midnight.",
+   "よる": "\"[[Yo]], a [[ru]]by moon tonight!\" It's **night**: よる."
+  },
+  "注": {
+   "チュウ": "[[Chew]], then **pour** the tea: 注意 (ちゅうい), attention.",
+   "そそ.ぐ": "**Pour** it [[so]]-[[so]] slowly: そそぐ."
+  },
+  "帰": {
+   "キ": "A [[key]] for the **homecoming**: 帰国 (きこく), returning home.",
+   "かえ.る": "The [[ca]]r pulls in for the **homecoming**: かえる."
+  },
+  "古": {
+   "コ": "**Old** [[co]]coa: 中古 (ちゅうこ), second-hand.",
+   "ふる.い": "[[Fu]]ll of [[ru]]ins, the town is so **old**: ふるい."
+  },
+  "歌": {
+   "カ": "A [[ca]]r full of **song**: 歌手 (かしゅ), singer.",
+   "うた": "\"[[Ooh]], [[ta]]-da!\" A **song**: うた."
+  },
+  "買": {
+   "バイ": "**Buy** it and say \"[[Bye]]!\": 購買 (こうばい), purchase.",
+   "か.う": "**Buy** a [[cow]]: かう."
+  },
+  "悪": {
+   "アク": "\"[[Ack]]!\" Something **bad**: 最悪 (さいあく), the worst.",
+   "わる.い": "A [[wa]]ffle [[ru]]ined: **bad**! わるい."
+  },
+  "図": {
+   "ズ": "A **map** of the [[zu]]cchini farm: 地図 (ちず).",
+   "ト": "A **drawing** of a [[to]]e: 図書館 (としょかん), library.",
+   "はか.る": "Do a [[haka]] to **plan** the match: はかる."
+  },
+  "週": {
+   "シュウ": "\"[[Shoo]]!\" Another **week** gone: 今週 (こんしゅう), this week."
+  },
+  "室": {
+   "シツ": "[[Sheets]] in every **room**: 教室 (きょうしつ), classroom."
+  },
+  "歩": {
+   "ホ": "**Walk** [[ho]]me along the 歩道 (ほどう), sidewalk.",
+   "ある.く": "[[A]] [[ru]]by-red path to **walk**: あるく."
+  },
+  "風": {
+   "フウ": "The **wind** blows the [[foo]]d away: 台風 (たいふう), typhoon.",
+   "フ": "[[Foo]]d smells on the **wind**: 風呂 (ふろ), bath.",
+   "かぜ": "The **wind** blows a [[ca]]r into a [[Ze]]n garden: かぜ."
+  },
+  "紙": {
+   "シ": "**Paper** [[shi]]ps: 用紙 (ようし), a form.",
+   "かみ": "[[Ca]]rry the [[mi]]lk on **paper** trays: かみ."
+  },
+  "黒": {
+   "コク": "**Black** [[Co]]ke: 黒板 (こくばん), blackboard.",
+   "くろ": "[[Ku]]ng fu [[ro]]bes are **black**: くろい."
+  },
+  "花": {
+   "カ": "A [[ca]]r full of **flower**s: 花瓶 (かびん), vase.",
+   "はな": "[[Ha]]rvest a [[na]]cho-yellow **flower**: はな."
+  },
+  "春": {
+   "はる": "[[Ha]]rry picks [[ru]]by tulips in **spring**: はる."
+  },
+  "赤": {
+   "セキ": "The **red** [[sec]]ond hand ticks on: 赤道 (せきどう), equator.",
+   "あか": "[[Aca]]pulco sunsets are **red**: あかい."
+  },
+  "青": {
+   "セイ": "[[Say]] it with **blue**: 青年 (せいねん), youth.",
+   "あお": "\"[[Ah]], [[oh]], the **blue** sea!\" あお."
+  },
+  "館": {
+   "カン": "A [[can]]ned-food **building**: 図書館 (としょかん), library."
+  },
+  "屋": {
+   "オク": "An [[oak]] on the **roof**: 屋上 (おくじょう), rooftop.",
+   "や": "A **shop** with a [[ya]]rd: や, as in 本屋 (ほんや), bookshop."
+  },
+  "色": {
+   "ショク": "What a [[shock]] of **color**: 特色 (とくしょく), characteristic.",
+   "いろ": "Sk[[i]] suits in every **color**, worn by [[ro]]bots: いろ."
+  },
+  "秋": {
+   "あき": "\"[[Ah]], [[ki]]wis in **autumn**!\" あき."
+  },
+  "夏": {
+   "なつ": "[[Na]]chos and a [[tsu]]nami: **summer**! なつ."
+  },
+  "習": {
+   "シュウ": "\"[[Shoo]]!\" I need to **learn**: 練習 (れんしゅう), practice.",
+   "なら.う": "[[Na]]chos and [[ra]]men: **learn** to cook them both. ならう."
+  },
+  "駅": {
+   "エキ": "An [[e]]gg and a [[key]] in the **station** locker: 駅員 (えきいん), station staff."
+  },
+  "洋": {
+   "ヨウ": "[[Yo]]ga by the **ocean**: 西洋 (せいよう), the West."
+  },
+  "旅": {
+   "リョ": "A **trip** with [[Leo]]: 旅行 (りょこう), travel.",
+   "たび": "**Travel** by [[ta]]xi to the [[bi]]g city: たび."
+  },
+  "服": {
+   "フク": "**Clothing** for [[foo]]d [[coo]]ks: 洋服 (ようふく), Western clothes."
+  },
+  "夕": {
+   "ゆう": "[[Yu]]le **evening**: ゆう, as in 夕方 (ゆうがた)."
+  },
+  "借": {
+   "シャク": "**Borrow** a [[shack]]: 借金 (しゃっきん), debt.",
+   "か.りる": "**Borrow** a [[ca]]r: かりる."
+  },
+  "曜": {
+   "ヨウ": "[[Yo]]ga every **weekday**: 日曜日 (にちようび), Sunday."
+  },
+  "飲": {
+   "の.む": "\"[[No]] more **drink**s!\" のむ."
+  },
+  "肉": {
+   "ニク": "[[Nick]] loves **meat**: 牛肉 (ぎゅうにく), beef."
+  },
+  "貸": {
+   "か.す": "I **lend** you my [[ca]]t for the weekend: かす.",
+   "かし-": "**Lend** [[ca]]sh to the [[shi]]p: 貸し出し (かしだし), lending."
+  },
+  "堂": {
+   "ドウ": "A **hall** full of [[dough]]: 食堂 (しょくどう), canteen."
+  },
+  "鳥": {
+   "とり": "A **bird** on my [[to]]e by the [[ri]]ver: とり."
+  },
+  "飯": {
+   "ハン": "A **meal** made by [[han]]d: 夕飯 (ゆうはん), dinner.",
+   "めし": "A **meal** on a [[me]]lon [[shi]]p: めし."
+  },
+  "勉": {
+   "ベン": "[[Ben]] puts in the **exertion**: 勉強 (べんきょう), study."
+  },
+  "昼": {
+   "チュウ": "[[Chew]] at **noon**: 昼食 (ちゅうしょく), lunch.",
+   "ひる": "**Noon** on the [[hi]]ll, under a [[ru]]by sun: ひる."
+  },
+  "茶": {
+   "チャ": "[[Cha]]i is **tea**: お茶 (おちゃ).",
+   "サ": "**Tea** with [[sa]]lsa? 喫茶店 (きっさてん), café."
+  },
+  "弟": {
+   "ダイ": "[[Dye]] your **younger brother**'s hair: 兄弟 (きょうだい), siblings.",
+   "デ": "My **younger brother** at his [[de]]sk: 弟子 (でし), disciple.",
+   "おとうと": "\"[[Oh]], [[to]]ast and [[to]]ffee!\" begs my **younger brother**: おとうと."
+  },
+  "牛": {
+   "ギュウ": "A **cow** in your [[gyu]]don bowl: 牛肉 (ぎゅうにく), beef.",
+   "うし": "\"[[Ooh]], a [[shi]]p full of **cow**s!\" うし."
+  },
+  "魚": {
+   "ギョ": "**Fish** [[gyo]]za: 金魚 (きんぎょ), goldfish.",
+   "さかな": "[[Sa]]lsa, [[ca]]rrots and [[na]]chos with **fish**: さかな."
+  },
+  "兄": {
+   "キョウ": "My **elder brother** lives in [[Kyo]]to: 兄弟 (きょうだい), siblings.",
+   "あに": "\"[[Ah]], my **elder brother** is a [[ni]]nja!\" あに."
+  },
+  "犬": {
+   "いぬ": "My **dog** sk[[i]]s, then licks the [[Nu]]tella: いぬ."
+  },
+  "妹": {
+   "マイ": "[[My]] **younger sister**: 姉妹 (しまい), sisters.",
+   "いもうと": "My **younger sister** sk[[i]]s, then eats [[mo]]re t[[u]]na on [[to]]ast: いもうと."
+  },
+  "姉": {
+   "シ": "My **elder sister** on a [[shi]]p: 姉妹 (しまい), sisters.",
+   "あね": "\"[[Ah]], [[ne]]ver!\" says my **elder sister**: あね."
+  },
+  "漢": {
+   "カン": "A [[can]] from **China**: 漢字 (かんじ), kanji."
   }
  }
 }

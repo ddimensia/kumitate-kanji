@@ -108,7 +108,7 @@ function kanjiCard(it) {
     ${vocab.length ? section('Words', vocab.length, `<ul class="wordlist">${vocab.slice(0, 12).map((v) => wordRow(v, it.ch)).join('')}</ul>`, { long: vocab.length > 3 }) : ''}`;
 }
 
-/** Mnemonics for the kanji's taught readings, where there are any (a pilot: N5 so far). */
+/** Mnemonics for the kanji's taught readings, where there are any (N5 and N4 so far). */
 function mnemonicsSection(it) {
   if (!it.mnemonics) return '';
   const t = taughtReadings(it);
@@ -119,7 +119,7 @@ function mnemonicsSection(it) {
   if (!rows.length) return '';
   return `<section class="info-sec mnemonics"><h3>Mnemonics</h3>
     <dl class="mn-list">${rows.map(([key, shown, kind]) => `<dt lang="ja" class="mn-r mn-${kind}">${esc(shown)}</dt><dd>${mnemonicHtml(it.mnemonics[key])}</dd>`).join('')}</dl>
-    <p class="hint">Bold: the meaning. Underlined: what sounds like the reading. These are generated and still a trial.</p>
+    <p class="hint">Bold: the meaning. Underlined: what sounds like the reading. These are generated, so some will work better than others.</p>
   </section>`;
 }
 

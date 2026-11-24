@@ -35,7 +35,7 @@ let n = 0;
 
 for (const k of [...curriculum().items.values()].filter((it) => it.kind === 'k')) {
   const have = data.kanji[k.ch];
-  if (!have && k.jlpt !== 5) continue; // the pilot covers N5
+  if (!have && k.jlpt < 4) continue; // N5 and N4 so far
   const t = taughtReadings(k);
   const keys = [...t.on.map((r) => r.forms[0]), ...t.kun.map((r) => kunFormsToShow(r)[0])];
   for (const key of keys) {
