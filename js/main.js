@@ -10,6 +10,7 @@ import { runReviews } from './views/reviews.js';
 import { runPractice } from './views/practice.js';
 import { renderBrowse } from './views/browse.js';
 import { renderItem } from './views/itempage.js';
+import { initPeek } from './views/peek.js';
 import { renderSettings } from './views/settings.js';
 import { renderWelcome } from './views/welcome.js';
 import { toast } from './ui.js';
@@ -127,6 +128,7 @@ async function start() {
     if ((location.hash || '#today') === '#today' && !document.querySelector('dialog[open]')) route();
   }, 60000);
   window.addEventListener('hashchange', route);
+  initPeek();
   route();
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('Service worker not registered', e));

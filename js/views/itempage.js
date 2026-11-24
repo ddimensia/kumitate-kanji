@@ -8,7 +8,8 @@ import { LEVELS, unstudiedParts } from '../state.js';
 import { esc, confirmDialog, toast } from '../ui.js';
 import { wireSpeech } from '../speech.js';
 
-export function renderItem(root, id, rerender) {
+/** inSession: shown over a lesson or review session, so nothing that changes its schedule. */
+export function renderItem(root, id, rerender, { inSession = false } = {}) {
   const it = item(id);
   if (!it) { root.innerHTML = '<p class="panel">That item isn’t in the course.</p>'; return; }
   const now = Date.now();
@@ -30,13 +31,13 @@ export function renderItem(root, id, rerender) {
       <p class="hint">“Memory” is how long until recall would drop to 90% without review (FSRS stability). Overall recall right now: ${Math.round(recall(it) * 100)}%.</p>`
       : locked ? `<p>Locked. It unlocks once you know ${waiting.map((p) => `<a href="#item/${encodeURIComponent(p.id)}" lang="ja">${esc(p.ch || p.w)}</a>`).join(', ')} well enough.</p>`
         : '<p>Not studied yet. It’s in your lesson queue.</p>'}
-      <h3>Already know it?</h3>
+      ${inSession ? '' : `<h3>Already know it?</h3>
       <p class="hint">Put it straight into reviews at the level you think it’s at, skipping the lesson. Its parts can come along too.</p>
-      ${levelPickerHtml({ partsCount: unstudiedParts(it).length })}
+      ${levelPickerHtml({ partsCount: unstudiedParts(it).length })}`}
       <h3>Your meanings</h3>
       <p class="hint">Extra English answers you want accepted for this ${it.kind === 'r' ? 'radical' : it.kind === 'k' ? 'kanji' : 'word'}.</p>
       ${synonymEditorHtml(it)}
-      ${hist.length ? `<p><button type="button" class="btn small danger" data-act="reset">Reset this item</button></p>` : ''}
+      ${hist.length && !inSession ? `<p><button type="button" class="btn small danger" data-act="reset">Reset this item</button></p>` : ''}
     </section>
   </div>`;
   wireSpeech(root);

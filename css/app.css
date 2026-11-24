@@ -387,6 +387,13 @@ body[data-route="study"] .site-foot { display: none; }
 
 /* Dialog and toast */
 .dialog { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--sheet); color: var(--ink); max-width: 28rem; }
+.peek { width: min(52rem, calc(100vw - 1.5rem)); max-width: none; max-height: calc(100dvh - 1.5rem); padding: 0;
+  border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper, var(--sheet)); color: var(--ink); overflow: auto; }
+.peek::backdrop { background: rgb(0 0 0 / 0.35); }
+.peek-bar { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
+  padding: 0.6rem 1rem; background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.peek-body { padding: 1rem; }
+@media (max-width: 600px) { .peek-bar .hint { display: none; } .peek-body { padding: 0.6rem; } }
 .dialog::backdrop { background: rgb(0 0 0 / 0.35); }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
 #toast {

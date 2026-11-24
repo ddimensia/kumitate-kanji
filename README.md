@@ -58,6 +58,8 @@ Only readings you'll actually need soon are asked for.
 
 **Your own meanings.** Add extra accepted meanings on a lesson card, after answering in a quiz ("Add a meaning"), or on an item's page.
 
+**Looking things up mid-session.** During lessons, reviews or extra study, tapping a radical, kanji or word opens it in a window over the session. Links inside it open the next item there. Back (your browser's button, Esc or "Back to your session") steps back through them and returns you to the same card. Changing an item's level or resetting it waits until you're outside a session.
+
 **Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule.
 
 **Pace.** Lessons come in batches (5 by default) up to a daily maximum (15 by default). With adaptive pacing on, the daily number shrinks when your 7-day accuracy falls below 90% (to zero at 70%) or when more than 150 reviews are waiting. **Learn more anyway** on the Today page always allows another batch.
@@ -115,6 +117,7 @@ Plain ES modules with no build step:
 | `js/quiz.js` | The typed quiz used by lessons and reviews (retry, undo, synonyms) |
 | `js/speech.js` | Web Speech API text-to-speech |
 | `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
+| `js/views/peek.js` | Item details over a session, with back returning to it |
 | `js/share.js` | Publishes a summary of your kanji progress for Kakitori (see below) |
 | `js/views/*.js` | Welcome page, Today, lessons, reviews, Extra study, browse, item pages, settings |
 | `vendor/` | [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) and [WanaKana](https://github.com/WaniKani/WanaKana), both MIT |
