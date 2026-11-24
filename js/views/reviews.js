@@ -15,7 +15,7 @@ export function runReviews(root, ids, { setKeys, onExit, again, practise }) {
       const left = dueCardIds().length;
       root.innerHTML = `<section class="panel summary">
         <h2>${res.answered ? `${pct}% right` : 'No answers this time'}</h2>
-        <p>${plural(res.answered, 'card')} reviewed${res.ended && left ? `, ${left} still due` : ''}.</p>
+        <p>${plural(res.answered, 'card')} reviewed${res.hinted ? ` (${res.hinted} right with a hint, which counts as Hard)` : ''}${res.ended && left ? `, ${left} still due` : ''}.</p>
         ${res.missed.length ? `<h3>Missed</h3><div class="tiles">${res.missed.map(item).map((it) => tileHtml(it, { stage: stage(it) })).join('')}</div>` : ''}
         ${res.unlocked.length ? `<h3>Newly unlocked</h3><p>${plural(res.unlocked.length, 'new item')} ready for lessons.</p>` : ''}
         <div class="hero-actions">

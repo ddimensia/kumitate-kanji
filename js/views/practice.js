@@ -14,7 +14,7 @@ export function runPractice(root, ids, { setKeys, onExit, again }) {
       const pct = res.answered ? Math.round((res.right / res.answered) * 100) : 0;
       root.innerHTML = `<section class="panel summary">
         <h2>${res.answered ? `${pct}% right first time` : 'No answers this time'}</h2>
-        <p>${plural(res.answered, 'card')} practised. Extra study doesn’t change when items come up for review.</p>
+        <p>${plural(res.answered, 'card')} practised${res.hinted ? `, ${res.hinted} with a hint` : ''}. Extra study doesn’t change when items come up for review.</p>
         ${res.missed.length ? `<h3>Still shaky</h3><div class="tiles">${res.missed.map(item).map((it) => tileHtml(it, { stage: stage(it) })).join('')}</div>` : ''}
         <div class="hero-actions">
           ${res.missedCards.length

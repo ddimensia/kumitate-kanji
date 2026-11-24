@@ -267,15 +267,16 @@ export async function introduceItems(items, now = new Date()) {
 /**
  * Grade one review. Returns the ids of items that became unlocked because of it.
  */
-export async function recordAnswer(id, ok, now = new Date()) {
+/** Grade a review. A right answer after a hint counts as Hard: remembered, but it grows less. */
+export async function recordAnswer(id, ok, now = new Date(), { hinted = false } = {}) {
   const c = cards.get(id);
   if (!c) return [];
   const before = new Set(lessonQueue(400).map((x) => x.id));
-  c.srs = review(c.srs, ok ? Rating.Good : Rating.Again, now);
+  c.srs = review(c.srs, ok ? (hinted ? Rating.Hard : Rating.Good) : Rating.Again, now);
   if (ok) c.right++; else c.wrong++;
   c.lastAnswer = now.getTime();
   await store.putMany('cards', [c]);
-  const entry = { ts: now.getTime(), card: id, ok, kind: 'review' };
+  const entry = { ts: now.getTime(), card: id, ok, kind: 'review', ...(hinted ? { hinted: true } : {}) };
   await store.addLogs([entry]);
   recentLog.push(entry);
   const it = item(splitCardId(id)[0]);

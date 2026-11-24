@@ -286,6 +286,7 @@ a.btn { text-decoration: none; }
 .q-form.is-wrong .q-input { background: color-mix(in srgb, var(--pen) 12%, transparent); }
 .q-note { min-height: 1.5em; text-align: center; margin: 0.5rem 0; font-weight: 500; }
 .q-note.is-retry { color: var(--warn); }
+.q-note.is-hint { color: var(--cover, var(--ink)); font-weight: 500; }
 .q-note.is-right { color: var(--good); }
 .usage { margin: 0.4rem 0 0; font-size: 0.95rem; color: var(--ink-soft); }
 .q-after > .usage { text-align: center; }

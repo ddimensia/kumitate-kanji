@@ -114,11 +114,15 @@ export function baseReading(k, kind, rt) {
  * Which reading each kanji uses in a word, for the answer after a reading question:
  * 学校 → 学 がっ on'yomi (from がく) + 校 こう on'yomi; 食べる → 食 た kun'yomi + べる.
  */
-export function readingBreakdownHtml(v) {
-  if (!v.furi || !v.furi.some(([ruby, rt]) => rt && [...ruby].some((c) => c >= '一'))) return '';
-  const parts = v.furi.map(([ruby, rt, tag]) => {
-    let kind = tag;
-    if (!rt) return `<span class="rb-kana" lang="ja">${esc(ruby)}</span>`;
+/**
+ * A word's parts with the kind of reading each kanji uses: [{ ruby, rt, kind, base }], kind
+ * 'o' | 'k' | 'j' (special) | null (kana, or unknown), base the reading behind a sound change.
+ */
+export function wordParts(v) {
+  if (!v.furi) return [];
+  return v.furi.map(([ruby, rt, tag]) => {
+    if (!rt) return { ruby, rt: '', kind: null, base: null };
+    let kind = tag || null;
     const k = [...ruby].length === 1 ? item('k:' + ruby) : null;
     let base = k && (kind === 'o' || kind === 'k') ? baseReading(k, kind, rt) : null;
     if (k && !kind) {
@@ -128,10 +132,32 @@ export function readingBreakdownHtml(v) {
         if (b) { kind = kk; base = b; break; }
       }
     }
-    const label = kind === 'j' ? (v.furi.length === 1 ? 'special reading for the whole word' : 'special reading')
-      : READING_KIND[kind] || 'special reading';
+    return { ruby, rt, kind: kind || 'j', base };
+  });
+}
+
+/** The label for a part's reading kind: on'yomi, kun'yomi or special reading. */
+function partLabel(kind, whole) {
+  return kind === 'j' ? (whole ? 'special reading for the whole word' : 'special reading') : READING_KIND[kind];
+}
+
+/**
+ * A hint for a word's reading that doesn't give it away: which kind of reading each kanji
+ * uses (学 on'yomi + 校 on'yomi; 食 kun'yomi + べる).
+ */
+export function wordReadingHint(v) {
+  const parts = wordParts(v);
+  if (!parts.some((p) => p.rt)) return '';
+  return parts.map((p) => (p.rt ? `${p.ruby} ${partLabel(p.kind, parts.length === 1)}` : p.ruby)).join(' + ');
+}
+
+export function readingBreakdownHtml(v) {
+  if (!v.furi || !v.furi.some(([ruby, rt]) => rt && [...ruby].some((c) => c >= '一'))) return '';
+  const parts = wordParts(v).map(({ ruby, rt, kind, base }) => {
+    if (!rt) return `<span class="rb-kana" lang="ja">${esc(ruby)}</span>`;
+    const label = partLabel(kind, v.furi.length === 1);
     return `<span class="rb-part"><span class="rb-kanji" lang="ja">${esc(ruby)}</span> <span class="rb-rt" lang="ja">${esc(rt)}</span>
-      <small class="rk rk-${kind || 'x'}">${esc(label)}${base ? ` <span lang="ja">(from ${esc(base)})</span>` : ''}</small></span>`;
+      <small class="rk rk-${kind}">${esc(label)}${base ? ` <span lang="ja">(from ${esc(base)})</span>` : ''}</small></span>`;
   });
   return `<p class="q-breakdown">${parts.join('<span class="rb-plus">+</span>')}</p>`;
 }

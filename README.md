@@ -64,6 +64,11 @@ Only readings you'll actually need soon are asked for.
 
 **Looking things up mid-session.** During lessons, reviews or extra study, tapping a radical, kanji or word opens it in a window over the session. Links inside it open the next item there. Back (your browser's button, Esc or "Back to your session") steps back through them and returns you to the same card. Changing an item's level or resetting it waits until you're outside a session.
 
+**Hints.** Press Enter on a blank reading answer for a hint. Press it again to mark the card wrong.
+- **A kanji's on'yomi or kun'yomi:** words you've already learned that use it ("as in 学校, 大学"), so you can find the reading through a word you know.
+- **A word's reading:** which kind of reading each kanji uses ("学 on'yomi + 校 on'yomi", "食 kun'yomi + べる").
+- **Grading:** a right answer after a hint is graded Hard rather than Good, so the card comes back sooner. Session summaries count hinted answers.
+
 **Missing a card in a session.** A missed card is asked again before the session ends, sooner each time you miss it: 3–6 cards later the first time, 1–2 cards later the second, then straight away. Once you get a card right after missing it twice or more, it comes back once more 3–6 cards later, to check it wasn't just the answer still on screen. Only your first answer in a session counts toward its review schedule.
 
 **Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule. At the end, **Practise the missed again** repeats just the cards you got wrong (or all of them, if you'd rather). The summary after reviews offers the same for the reviews you missed.

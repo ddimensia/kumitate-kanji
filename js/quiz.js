@@ -8,8 +8,8 @@
 import { bind, unbind } from '../vendor/wanakana.js';
 import { item, splitCardId, glyph, KIND_LABEL, TYPE_LABEL, typeLabel, meaningWord, meanings, taughtReadings, kunFormsToShow, readingToSay } from './data.js';
 import { checkMeaning, checkReading, kunDisplay, toKanaAnswer } from './answer.js';
-import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss } from './state.js';
-import { esc, readingBreakdownHtml } from './ui.js';
+import { recordAnswer, getSynonyms, addSynonym, getSettings, logMiss, isIntroduced } from './state.js';
+import { esc, readingBreakdownHtml, wordParts, wordReadingHint } from './ui.js';
 import { speak, speakerButton, wireSpeech, readAloud } from './speech.js';
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './views/info.js';
 
@@ -47,6 +47,21 @@ export function retryPosition(misses, random = Math.random) {
 /** Where a struggling card comes back once more to check it stuck, after it's finally right. */
 export const checkPosition = (random = Math.random) => 3 + Math.floor(random() * 4);
 
+/**
+ * A hint for a reading question, or '' if there's none:
+ *  - a kanji's on'yomi or kun'yomi: words you've learned that use it (as in 学校, 大学), so
+ *    you can find the reading through a word you know;
+ *  - a word's reading: which kind of reading each kanji uses (学 on'yomi + 校 on'yomi).
+ */
+export function hintFor(it, type) {
+  if (type === 'r') return wordReadingHint(it);
+  if (it.kind !== 'k' || (type !== 'on' && type !== 'kun')) return '';
+  const kind = type === 'on' ? 'o' : 'k';
+  const words = it.vocab.map(item).filter((v) => v && isIntroduced(v)
+    && wordParts(v).some((p) => p.ruby === it.ch && p.kind === kind));
+  return words.length ? `as in ${words.slice(0, 3).map((v) => v.w).join(', ')}` : '';
+}
+
 const PROMPT = {
   m: (it) => `${KIND_LABEL[it.kind]} <b>${meaningWord(it)}</b>`,
   on: () => `Kanji <b>on'yomi</b> reading`,
@@ -80,6 +95,8 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
   const queue = arrange(cardIds);
   const first = new Map(); // card id -> first answer right?
   const misses = new Map(); // card id -> times missed this session
+  const hintedFirst = new Set(); // cards whose first answer came after a hint
+  let hinted = false; // a hint was shown for the current question
   const toCheck = new Set(); // cards missed twice or more: once right, ask again a little later
   const unlocked = new Set();
   const total = new Set(cardIds).size;
@@ -121,6 +138,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
 
   function renderQuestion(prefill = '') {
     rejected = null;
+    hinted = false;
     const [itemId, type] = splitCardId(current);
     const it = item(itemId);
     const reading = type !== 'm';
@@ -153,8 +171,21 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     const given = input.value;
     let res = type === 'm' ? checkMeaning(it, given, getSynonyms(it.id)) : checkReading(it, type, given);
     const note = stageEl.querySelector('.q-note');
+    // A blank answer the first time: a hint, if there is one. Enter again marks it wrong.
+    if (!given.trim() && rejected === null && !hinted && type !== 'm') {
+      const hint = hintFor(it, type);
+      if (hint) {
+        hinted = true;
+        rejected = '';
+        note.className = 'q-note is-hint';
+        note.textContent = `Hint: ${hint}. Press Enter again to mark it wrong.`;
+        input.focus();
+        return;
+      }
+    }
     // Enter again on the same rejected answer (or still blank) means "I don't know": wrong.
     if (res.verdict === 'retry' && rejected !== null && given.trim() === rejected) res = { verdict: 'wrong' };
+    if (!given.trim() && hinted) res = { verdict: 'wrong' };
     if (res.verdict === 'retry') {
       rejected = given.trim();
       input.classList.remove('shake');
@@ -166,12 +197,12 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
       return;
     }
     const ok = res.verdict === 'correct';
-    answered = { ok, given, it, type };
+    answered = { ok, given, it, type, hinted };
     input.readOnly = true;
     try { unbind(input); } catch { /* not bound */ }
     stageEl.querySelector('.q-form').classList.add(ok ? 'is-right' : 'is-wrong');
     note.className = `q-note ${ok ? 'is-right' : 'is-wrong'}`;
-    note.textContent = ok ? (res.note || '') : '';
+    note.textContent = ok ? (res.note || (hinted ? 'Right, with a hint.' : '')) : '';
     renderAfter();
     // Read aloud (setting): a word's reading, or after a kanji reading question, the reading you
     // typed if right, otherwise that kind's common readings.
@@ -242,13 +273,14 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
 
   async function advance() {
     if (!answered) return;
-    const { ok } = answered;
+    const { ok, hinted: usedHint } = answered;
     const id = current;
     answered = null;
     if (!first.has(id)) {
       first.set(id, ok);
+      if (ok && usedHint) hintedFirst.add(id);
       if (mode === 'review') {
-        const newly = await recordAnswer(id, ok);
+        const newly = await recordAnswer(id, ok, undefined, { hinted: usedHint });
         newly.forEach((x) => unlocked.add(x));
       } else if (mode === 'lesson' && !ok) {
         await logMiss(id); // so lesson-quiz slips show up in Extra study
@@ -274,7 +306,7 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     const right = [...first.values()].filter(Boolean).length;
     const missedCards = [...first].filter(([, v]) => !v).map(([id]) => id);
     const missed = [...new Set(missedCards.map((id) => splitCardId(id)[0]))];
-    onDone({ total, answered: first.size, right, wrong: first.size - right, missed, missedCards, unlocked: [...unlocked], ended, complete: !queue.length });
+    onDone({ total, answered: first.size, right, wrong: first.size - right, hinted: hintedFirst.size, missed, missedCards, unlocked: [...unlocked], ended, complete: !queue.length });
   }
 
   setKeys((e) => {
