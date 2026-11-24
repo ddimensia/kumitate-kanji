@@ -1,11 +1,11 @@
 {
- "about": "Generated mnemonics for kanji readings (pilot: JLPT N5). **meaning**, [[sound-alike]]; a doubled vowel marks a long one ([[co-o]]p for コウ). CC BY-SA 4.0, like the rest of the data.",
+ "about": "Generated mnemonics for kanji readings (pilot: JLPT N5). **meaning**, [[sound-alike]]: only the part spelled the way you would type the reading ([[to]]e for と, [[shi]]p for し). CC BY-SA 4.0, like the rest of the data.",
  "sounds": {
-  "ニチ": "niche",
+  "ニチ": "Ni chi",
   "ジツ": "jitsu",
   "イチ": "itchy",
-  "コク": "Coke",
-  "ジン": "gin",
+  "コク": "Co",
+  "ジン": "jin",
   "ニン": "nin",
   "ネン": "Nen",
   "ダイ": "dye",
@@ -18,7 +18,7 @@
   "シュツ": "shoots",
   "サン": "san",
   "ジ": "Gee",
-  "コウ": "co-o",
+  "コウ": "co",
   "ギョウ": "gyo",
   "ケン": "Ken",
   "ゲツ": "gets",
@@ -29,8 +29,8 @@
   "ショウ": "show",
   "カン": "can",
   "ジョウ": "Jo",
-  "トウ": "toe",
-  "シ": "she",
+  "トウ": "to",
+  "シ": "shi",
   "コン": "con",
   "キン": "kin",
   "キュウ": "cue",
@@ -45,16 +45,16 @@
   "ライ": "rye",
   "キ": "key",
   "ケ": "ke",
-  "シチ": "she chee",
+  "シチ": "shi chi",
   "ワ": "wa",
   "ジョ": "jo",
   "ヒャク": "he yak",
   "ショ": "sho",
-  "セン": "cen",
+  "セン": "Sen",
   "メイ": "May",
   "スイ": "swee",
   "ハン": "han",
-  "ダン": "Don",
+  "ダン": "Dan",
   "デン": "den",
   "ド": "dough",
   "モク": "mock",
@@ -65,31 +65,31 @@
   "マイ": "my",
   "テン": "ten",
   "ボ": "bo",
-  "ユウ": "you",
+  "ユウ": "Yu",
   "ドク": "doc",
   "サ": "sa",
   "フ": "foo",
-  "ひ": "he",
+  "ひ": "hi",
   "-か": "ca",
-  "ひと.つ": "he toe",
-  "ひと": "he toe",
+  "ひと.つ": "Hi to",
+  "ひと": "hi to",
   "くに": "coo knee",
-  "とし": "toe she",
+  "とし": "to shi",
   "おお.きい": "Oh",
-  "とお": "toe",
+  "とお": "to",
   "ふた.つ": "Foo ta",
   "なか": "knock",
   "なが.い": "nag",
   "で.る": "de",
   "だ.す": "dash",
   "みっ.つ": "mitts",
-  "とき": "toe key",
+  "とき": "to ki",
   "い.く": "Eek",
   "おこな.う": "Oh Kona",
-  "み.せる": "me",
+  "み.せる": "mi",
   "つき": "ts ski",
-  "うし.ろ": "Ooh she",
-  "あと": "a toe",
+  "うし.ろ": "Ooh shi",
+  "あと": "a to",
   "まえ": "Ma eh",
   "い.きる": "icky",
   "う.まれる": "Ooh Mary",
@@ -98,23 +98,23 @@
   "ま": "Ma",
   "うえ": "way",
   "あ.がる": "Ah garoo",
-  "ひがし": "he gosh",
+  "ひがし": "Hi ga shi",
   "よっ.つ": "yachts",
   "いま": "I'm a",
   "かね": "ca Ne",
   "ここの.つ": "Coco no",
   "い.れる": "ear",
   "はい.る": "high",
-  "まな.ぶ": "manna",
+  "まな.ぶ": "mana",
   "たか": "tuck a",
   "こ": "co",
-  "そと": "so toe",
+  "そと": "so to",
   "はず.す": "has",
   "やっ.つ": "Yahtz",
-  "よう": "yo-o",
+  "よう": "yo",
   "むっ.つ": "mutts",
   "むい": "mooi",
-  "した": "she ta",
+  "した": "shi Ta",
   "さ.げる": "sag",
   "く.る": "crew",
   "き": "key",
@@ -124,18 +124,18 @@
   "なの": "nano",
   "やま": "yam",
   "はな.す": "Hannah",
-  "はなし": "Hannah She",
+  "はなし": "Hannah shi",
   "おんな": "onna",
   "きた": "kit",
-  "しろ": "She row",
+  "しろ": "shi ro",
   "か.く": "Caw",
   "さき": "sock key",
   "な": "Nah",
   "かわ": "ca wa",
-  "みず": "Me zoo",
+  "みず": "Mi zu",
   "なか.ば": "Knock ba",
-  "おとこ": "Otto co",
-  "にし": "knee she",
+  "おとこ": "O to co",
+  "にし": "ni shi",
   "かた.る": "Qatar",
   "つち": "touchy",
   "き.く": "key",
@@ -143,40 +143,40 @@
   "た.べる": "tab",
   "くるま": "Cool Ma",
   "なに": "Nanny",
-  "なん": "naan",
-  "みなみ": "Me Nah me",
+  "なん": "na",
+  "みなみ": "Mina mi",
   "はは": "Ha ha",
-  "みぎ": "Me Gi",
+  "みぎ": "Mi Gi",
   "よ.む": "Yo",
   "とも": "Tom",
-  "ひだり": "He Dari",
-  "やす.む": "Ya Sue",
+  "ひだり": "hi Dari",
+  "やす.む": "Ya Su",
   "ちち": "chee chee",
   "あめ": "Ame"
  },
  "kanji": {
   "日": {
-   "ニチ": "The **sun** shines into one [[niche]] every **day**: 毎日 (まいにち), every day.",
+   "ニチ": "Every **day** starts [[ni]]ppy and [[chi]]lly until the **sun** comes out: 毎日 (まいにち).",
    "ジツ": "Jiu-[[jitsu]] class meets every **day**; signs say 本日 (ほんじつ) for \"today\".",
-   "ひ": "[[He]] squints at the **sun** all **day**: ひ.",
+   "ひ": "From the [[hi]]ll, watch the **sun** all **day**: ひ.",
    "-か": "Counting **day**s on a [[ca]]lendar: 二日 (ふつか), 三日 (みっか)."
   },
   "一": {
    "イチ": "**One** mosquito bite and you're [[itchy]] all night: いち.",
-   "ひと.つ": "[[He]] stubbed just **one** [[toe]]: ひとつ."
+   "ひと.つ": "A [[hi]]ppo stepped on just **one** [[to]]e: ひとつ."
   },
   "国": {
-   "コク": "Every **country** sells [[Coke]]: 外国 (がいこく), a foreign country.",
+   "コク": "Every **country** sells [[Co]]ke: 外国 (がいこく), a foreign country.",
    "くに": "Out in the **country**, a pigeon [[coo]]s on my [[knee]]: くに."
   },
   "人": {
-   "ジン": "That **person** drinks [[gin]]: 日本人 (にほんじん), a Japanese person.",
+   "ジン": "That **person** is a [[jin]]x: 日本人 (にほんじん), a Japanese person.",
    "ニン": "One **person** sneaks past, a [[nin]]ja: 三人 (さんにん), three people.",
-   "ひと": "A **person**: [[he]] has ten [[toe]]s. ひと."
+   "ひと": "A **person** [[hi]]ts their [[to]]e: ひと."
   },
   "年": {
    "ネン": "Every **year**, Grandma [[Nen]] bakes a cake: 来年 (らいねん), next year.",
-   "とし": "Every **year** I stub my [[toe]], and [[she]] laughs: とし."
+   "とし": "Every **year** we [[to]]ast the [[shi]]p: とし."
   },
   "大": {
    "ダイ": "A **big** vat of [[dye]]: someone dyed a whole university (大学, だいがく) in school colours.",
@@ -185,7 +185,7 @@
   },
   "十": {
    "ジュウ": "**Ten** glasses of [[ju]]ice is plenty: 十分 (じゅうぶん), enough.",
-   "とお": "Count your [[toe]]s: **ten**. とお."
+   "とお": "Count your [[to]]es: **ten**. とお."
   },
   "二": {
    "ニ": "You have **two** [[knee]]s: に.",
@@ -213,17 +213,17 @@
   },
   "時": {
    "ジ": "\"[[Gee]], look at the **time**!\" 時間 (じかん).",
-   "とき": "[[Toe]] on the [[key]]: **time** to go. とき."
+   "とき": "**Time** for a [[to]]e [[ki]]ck: とき."
   },
   "行": {
-   "コウ": "**Going** on a trip with the [[co-o]]p: 旅行 (りょこう).",
+   "コウ": "**Going** on a trip with the [[co]]-op: 旅行 (りょこう).",
    "ギョウ": "[[Gyo]]za stalls stand in a **line**: 行列 (ぎょうれつ), a queue.",
    "い.く": "\"[[Eek]], I'm late!\" and off I **go**: いく.",
    "おこな.う": "\"[[Oh]], [[Kona]]!\" We **carry out** our plan to fly to Hawaii: おこなう."
   },
   "見": {
    "ケン": "[[Ken]] wants to **see** everything: 見学 (けんがく), a study visit.",
-   "み.せる": "\"**See** this? Show [[me]]!\" みせる, to show; みる, to see."
+   "み.せる": "\"**See** this [[mi]]lk? Show it to me!\" みせる, to show; みる, to see."
   },
   "月": {
    "ゲツ": "Every **month** she [[gets]] paid: 今月 (こんげつ), this month.",
@@ -232,9 +232,9 @@
   },
   "後": {
    "ゴ": "[[Go]] **later**, after noon: 午後 (ごご), afternoon.",
-   "コウ": "In the [[co-o]]p queue, I'm **behind** you: 後半 (こうはん), the second half.",
-   "うし.ろ": "\"[[Ooh]], [[she]]'s **behind** you!\" うしろ.",
-   "あと": "One step **later**, [[a]] [[toe]] follows: あと."
+   "コウ": "In the [[co]]-op queue, I'm **behind** you: 後半 (こうはん), the second half.",
+   "うし.ろ": "\"[[Ooh]], a [[shi]]p is **behind** you!\" うしろ.",
+   "あと": "One step **later**, [[a]] [[to]]e follows: あと."
   },
   "前": {
    "ゼン": "Find [[Zen]] **before** you begin: 午前 (ごぜん), morning.",
@@ -262,11 +262,11 @@
    "あ.がる": "\"[[Ah]]!\" A kan[[garoo]] leaps **up**: あがる."
   },
   "東": {
-   "トウ": "Stub your [[toe]] walking **east**: 東京 (とうきょう), Tokyo.",
-   "ひがし": "Facing **east** at dawn, [[he]] says \"[[gosh]]!\": ひがし."
+   "トウ": "Stub your [[to]]e walking **east**: 東京 (とうきょう), Tokyo.",
+   "ひがし": "[[Hi]]king **east** to a [[ga]]la on a [[shi]]p: ひがし."
   },
   "四": {
-   "シ": "[[She]] has **four** cats: 四月 (しがつ), April.",
+   "シ": "A [[shi]]p with **four** masts: 四月 (しがつ), April.",
    "よっ.つ": "**Four** [[yachts]] in the harbour: よっつ."
   },
   "今": {
@@ -288,28 +288,28 @@
   },
   "学": {
    "ガク": "Students [[gawk]] while they **study**: 大学 (だいがく), university.",
-   "まな.ぶ": "**Learning** is [[manna]] for the mind: まなぶ."
+   "まな.ぶ": "**Learning** fills up your [[mana]]: まなぶ."
   },
   "高": {
-   "コウ": "The [[co-o]]p built a **tall** tower: 高校 (こうこう), high school.",
+   "コウ": "The [[co]]-op built a **tall** tower: 高校 (こうこう), high school.",
    "たか": "A **tall** order: [[tuck]] [[a]] giraffe into bed! たかい."
   },
   "円": {
    "エン": "English says **yen**, but Japanese says just [[en]]: えん."
   },
   "子": {
-   "シ": "[[She]] is a **child**: 女子 (じょし), girl.",
+   "シ": "A **child** on a [[shi]]p: 女子 (じょし), girl.",
    "こ": "A **child** in a big [[co]]at: こ."
   },
   "外": {
    "ガイ": "That [[guy]] is from **outside**: 外国 (がいこく), abroad.",
-   "そと": "**Outside** in the snow, [[so]] my [[toe]]s freeze: そと.",
+   "そと": "**Outside** in the snow, [[so]] my [[to]]es freeze: そと.",
    "はず.す": "He [[has]] to take his coat off **outside**: はずす, to remove."
   },
   "八": {
    "ハチ": "**Eight** chicks [[hatch]]: はち.",
    "やっ.つ": "**Eight** rounds of [[Yahtz]]ee: やっつ.",
-   "よう": "On the **eight**h day, a long [[yo-o]]-yo string: 八日 (ようか)."
+   "よう": "On the **eight**h day, a long [[yo]]-yo string: 八日 (ようか)."
   },
   "六": {
    "ロク": "**Six** [[rock]]s in a row: ろく.",
@@ -319,7 +319,7 @@
   "下": {
    "カ": "A [[ca]]r parked **below** ground: 地下 (ちか), underground.",
    "ゲ": "A [[ge]]cko hides **below**: 下水 (げすい), sewer.",
-   "した": "**Below** deck, [[she]] [[ta]]kes a nap: した.",
+   "した": "**Below** deck, the [[shi]]p sails to [[Ta]]hiti: した.",
    "さ.げる": "The shelf [[sag]]s **down**: さげる, to lower."
   },
   "来": {
@@ -337,7 +337,7 @@
    "こ-": "A **small** [[co]]at for a small bird: 小鳥 (ことり)."
   },
   "七": {
-   "シチ": "[[She]] [[chee]]rs **seven** times: しち.",
+   "シチ": "**Seven** [[shi]]ps carry [[chi]]ps: しち.",
    "なな.つ": "**Seven** [[nana]]s at the party: ななつ.",
    "なの": "**Seven** [[nano]]seconds: 七日 (なのか), the seventh day."
   },
@@ -348,7 +348,7 @@
   "話": {
    "ワ": "**Talk** on a [[wa]]lkie-talkie: 電話 (でんわ), phone.",
    "はな.す": "[[Hannah]] loves to **talk**: はなす.",
-   "はなし": "[[Hannah]]'s **tale**? [[She]] tells it best: はなし."
+   "はなし": "[[Hannah]]'s **tale** of a [[shi]]p: はなし."
   },
   "女": {
    "ジョ": "A **woman** out for a [[jo]]g: 女子 (じょし), girl.",
@@ -361,7 +361,7 @@
    "ゴ": "At **noon**, [[go]] to lunch: 午後 (ごご), afternoon."
   },
   "白": {
-   "しろ": "[[She]] [[row]]s a **white** boat: しろい."
+   "しろ": "A **white** [[shi]]p [[ro]]lls on the waves: しろい."
   },
   "百": {
    "ヒャク": "[[He]] [[yak]]s a **hundred** times a day: ひゃく."
@@ -371,7 +371,7 @@
    "か.く": "The crow can **write**: \"[[Caw]]!\" かく."
   },
   "先": {
-   "セン": "Every [[cen]]t paid **before** the month ends: 先月 (せんげつ), last month.",
+   "セン": "[[Sen]]d it **before** the month ends: 先月 (せんげつ), last month.",
    "さき": "Pack your [[sock]]s and [[key]]s **ahead** of time: さき."
   },
   "名": {
@@ -382,29 +382,29 @@
    "かわ": "A [[ca]]r [[wa]]sh in the **river**: かわ."
   },
   "千": {
-   "セン": "A **thousand** [[cen]]ts: せん."
+   "セン": "[[Sen]]d a **thousand** letters: せん."
   },
   "水": {
    "スイ": "[[Swee]]t **water**: 水曜日 (すいようび), Wednesday.",
-   "みず": "[[Me]] at the [[zoo]], drinking **water**: みず."
+   "みず": "[[Mi]]x the **water** into the [[zu]]cchini soup: みず."
   },
   "半": {
    "ハン": "**Half** a [[han]]dful: 半分 (はんぶん).",
    "なか.ば": "[[Knock]] **half**way down the hall, then [[ba]]ck off: なかば."
   },
   "男": {
-   "ダン": "[[Don]] is a **male** name: 男子 (だんし), boy.",
-   "おとこ": "\"[[Otto]], [[co]]me here!\" a **male** voice calls: おとこ."
+   "ダン": "[[Dan]] is a **male** name: 男子 (だんし), boy.",
+   "おとこ": "The **male** chef shouts \"[[O]]kay, [[to]]ss the [[co]]conut!\" おとこ."
   },
   "西": {
    "セイ": "[[Say]] goodbye to the **west**ern sun: 西洋 (せいよう), the West.",
-   "にし": "Out **west**, [[knee]]-deep in the river, [[she]] waits: にし."
+   "にし": "Out **west**, the cold [[ni]]ps at the [[shi]]p: にし."
   },
   "電": {
    "デン": "**Electricity** hums in the [[den]]: 電車 (でんしゃ), train."
   },
   "校": {
-   "コウ": "The [[co-o]]p runs the **school** canteen: 学校 (がっこう)."
+   "コウ": "The [[co]]-op runs the **school** canteen: 学校 (がっこう)."
   },
   "語": {
    "ゴ": "Learn a **word** and [[go]]: 日本語 (にほんご), Japanese.",
@@ -433,10 +433,10 @@
   },
   "何": {
    "なに": "\"**What**, [[Nanny]]?\" なに.",
-   "なん": "\"**What** is [[naan]]?\" なん."
+   "なん": "\"**What** is [[na]]an?\" なん."
   },
   "南": {
-   "みなみ": "\"[[Me]]? [[Nah]], [[me]]!\" Everyone wants to go **south**: みなみ."
+   "みなみ": "[[Mina]] [[mi]]sses the **south**: みなみ."
   },
   "万": {
    "マン": "**Ten thousand** people, every [[man]] counted: 一万 (いちまん)."
@@ -453,27 +453,27 @@
   },
   "火": {
    "カ": "A [[ca]]r on **fire**: 火曜日 (かようび), Tuesday.",
-   "ひ": "[[He]]'s playing with **fire**: ひ."
+   "ひ": "A [[hi]]ppo leaps over the **fire**: ひ."
   },
   "右": {
-   "ユウ": "[[You]] turn **right**: 左右 (さゆう), left and right.",
-   "みぎ": "\"[[Me]]? [[Gi]]ve me the **right** one!\" みぎ."
+   "ユウ": "At [[Yu]]le, turn **right**: 左右 (さゆう), left and right.",
+   "みぎ": "\"[[Mi]]lk? [[Gi]]ve me the one on the **right**!\" みぎ."
   },
   "読": {
    "ドク": "The [[doc]] **read**s your chart: 読書 (どくしょ), reading.",
    "よ.む": "\"[[Yo]], **read** this!\" よむ."
   },
   "友": {
-   "ユウ": "[[You]] are my **friend**: 友人 (ゆうじん).",
+   "ユウ": "Celebrate [[Yu]]le with a **friend**: 友人 (ゆうじん).",
    "とも": "[[Tom]] is my **friend**: とも."
   },
   "左": {
    "サ": "[[Sa]]w off the **left** branch: 左右 (さゆう), left and right.",
-   "ひだり": "[[He]] and [[Dari]]o drive on the **left**: ひだり."
+   "ひだり": "A [[hi]]ppo and [[Dari]]o drive on the **left**: ひだり."
   },
   "休": {
    "キュウ": "Lean on your [[cue]] and **rest**: 休日 (きゅうじつ), day off.",
-   "やす.む": "\"[[Ya]], [[Sue]], take a **rest**.\" やすむ."
+   "やす.む": "\"[[Ya]]hoo! [[Su]]shi, then a **rest**!\" やすむ."
   },
   "父": {
    "フ": "**Father** brings home [[foo]]d: 父母 (ふぼ), parents.",
