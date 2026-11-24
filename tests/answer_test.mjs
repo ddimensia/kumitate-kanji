@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { useCurriculum, item, cardTypes, taughtReadings, setReadingWindow, kunFormsToShow, readingToSay } from '../js/data.js';
 import { checkMeaning, checkReading, isKanaTypo, toKanaAnswer } from '../js/answer.js';
+import { readingBreakdownHtml } from '../js/ui.js';
 
 useCurriculum(JSON.parse(readFileSync(new URL('../data/curriculum.json', import.meta.url))));
 const v = (w) => [...item('k:' + [...w][0]).vocab].map(item).find((x) => x.w === w);
@@ -72,4 +73,11 @@ const ichi = checkReading(v('市'), 'r', 'し');
 ok(ichi, 'retry', '市 answered し');
 assert.match(ichi.note, /^し is 市’s on’yomi, used in words like \S+ \(\S+\)\. Try the reading 市 has on its own\.$/, 'explains the on\'yomi'); n++;
 assert.ok(!ichi.note.includes('いち') && !ichi.note.includes('market'), 'without giving the answer away'); n++;
+// After a word's reading: which reading each kanji uses, with sound changes traced back.
+const parts = (w) => readingBreakdownHtml(v(w)).replace(/<[^>]+>/g, '').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+assert.equal(parts('学校'), "学 がっ on'yomi (from がく)+校 こう on'yomi", '学校 breakdown'); n++;
+assert.equal(parts('食べる'), "食 た kun'yomi+べる", '食べる breakdown'); n++;
+assert.equal(parts('手紙'), "手 て kun'yomi+紙 がみ kun'yomi (from かみ)", '手紙: rendaku'); n++;
+assert.equal(parts('切手'), "切 きっ kun'yomi (from き(る))+手 て kun'yomi", '切手: untagged in the data, still explained'); n++;
+assert.equal(parts('大人'), '大人 おとな special reading for the whole word', '大人: jukujikun'); n++;
 console.log(`answer_test: ${n} checks passed`);

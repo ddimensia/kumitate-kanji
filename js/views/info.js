@@ -1,7 +1,7 @@
 // Info cards: what's shown in lessons, after an answer, and on an item's page.
 
 import { item, primaryMeaning, KIND_LABEL, glyph } from '../data.js';
-import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge } from '../ui.js';
+import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading } from '../ui.js';
 import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL, addSynonym, removeSynonym, LEVELS, setLevel, unstudiedParts } from '../state.js';
 import { speakerButton } from '../speech.js';
 
@@ -118,9 +118,10 @@ function vocabCard(it) {
     .filter(([ruby, rt]) => rt && [...ruby].some((c) => c >= '一'))
     .map(([ruby, rt, kind]) => {
       const ks = [...ruby].map((c) => item('k:' + c)).filter(Boolean);
+      const base = ks.length === 1 && (kind === 'o' || kind === 'k') ? baseReading(ks[0], kind, rt) : null;
       return `<li>${ks.map((k) => tileHtml(k, { stage: stage(k) })).join('')}
         <span class="kr-reading" lang="ja">${esc(rt)}</span>
-        ${kind ? `<small class="rk rk-${kind}">${READING_KIND[kind]}</small>` : ''}</li>`;
+        ${kind ? `<small class="rk rk-${kind}">${READING_KIND[kind]}${base ? ` <span lang="ja">(from ${esc(base)})</span>` : ''}</small>` : ''}</li>`;
     });
   return `${header(it)}
     <section class="info-sec"><h3>Reading</h3>
