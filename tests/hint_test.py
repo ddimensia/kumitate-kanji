@@ -64,7 +64,26 @@ with sync_playwright() as p:
     # No word known for 生: no hint, the old "Enter again" prompt.
     start(['k:生/on'], 'practice')
     note = blank()
-    check(not note.startswith('Hint'), f'no hint without a known word ({note})')
+    check(note.startswith('No hint yet: you haven’t learned a word that uses this on’yomi.'), f'no hint without a known word, and it says so ({note})')
+    pg.fill('.q-input', 'せい')
+    pg.keyboard.press('Enter')
+    pg.wait_for_selector('.q-after .q-next')
+    check(pg.inner_text('.q-note') != 'Right, with a hint.', 'a "no hint" note doesn\'t count as a hint')
+
+    # The kanji's own one-character word isn't a hint for it (山 for 山).
+    pg.evaluate("""async () => {
+      const st = await import('./js/state.js');
+      const { curriculum, item } = await import('./js/data.js');
+      const yama = [...curriculum().items.values()].find((x) => x.kind === 'v' && x.w === '山');
+      await st.setLevel([item('k:山'), yama], 'settling', new Date(Date.now() - 10 * 86400e3));
+    }""")
+    start(['k:山/kun'], 'practice')
+    note = blank()
+    check('as in 山' not in note, f'山 kun\'yomi is not hinted with the word 山 itself ({note})')
+
+    # Meanings have no hints, and say so.
+    start(['k:山/m'], 'practice')
+    check(blank().startswith('No hints for meanings.'), 'meaning questions say there are no hints')
 
     # Graded: right with a hint counts as Hard, so it's due sooner than right without.
     start(['k:学/on', 'k:校/on'], 'review')

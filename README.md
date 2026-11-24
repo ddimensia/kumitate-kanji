@@ -65,7 +65,8 @@ Only readings you'll actually need soon are asked for.
 **Looking things up mid-session.** During lessons, reviews or extra study, tapping a radical, kanji or word opens it in a window over the session. Links inside it open the next item there. Back (your browser's button, Esc or "Back to your session") steps back through them and returns you to the same card. Changing an item's level or resetting it waits until you're outside a session.
 
 **Hints.** Press Enter on a blank reading answer for a hint. Press it again to mark the card wrong.
-- **A kanji's on'yomi or kun'yomi:** words you've already learned that use it ("as in 学校, 大学"), so you can find the reading through a word you know.
+- **A kanji's on'yomi or kun'yomi:** words you've already learned that use it ("as in 学校, 大学"), so you can find the reading through a word you know The kanji's own one-character word (山 for 山) doesn't count, since it just repeats the question.
+- **No hint:** if there isn't one (no learned word with that reading yet, or a meaning question), it says so. That doesn't count as a hint.
 - **A word's reading:** which kind of reading each kanji uses ("学 on'yomi + 校 on'yomi", "食 kun'yomi + べる").
 - **Grading:** a right answer after a hint is graded Hard rather than Good, so the card comes back sooner. Session summaries count hinted answers.
 

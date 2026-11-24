@@ -57,9 +57,17 @@ export function hintFor(it, type) {
   if (type === 'r') return wordReadingHint(it);
   if (it.kind !== 'k' || (type !== 'on' && type !== 'kun')) return '';
   const kind = type === 'on' ? 'o' : 'k';
-  const words = it.vocab.map(item).filter((v) => v && isIntroduced(v)
+  // Not the kanji's own one-character word (山 for 山): that just repeats the question.
+  const words = it.vocab.map(item).filter((v) => v && v.w !== it.ch && isIntroduced(v)
     && wordParts(v).some((p) => p.ruby === it.ch && p.kind === kind));
   return words.length ? `as in ${words.slice(0, 3).map((v) => v.w).join(', ')}` : '';
+}
+
+/** Why there's no hint for a question. */
+function noHintReason(it, type) {
+  if (type === 'm') return 'No hints for meanings.';
+  if (type === 'on' || type === 'kun') return `No hint yet: you haven’t learned a word that uses this ${type === 'on' ? 'on’yomi' : 'kun’yomi'}.`;
+  return 'No hint for this one.';
 }
 
 const PROMPT = {
@@ -171,17 +179,17 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     const given = input.value;
     let res = type === 'm' ? checkMeaning(it, given, getSynonyms(it.id)) : checkReading(it, type, given);
     const note = stageEl.querySelector('.q-note');
-    // A blank answer the first time: a hint, if there is one. Enter again marks it wrong.
-    if (!given.trim() && rejected === null && !hinted && type !== 'm') {
-      const hint = hintFor(it, type);
-      if (hint) {
-        hinted = true;
-        rejected = '';
-        note.className = 'q-note is-hint';
-        note.textContent = `Hint: ${hint}. Press Enter again to mark it wrong.`;
-        input.focus();
-        return;
-      }
+    // A blank answer the first time: a hint, if there is one (a right answer after it counts
+    // as Hard), or a note that there isn't (which costs nothing). Enter again marks it wrong.
+    if (!given.trim() && rejected === null && !hinted) {
+      const hint = type === 'm' ? '' : hintFor(it, type);
+      rejected = '';
+      if (hint) hinted = true;
+      note.className = `q-note ${hint ? 'is-hint' : 'is-retry'}`;
+      note.textContent = hint ? `Hint: ${hint}. Press Enter again to mark it wrong.`
+        : `${noHintReason(it, type)} Press Enter again to mark it wrong.`;
+      input.focus();
+      return;
     }
     // Enter again on the same rejected answer (or still blank) means "I don't know": wrong.
     if (res.verdict === 'retry' && rejected !== null && given.trim() === rejected) res = { verdict: 'wrong' };
