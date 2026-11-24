@@ -27,6 +27,8 @@ Everything runs in the browser. There is no server and no account: progress is s
 | Kanji | meaning, on'yomi (if it has a common one), kun'yomi (if it has a common one) |
 | Word | meaning, reading (the answer also shows the word's first meaning) |
 
+**Order.** Kanji go by JLPT level, easiest first (N5 to N1), each preceded by the radicals and parts it's built from. A word comes after its last kanji, but no earlier than its own level: the harder of the word's JLPT level and its hardest kanji's (words outside the JLPT lists count as N1). So an N2 word written with N5 kanji waits for N2, where such words are spread among the N2 kanji. Lessons come from your current level (the easiest one with items you haven't started) and the next. Kanji you import or mark as known don't change your level, so their far-ahead words wait their turn. Set **Lessons from** to "Anything unlocked" to get them sooner.
+
 Only readings you'll actually need soon are asked for.
 - **Common:** a reading counts as common when it appears in enough common or JLPT words (counted from JmdictFurigana, allowing for rendaku and small っ), or when the kanji on its own is a word read that way (上 うえ, 明るい).
 - **Taught:** a common reading is taught and quizzed with the kanji only if a JLPT word using it is at most two levels harder than the kanji. 田 (N4) teaches た (田, N3) but not デン, which is only used in N1 words (水田, 田園); you learn デン through those words. At most two kun'yomi are taught, the most used: 生 teaches い(きる) and う(まれる), while は(える) and なま come with their words. Every kanji teaches at least its most used reading.

@@ -57,6 +57,16 @@ export function index(raw) {
     });
     for (const k of kanji) items.get(k).vocab.push('v:' + id);
   }
+  // The JLPT level an item is taught in: a word's is the harder of its own level and its
+  // hardest kanji's (words outside the JLPT lists count as N1), matching the course order.
+  for (const it of items.values()) {
+    if (it.kind === 'k') it.level = it.jlpt;
+    else if (it.kind === 'r') it.level = it.jlpt || 5;
+  }
+  for (const it of items.values()) {
+    if (it.kind === 'v') it.level = Math.min(it.jlpt || 1, ...it.prereq.map((k) => items.get(k).jlpt));
+  }
+
   // A radical has a meaning when it's also a kanji in the course with that meaning (糸 thread);
   // otherwise what you learn is its name (幺 short thread, 酉 sake jar).
   const norm = (s) => s.toLowerCase().replace(/[^a-z ]/g, '').trim();

@@ -600,13 +600,33 @@ def main(argv):
         for w in ws[1:]:
             del chosen[w['id']]
 
-    # Vocab follows the last of its kanji; JLPT words first, easier levels first.
+    # Vocab follows the last of its kanji, but no earlier than its own level: an N2 word written
+    # with N5 kanji (一応) waits for the N2 section, where such words are spread evenly among the
+    # N2 kanji. A word's level is the harder of its JLPT level and its hardest kanji's level;
+    # words outside the JLPT lists count as N1.
     vocab_after = defaultdict(list)
-    korder = {c: i for i, c in enumerate(x[2:] for x in order if x.startswith('k:'))}
+    kseq = [x[2:] for x in order if x.startswith('k:')]
+    korder = {c: i for i, c in enumerate(kseq)}
+    by_level = defaultdict(list)
+    for c in kseq:
+        by_level[jlpt_level[c]].append(c)
+    deferred = defaultdict(list)
     for w in chosen.values():
         ks = [c for c in w['w'] if c in kset]
         last = max(ks, key=lambda c: korder[c])
-        vocab_after[last].append(w)
+        level = min([w['jlpt'] or 1] + [jlpt_level[c] for c in ks])
+        if level < jlpt_level[last]:
+            deferred[level].append((korder[last], w))
+        else:
+            vocab_after[last].append(w)
+    for level, ws in deferred.items():
+        ws.sort(key=lambda x: (x[0], -(x[1]['jlpt'] or 0), not x[1]['common'], x[1]['id']))
+        section = by_level[level]
+        for i, (last_pos, w) in enumerate(ws):
+            anchor = section[i * len(section) // len(ws)]
+            if korder[anchor] < last_pos:
+                anchor = kseq[last_pos]
+            vocab_after[anchor].append(w)
     full_order = []
     for item in order:
         full_order.append(item)

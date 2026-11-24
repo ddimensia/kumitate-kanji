@@ -33,3 +33,4 @@ jobs:
           python tests/e2e.py http://localhost:8000/
           python tests/wanikani_test.py http://localhost:8000/
           python tests/peek_test.py http://localhost:8000/
+          python tests/lesson_order_test.py http://localhost:8000/

@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS = {
   firstReview: '4h',    // wait between a lesson and its first review
   missReview: '1h',     // wait before a missed card comes back
   welcomed: false,      // has seen the welcome page
+  lessonsAhead: 'next', // lessons from: 'next' = your current JLPT level and the next one; 'all' = anything unlocked
   readingWindow: 2,     // teach kanji readings used in JLPT words up to this many levels harder ('all': every common one)
 };
 
@@ -208,12 +209,27 @@ export function allowance(now = new Date()) {
 }
 
 /** The next items to learn: curriculum order, skipping anything learned or still locked. */
+/**
+ * Your current level: the easiest JLPT level with items you haven't started. Imported or
+ * marked items don't move it, so kanji you know from elsewhere don't pull far-ahead words in.
+ */
+export function currentLevel() {
+  let level = 0;
+  for (const it of curriculum().items.values()) {
+    if (it.level > level && !isIntroduced(it)) level = it.level;
+  }
+  return level || 1;
+}
+
+/** Items available for lessons, in course order. */
 export function lessonQueue(n = Infinity) {
   const db = curriculum();
   const out = [];
+  // With 'next', only your current level and the next one: N5 and N4 while N5 isn't finished.
+  const floor = settings.lessonsAhead === 'all' ? 0 : currentLevel() - 1;
   for (const id of db.order) {
     const it = db.items.get(id);
-    if (isIntroduced(it) || !isUnlocked(it)) continue;
+    if (it.level < floor || isIntroduced(it) || !isUnlocked(it)) continue;
     out.push(it);
     if (out.length >= n) break;
   }
