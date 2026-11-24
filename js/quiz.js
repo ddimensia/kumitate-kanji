@@ -33,6 +33,20 @@ export function arrange(ids) {
   return out;
 }
 
+/**
+ * Where a missed card goes back in the queue (0 = next), by how many times it's been missed
+ * this session: a few cards later the first time, 1–2 later the second, then straight away,
+ * since putting more cards in between doesn't help a card that isn't sticking.
+ */
+export function retryPosition(misses, random = Math.random) {
+  if (misses <= 1) return 3 + Math.floor(random() * 4);
+  if (misses === 2) return 1 + Math.floor(random() * 2);
+  return 0;
+}
+
+/** Where a struggling card comes back once more to check it stuck, after it's finally right. */
+export const checkPosition = (random = Math.random) => 3 + Math.floor(random() * 4);
+
 const PROMPT = {
   m: (it) => `${KIND_LABEL[it.kind]} <b>${meaningWord(it)}</b>`,
   on: () => `Kanji <b>on'yomi</b> reading`,
@@ -65,6 +79,8 @@ function expectedHtml(it, type) {
 export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title = 'Reviews' }) {
   const queue = arrange(cardIds);
   const first = new Map(); // card id -> first answer right?
+  const misses = new Map(); // card id -> times missed this session
+  const toCheck = new Set(); // cards missed twice or more: once right, ask again a little later
   const unlocked = new Set();
   const total = new Set(cardIds).size;
   let current = null;
@@ -241,9 +257,14 @@ export function runQuiz(root, cardIds, { mode = 'review', onDone, setKeys, title
     }
     queue.shift();
     if (!ok) {
-      // Ask again a few cards later.
-      const at = Math.min(queue.length, 3 + Math.floor(Math.random() * 4));
-      queue.splice(at, 0, id);
+      // Ask again: later the first time, sooner each time after.
+      const n = (misses.get(id) || 0) + 1;
+      misses.set(id, n);
+      if (n >= 2) toCheck.add(id);
+      queue.splice(Math.min(queue.length, retryPosition(n)), 0, id);
+    } else if (toCheck.delete(id)) {
+      // Right after a run of misses, maybe only from just seeing the answer: check once more.
+      queue.splice(Math.min(queue.length, checkPosition()), 0, id);
     }
     next();
   }

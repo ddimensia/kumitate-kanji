@@ -64,6 +64,8 @@ Only readings you'll actually need soon are asked for.
 
 **Looking things up mid-session.** During lessons, reviews or extra study, tapping a radical, kanji or word opens it in a window over the session. Links inside it open the next item there. Back (your browser's button, Esc or "Back to your session") steps back through them and returns you to the same card. Changing an item's level or resetting it waits until you're outside a session.
 
+**Missing a card in a session.** A missed card is asked again before the session ends, sooner each time you miss it: 3–6 cards later the first time, 1–2 cards later the second, then straight away. Once you get a card right after missing it twice or more, it comes back once more 3–6 cards later, to check it wasn't just the answer still on screen. Only your first answer in a session counts toward its review schedule.
+
 **Extra study.** Today lists what you missed in your latest stretch of study: the 24 hours up to your most recent lesson or review, so a day off doesn't empty it. This covers lesson-quiz slips as well as reviews. **Extra study** quizzes you on those cards without changing their review schedule.
 
 **Pace.** Lessons come in batches (5 by default) up to a daily maximum (15 by default). With adaptive pacing on, the daily number shrinks when your 7-day accuracy falls below 90% (to zero at 70%) or when more than 150 reviews are waiting. **Learn more anyway** on the Today page always allows another batch.

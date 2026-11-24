@@ -34,3 +34,4 @@ jobs:
           python tests/wanikani_test.py http://localhost:8000/
           python tests/peek_test.py http://localhost:8000/
           python tests/lesson_order_test.py http://localhost:8000/
+          python tests/retry_test.py http://localhost:8000/
