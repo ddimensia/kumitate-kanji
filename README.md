@@ -37,7 +37,7 @@ Only readings you'll actually need soon are asked for.
 
 - **Close spelling** of a meaning is accepted. Swapped letters count as one slip ("wrok" for "work").
 - **Typo in a reading** (one kana off, as in ひるい for ひろい) isn't graded. The card shakes and you try again. Long vowels, small kana and dakuten are real distinctions, so こ for こう or か for が still counts as wrong.
-- **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently (市 answered し is explained as 市's on'yomi, used in words like 市民, while 市 on its own is read いち), or a reading typed into a meaning question.
+- **Wrong kind of answer** isn't graded either: a kun'yomi when the on'yomi was asked, the kanji's reading for a word read differently (市 answered し is explained as 市's on'yomi, used in words like 市民, without giving away the answer), or a reading typed into a meaning question.
 - **Giving up:** pressing Enter again on the same sent-back answer (or a blank one) marks it wrong.
 - **Undo** (Backspace) reverts a wrong answer so you can fix it, as on Bunpro. You can also accept your wording as one of your own meanings.
 

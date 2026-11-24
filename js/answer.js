@@ -117,7 +117,7 @@ export function isKanaTypo(given, target) {
 }
 
 /**
- * 市 answered し: "し is 市’s on’yomi, used in words like 市長 (しちょう). On its own, 市 is read いち."
+ * 市 answered し: "し is 市’s on’yomi, used in words like 市民 (しみん). Try the reading 市 has on its own."
  */
 function otherKanjiReadingNote(word, k, given) {
   const kind = readingAnswers(k, 'on', { commonOnly: false }).includes(given) ? 'on’yomi' : 'kun’yomi';
@@ -125,10 +125,8 @@ function otherKanjiReadingNote(word, k, given) {
   const example = k.vocab.map(item).find((v) => v && v.id !== word.id && v.w.length > 1 && v.furi
     && v.furi.some(([ruby, rt]) => ruby === k.ch && toHiragana(rt || '') === given));
   const where = example ? `, used in words like ${example.w} (${example.readings[0]})` : ', used in compound words';
-  // When the dictionary also lists that reading on its own (方: ほう, direction), say which word this is.
-  const alsoAlone = word.otherReadings.some((r) => toHiragana(r) === given);
-  const which = alsoAlone ? ` meaning “${word.senses[0][0]}”` : "";
-  return `${given} is ${k.ch}’s ${kind}${where}. On its own, ${word.w}${which} is read ${word.readings[0]}.`;
+  // No hint at the answer: just what the typed reading is, and a word that uses it.
+  return `${given} is ${k.ch}’s ${kind}${where}. Try the reading ${word.w} has on its own.`;
 }
 
 export function checkReading(it, type, answer) {

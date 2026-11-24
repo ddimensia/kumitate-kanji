@@ -70,5 +70,6 @@ ok(checkReading(sei, 'kun', 'なま'), 'correct', '生: なま is still accepted
 // A one-kanji word answered with its kanji's other reading: explained, not "another word".
 const ichi = checkReading(v('市'), 'r', 'し');
 ok(ichi, 'retry', '市 answered し');
-assert.match(ichi.note, /^し is 市’s on’yomi, used in words like \S+ \(\S+\)\. On its own, 市/, 'explains on\'yomi vs on its own'); n++;
+assert.match(ichi.note, /^し is 市’s on’yomi, used in words like \S+ \(\S+\)\. Try the reading 市 has on its own\.$/, 'explains the on\'yomi'); n++;
+assert.ok(!ichi.note.includes('いち') && !ichi.note.includes('market'), 'without giving the answer away'); n++;
 console.log(`answer_test: ${n} checks passed`);
