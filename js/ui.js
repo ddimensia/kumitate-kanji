@@ -47,6 +47,13 @@ export function furiganaHtml(it, { highlight = null, hide = false } = {}) {
   }).join('')}${post}</span>`;
 }
 
+/** A mnemonic's text as HTML: **meaning** in bold, [[sound-alike]] underlined. */
+export function mnemonicHtml(text) {
+  return esc(text)
+    .replace(/\*\*(.+?)\*\*/g, '<b class="mn-m">$1</b>')
+    .replace(/\[\[(.+?)\]\]/g, '<span class="mn-s">$1</span>');
+}
+
 /**
  * How a counter, prefix or suffix is used, with an example (〜か月: 二か月 にかげつ, two months),
  * and any note (sound changes, easily confused words). Empty for other words.

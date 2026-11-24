@@ -1,7 +1,8 @@
 // Info cards: what's shown in lessons, after an answer, and on an item's page.
 
-import { item, primaryMeaning, KIND_LABEL, glyph, meaningWord } from '../data.js';
-import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading, usageHtml } from '../ui.js';
+import { kunDisplay } from '../answer.js';
+import { item, primaryMeaning, KIND_LABEL, glyph, meaningWord, taughtReadings, kunFormsToShow } from '../data.js';
+import { esc, furiganaHtml, readingListHtml, tileHtml, READING_KIND, recallBadge, baseReading, usageHtml, mnemonicHtml } from '../ui.js';
 import { stage, recall, getSynonyms, isIntroduced, STAGE_LABEL, addSynonym, removeSynonym, LEVELS, setLevel, unstudiedParts } from '../state.js';
 import { speakerButton } from '../speech.js';
 
@@ -101,9 +102,25 @@ function kanjiCard(it) {
       </dl>
       <p class="hint"><span class="reading taught" style="font-size:inherit">Highlighted</span>: taught and quizzed with this kanji. Plain: you’ll meet it later in words. Grey: rare. Tap a reading to hear it.</p>
     </section>
+    ${mnemonicsSection(it)}
     ${radicalsSection(it)}
     ${it.usedIn.length ? section('Part of', it.usedIn.length, `<div class="tiles">${tiles(it.usedIn, 12)}</div>`) : ''}
     ${vocab.length ? section('Words', vocab.length, `<ul class="wordlist">${vocab.slice(0, 12).map((v) => wordRow(v, it.ch)).join('')}</ul>`, { long: vocab.length > 3 }) : ''}`;
+}
+
+/** Mnemonics for the kanji's taught readings, where there are any (a pilot: N5 so far). */
+function mnemonicsSection(it) {
+  if (!it.mnemonics) return '';
+  const t = taughtReadings(it);
+  const rows = [
+    ...t.on.map((r) => [r.forms[0], r.forms[0], 'on']),
+    ...t.kun.map((r) => [kunFormsToShow(r)[0], kunFormsToShow(r).map(kunDisplay).join('・'), 'kun']),
+  ].filter(([key]) => it.mnemonics[key]);
+  if (!rows.length) return '';
+  return `<section class="info-sec mnemonics"><h3>Mnemonics</h3>
+    <dl class="mn-list">${rows.map(([key, shown, kind]) => `<dt lang="ja" class="mn-r mn-${kind}">${esc(shown)}</dt><dd>${mnemonicHtml(it.mnemonics[key])}</dd>`).join('')}</dl>
+    <p class="hint">Bold: the meaning. Underlined: what sounds like the reading. These are generated and still a trial.</p>
+  </section>`;
 }
 
 function wordRow(v, highlight) {

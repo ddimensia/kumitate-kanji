@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Answer checking
-        run: node tests/answer_test.mjs
+        run: node tests/answer_test.mjs && node tests/mnemonics_test.mjs
       - name: Browser end-to-end
         run: |
           pip install playwright

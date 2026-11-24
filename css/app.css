@@ -288,6 +288,11 @@ a.btn { text-decoration: none; }
 .q-note.is-retry { color: var(--warn); }
 .q-note.is-hint { color: var(--cover, var(--ink)); font-weight: 500; }
 .q-note.is-right { color: var(--good); }
+.mn-list { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 0.8rem; margin: 0; }
+.mn-list dt { font-size: 1.05rem; font-weight: 600; }
+.mn-list dd { margin: 0; }
+.mn-m { color: var(--ink); }
+.mn-s { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; color: var(--cover, var(--ink)); font-weight: 600; }
 .usage { margin: 0.4rem 0 0; font-size: 0.95rem; color: var(--ink-soft); }
 .q-after > .usage { text-align: center; }
 .usage p { margin: 0.2rem 0; }

@@ -64,6 +64,8 @@ Only readings you'll actually need soon are asked for.
 
 **Looking things up mid-session.** During lessons, reviews or extra study, tapping a radical, kanji or word opens it in a window over the session. Links inside it open the next item there. Back (your browser's button, Esc or "Back to your session") steps back through them and returns you to the same card. Changing an item's level or resetting it waits until you're outside a session.
 
+**Mnemonics (pilot: N5 kanji).** Kanji cards show a short mnemonic for each taught reading. The meaning is in bold, and the part that sounds like the reading is underlined: "A **big** vat of <u>dye</u>" for 大 ダイ. Each reading has one English sound-alike, reused by every kanji with that reading. A doubled vowel marks a long reading (<u>co-o</u>p for コウ). The mnemonics are generated (`tools/mnemonics_n5.py`, output `data/mnemonics.json`). `tests/mnemonics_test.mjs` checks that every N5 reading has one, that it uses its sound-alike and a meaning of the kanji, that it stays under 25 words, and that it avoids a list of words. They were also reviewed independently.
+
 **Hints.** Press Enter on a blank reading answer for a hint. Press it again to mark the card wrong.
 - **A kanji's on'yomi or kun'yomi:** words you've already learned that use it ("as in 学校, 大学"), so you can find the reading through a word you know The kanji's own one-character word (山 for 山) doesn't count, since it just repeats the question.
 - **No hint:** if there isn't one (no learned word with that reading yet, or a meaning question), it says so. That doesn't count as a hint.
@@ -130,6 +132,7 @@ Plain ES modules with no build step:
 | `js/speech.js` | Web Speech API text-to-speech |
 | `js/wanikani.js` | WaniKani API v2 import: fetch, match, plan |
 | `js/views/peek.js` | Item details over a session, with back returning to it |
+| `data/mnemonics.json` | Mnemonics for kanji readings (pilot: N5), from `tools/mnemonics_n5.py` |
 | `js/usage.js` | Examples and notes for counters, prefixes and suffixes |
 | `js/share.js` | Publishes a summary of your kanji progress for Kakitori (see below) |
 | `js/views/*.js` | Welcome page, Today, lessons, reviews, Extra study, browse, item pages, settings |
