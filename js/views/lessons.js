@@ -2,7 +2,7 @@
 // Items only start their spaced-repetition schedule once the quiz is passed.
 
 import { cardId, glyph, KIND_LABEL } from '../data.js';
-import { introduceItems, allowance, lessonQueue, dueCardIds, getSettings, lessonTypes } from '../state.js';
+import { introduceItems, allowance, lessonQueue, dueCardIds, getSettings, lessonTypes, pendingReadingsFor, radicalWithMeaning, laterReadings } from '../state.js';
 import { infoCardHtml, synonymEditorHtml, wireSynonymEditors } from './info.js';
 import { runQuiz } from '../quiz.js';
 import { esc, plural } from '../ui.js';
@@ -22,12 +22,35 @@ export function nextBatch(extra) {
   return lessonQueue(n);
 }
 
-/** The kind of reading a kanji lesson teaches, when it teaches only one ('on' | 'kun'), else null. */
-function readingFocus(it) {
-  if (it.kind !== 'k') return null;
-  const types = lessonTypes(it).filter((t) => t === 'on' || t === 'kun');
-  return types.length === 1 ? types[0] : null;
+const KIND_NAME = { on: 'on’yomi', kun: 'kun’yomi' };
+const list = (xs) => xs.map((t) => KIND_NAME[t]).join(' and ');
+
+/**
+ * The step a kanji lesson teaches, when it's one of several: 'm' (the meaning alone) or the one
+ * kind of reading ('on' | 'kun'), with a note on what it teaches and what comes next.
+ */
+function kanjiStep(it) {
+  if (it.kind !== 'k') return { focus: null, note: '' };
+  const types = lessonTypes(it);
+  const readings = types.filter((t) => t === 'on' || t === 'kun');
+  if (!readings.length && types.includes('m')) {
+    const later = laterReadings(it);
+    return { focus: 'm', note: later.length ? `This lesson teaches the meaning. Its ${list(later)} get their own lessons once you remember it.` : '' };
+  }
+  if (readings.length !== 1) return { focus: null, note: '' };
+  const kind = readings[0];
+  // What's still to come after this lesson.
+  const left = it.lessonReading ? pendingReadingsFor(it.id).filter((t) => t !== kind) : laterReadings(it);
+  const next = left.length ? ` The ${list(left)} comes once you’ve reviewed this one.` : '';
+  if (!it.lessonReading) {
+    const r = radicalWithMeaning(it);
+    return { focus: kind, note: `You know this meaning from the radical ${r ? r.ch : it.ch}, so this lesson goes on to its ${KIND_NAME[kind]}.${next}` };
+  }
+  const known = ['meaning', ...['on', 'kun'].filter((t) => t !== kind && !left.includes(t)).map((t) => KIND_NAME[t])];
+  return { focus: kind, note: `You learned this kanji’s ${known.join(' and ')} earlier. This lesson teaches its ${KIND_NAME[kind]}.${next}` };
 }
+
+
 
 export function runLessons(root, batch, { setKeys, onExit, again }) {
   let index = 0;
@@ -62,16 +85,16 @@ export function runLessons(root, batch, { setKeys, onExit, again }) {
     index = Math.max(0, Math.min(batch.length - 1, i));
     const it = batch[index];
     const card = root.querySelector('.lesson-card');
-    // A kanji lesson that teaches one kind of reading shows (and says) only that kind.
-    const focus = readingFocus(it);
-    const label = it.lessonReading ? `Kanji ${it.lessonReading === 'on' ? 'on’yomi' : 'kun’yomi'}` : KIND_LABEL[it.kind];
-    card.innerHTML = `<p class="lesson-step">${label} ${index + 1} of ${batch.length}</p>${infoCardHtml(it, { compact: true, focus, later: !it.lessonReading })}${it.lessonReading ? '' : synonymEditorHtml(it)}`;
+    // A kanji lesson that teaches one step shows (and says) only that step.
+    const { focus, note } = kanjiStep(it);
+    const label = it.lessonReading ? `Kanji ${KIND_NAME[it.lessonReading]}` : focus === 'm' ? 'Kanji meaning' : KIND_LABEL[it.kind];
+    card.innerHTML = `<p class="lesson-step">${label} ${index + 1} of ${batch.length}</p>${infoCardHtml(it, { compact: true, focus, note })}${it.lessonReading ? '' : synonymEditorHtml(it)}`;
     wireSynonymEditors(card, () => go(index));
     root.querySelectorAll('.lesson-tabs button').forEach((b, k) => b.classList.toggle('is-on', k === index));
     root.querySelector('[data-act="prev"]').disabled = index === 0;
     root.querySelector('[data-act="next"]').textContent = index === batch.length - 1 ? 'Start quiz →' : 'Next →';
     const key = it.id + (it.lessonReading || '');
-    if (!card.dataset.shown?.includes(key)) readAloud(it, focus); // first time each card is shown
+    if (!card.dataset.shown?.includes(key) && focus !== 'm') readAloud(it, focus); // first time each card is shown; nothing to say for a meaning
     card.dataset.shown = (card.dataset.shown || '') + ' ' + key;
     window.scrollTo({ top: 0 });
   }

@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS = {
   firstReview: '4h',    // wait between a lesson and its first review
   missReview: '1h',     // wait before a missed card comes back
   welcomed: false,      // has seen the welcome page
-  splitReadings: true,  // teach a kanji's on'yomi and kun'yomi in separate lessons, the second once the first has been reviewed
+  splitReadings: true,  // kanji step by step: meaning, then each kind of reading in its own lesson, each once the last has been reviewed
   lessonsAhead: 'next', // lessons from: 'next' = your current JLPT level and the next one; 'all' = anything unlocked
   readingWindow: 2,     // teach kanji readings used in JLPT words up to this many levels harder ('all': every common one)
 };
@@ -28,7 +28,7 @@ let settings = { ...DEFAULT_SETTINGS };
 const cards = new Map();
 let synonyms = {};
 let passed = {};
-let pendingReadings = {}; // kanji id -> 'on' | 'kun': a reading saved for its own, later lesson
+let pendingReadings = {}; // kanji id -> ['on', 'kun']: readings saved for their own, later lessons, in order
 let recentLog = [];
 const listeners = new Set();
 
@@ -44,6 +44,7 @@ export async function initState() {
   synonyms = (await store.kvGet('synonyms')) || {};
   passed = (await store.kvGet('passed')) || {};
   pendingReadings = (await store.kvGet('pendingReadings')) || {};
+  for (const [id, v] of Object.entries(pendingReadings)) if (!Array.isArray(v)) pendingReadings[id] = [v]; // one saved reading, before steps
   recentLog = await store.logSince(Date.now() - 30 * DAY);
   // People who studied before the welcome page existed have seen enough of the app.
   if (saved.welcomed === undefined && cards.size) settings.welcomed = true;
@@ -98,7 +99,7 @@ export async function syncReadingCards(now = new Date()) {
     if (it.kind !== 'k') continue;
     for (const t of cardTypes(it)) {
       const id = cardId(it.id, t);
-      if (cards.has(id) || pendingReadings[it.id] === t) continue; // waiting for its own lesson
+      if (cards.has(id) || pendingReadings[it.id]?.includes(t)) continue; // waiting for its own lesson
       const c = { id, item: it.id, type: t, introducedAt: now.getTime(), srs: review(newSrsCard(now), Rating.Good, now), right: 0, wrong: 0, marked: true };
       cards.set(id, c);
       fresh.push(c);
@@ -150,8 +151,10 @@ function checkPassed(it, now) {
   const cs = itemCards(it);
   // A reading saved for its own lesson doesn't hold the kanji back: words that use the reading
   // already learned unlock as usual, and the saved lesson comes before them in the queue.
-  const needed = cardTypes(it).filter((t) => pendingReadings[it.id] !== t);
+  const needed = cardTypes(it).filter((t) => !pendingReadings[it.id]?.includes(t));
   if (cs.length < needed.length) return false;
+  // A kanji needs at least one reading learned before its words unlock.
+  if (it.kind === 'k' && cardTypes(it).some((t) => t === 'on' || t === 'kun') && !needed.some((t) => t === 'on' || t === 'kun')) return false;
   if (cs.every((c) => c.srs.state === State.Review && c.srs.stability >= settings.unlockStability)) {
     passed[it.id] = now.getTime();
     return true;
@@ -232,10 +235,22 @@ export function currentLevel() {
  * itself, marked with the one reading type to teach (lessonTypes).
  */
 function readingLesson(it) {
-  const kind = pendingReadings[it.id];
-  if (!kind || !isIntroduced(it) || !cardTypes(it).includes(kind)) return null;
-  if (itemCards(it).some((c) => c.srs.state !== State.Review)) return null; // still learning the first part
+  const kind = (pendingReadings[it.id] || []).find((t) => cardTypes(it).includes(t));
+  if (!kind || !isIntroduced(it)) return null;
+  if (itemCards(it).some((c) => c.srs.state !== State.Review)) return null; // still learning the last step
   return Object.create(it, { lessonTypes: { value: [kind] }, lessonReading: { value: kind } });
+}
+
+/** Readings still saved for a kanji's later lessons, in order. */
+export const pendingReadingsFor = (id) => [...(pendingReadings[id] || [])];
+
+/**
+ * The radical that already taught a kanji's meaning: one with the same character and meaning
+ * that you've learned (口 mouth), so the kanji's first lesson can go on to a reading.
+ */
+export function radicalWithMeaning(it) {
+  const r = curriculum().items.get('r:' + it.ch);
+  return r && r.hasMeaning && isIntroduced(r) ? r : null;
 }
 
 /** Items available for lessons, in course order (a kanji's second reading at the kanji's place). */
@@ -265,8 +280,24 @@ export function lessonQueue(n = Infinity) {
 export function lessonTypes(it) {
   if (it.lessonTypes) return it.lessonTypes;
   const types = cardTypes(it);
-  if (it.kind !== 'k' || !settings.splitReadings || !(types.includes('on') && types.includes('kun'))) return types;
-  return ['m', firstReadingKind(it)];
+  if (it.kind !== 'k' || !settings.splitReadings) return types;
+  // Step by step: the meaning first; then each kind of reading in its own lesson. A kanji whose
+  // meaning you know from its radical starts with the meaning and its first reading.
+  const readings = readingSteps(it);
+  return radicalWithMeaning(it) && readings.length ? ['m', readings[0]] : ['m'];
+}
+
+/** The readings a kanji's first lesson leaves for later lessons, in order. */
+export function laterReadings(it) {
+  const types = lessonTypes(it);
+  return readingSteps(it).filter((t) => !types.includes(t));
+}
+
+/** A kanji's kinds of reading in the order they're taught: the one its easiest word uses first. */
+function readingSteps(it) {
+  const types = cardTypes(it).filter((t) => t === 'on' || t === 'kun');
+  const first = firstReadingKind(it);
+  return types.sort((a, b) => (a === first ? -1 : b === first ? 1 : 0));
 }
 
 export function availableLessonCount() {
@@ -280,10 +311,13 @@ export async function introduceItems(items, now = new Date()) {
   const fresh = [], logs = [];
   for (const it of items) {
     const types = lessonTypes(it);
-    if (it.lessonReading) delete pendingReadings[it.id];
-    else {
-      const later = cardTypes(it).filter((t) => !types.includes(t));
-      if (later.length) pendingReadings[it.id] = later[0];
+    if (it.lessonReading) {
+      const left = (pendingReadings[it.id] || []).filter((t) => t !== it.lessonReading);
+      if (left.length) pendingReadings[it.id] = left;
+      else delete pendingReadings[it.id];
+    } else {
+      const later = readingSteps(it).filter((t) => !types.includes(t));
+      if (later.length) pendingReadings[it.id] = later;
     }
     for (const t of types) {
       const id = cardId(it.id, t);

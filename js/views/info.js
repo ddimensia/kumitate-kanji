@@ -8,8 +8,8 @@ import { speakerButton } from '../speech.js';
 
 // In lessons and quizzes (compact), long lists start collapsed so the buttons stay in view.
 let compactMode = false;
-let focusKind = null; // 'on' | 'kun' while a lesson teaches one kind of reading
-let focusLater = true;
+let focusKind = null; // 'm' | 'on' | 'kun' while a lesson teaches one step of a kanji
+let focusNote = ''; // what this step teaches and what comes next
 function section(title, count, body, { long = true } = {}) {
   if (compactMode && long) {
     return `<details class="info-sec fold"><summary><h3>${title} <small>(${count})</small></h3></summary>${body}</details>`;
@@ -97,10 +97,16 @@ function kanjiCard(it) {
   let vocab = it.vocab.map(item).filter(Boolean);
   const hasKun = it.kun.length > 0;
   const f = focusKind;
-  if (f) vocab = vocab.filter((v) => v.furi?.some(([ruby, , k]) => ruby === it.ch && k === (f === 'on' ? 'o' : 'k')));
-  const other = f === 'on' ? 'kun' : 'on';
-  const focusNote = f && taughtReadings(it)[other].length
-    ? `<p class="lesson-focus-note">${focusLater ? `This lesson teaches the ${KIND_NAME[f]}. The ${KIND_NAME[other]} gets its own lesson once you’ve reviewed this one.` : `You learned this kanji’s ${KIND_NAME[other]} earlier. This lesson adds its ${KIND_NAME[f]}.`}</p>` : '';
+  if (f === 'on' || f === 'kun') vocab = vocab.filter((v) => v.furi?.some(([ruby, , k]) => ruby === it.ch && k === (f === 'on' ? 'o' : 'k')));
+  const note = focusNote ? `<p class="lesson-focus-note">${esc(focusNote)}</p>` : '';
+  if (f === 'm') {
+    // The meaning step: no readings yet, so nothing to say or read.
+    return `${header(it)}
+    ${meaningsBlock(it.meanings, it.id)}
+    ${note}
+    ${radicalsSection(it)}
+    ${it.usedIn.length ? section('Part of', it.usedIn.length, `<div class="tiles">${tiles(it.usedIn, 12)}</div>`) : ''}`;
+  }
   return `${header(it)}
     ${meaningsBlock(it.meanings, it.id)}
     <section class="info-sec readings-sec"><h3>Readings</h3>
@@ -109,7 +115,7 @@ function kanjiCard(it) {
         ${hasKun && f !== 'on' ? `<dt>Kun'yomi <small>訓読み</small></dt><dd>${readingListHtml(it, 'kun')}</dd>` : ''}
         ${juku.length ? `<dt>Special <small>熟字訓</small></dt><dd>${juku.map((v) => `<span class="juku" data-say="${esc(v.readings[0])}">${furiganaHtml(v)}</span>`).join('')}</dd>` : ''}
       </dl>
-      ${focusNote}
+      ${note}
       <p class="hint"><span class="reading taught" style="font-size:inherit">Highlighted</span>: taught and quizzed with this kanji. Plain: you’ll meet it later in words. Grey: rare. Tap a reading to hear it.</p>
     </section>
     ${mnemonicsSection(it)}
@@ -162,14 +168,14 @@ function vocabCard(it) {
 }
 
 /**
- * focus ('on' | 'kun'): in a kanji lesson that teaches one kind of reading, show only that kind
- * (its readings, mnemonics and words), with a note about the other. later: the other kind comes
- * in a later lesson (true) or came in an earlier one (false).
+ * focus ('m' | 'on' | 'kun'): in a kanji lesson that teaches one step, show only that: the
+ * meaning without readings, or one kind of reading (its readings, mnemonics and words). note:
+ * what the step teaches and what comes next.
  */
-export function infoCardHtml(it, { compact = false, focus = null, later = true } = {}) {
+export function infoCardHtml(it, { compact = false, focus = null, note = '' } = {}) {
   compactMode = compact;
   focusKind = it.kind === 'k' ? focus : null;
-  focusLater = later;
+  focusNote = focusKind ? note : '';
   const body = it.kind === 'r' ? radicalCard(it) : it.kind === 'k' ? kanjiCard(it) : vocabCard(it);
   return `<article class="info kind-${it.kind}" data-item="${esc(it.id)}">${body}</article>`;
 }
