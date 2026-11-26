@@ -88,7 +88,7 @@ async def main():
           out.token = await (await import('./js/store.js')).kvGet('wkToken');
           return out;
         }""")
-        check(res['r:口']['stage'] == 'settling' and res['r:口']['passed'], 'Guru I radical: in review and unlocked what uses it')
+        check(res['r:口']['stage'] == 'settling' and res['r:口']['passed'], f"Guru I radical: in review and unlocked what uses it ({res['r:口']})")
         check(res['k:働']['stage'] == 'mastered', 'Enlightened kanji: mastered')
         check(all(d.startswith(IN_3_DAYS[:13]) for d in res['k:働']['due']), 'next review matches WaniKani’s')
         check(res['k:日']['stage'] == 'mastered', 'burned kanji: mastered')
