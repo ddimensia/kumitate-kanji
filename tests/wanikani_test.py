@@ -73,7 +73,8 @@ async def main():
         check('tester' in text and '7 items started' in text, 'preview shows the account and items started')
         check('1 radical (' in text and '1 kanji outside' in text and '0 words' in text, f'unmatched items are listed: {text.split("skipped:")[-1].strip()[:90]}')
         await pg.click('[data-act="wk-import"]')
-        await pg.wait_for_selector('text=Imported')
+        # Wait for the import's own message (Settings also mentions "imported" elsewhere).
+        await pg.wait_for_function("document.querySelector('.wk-preview')?.textContent.includes('Imported ')")
 
         res = await pg.evaluate("""async () => {
           const s = await import('./js/state.js'); const d = await import('./js/data.js');
@@ -88,7 +89,7 @@ async def main():
           out.token = await (await import('./js/store.js')).kvGet('wkToken');
           return out;
         }""")
-        check(res['r:口']['stage'] == 'settling' and res['r:口']['passed'], f"Guru I radical: in review and unlocked what uses it ({res}) errors={errors}")
+        check(res['r:口']['stage'] == 'settling' and res['r:口']['passed'], 'Guru I radical: in review and unlocked what uses it')
         check(res['k:働']['stage'] == 'mastered', 'Enlightened kanji: mastered')
         check(all(d.startswith(IN_3_DAYS[:13]) for d in res['k:働']['due']), 'next review matches WaniKani’s')
         check(res['k:日']['stage'] == 'mastered', 'burned kanji: mastered')
